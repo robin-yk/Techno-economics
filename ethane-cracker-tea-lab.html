@@ -345,6 +345,20 @@
     .toast.show { transform: none; opacity: 1; }
     .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
+    abbr[title] { text-decoration: underline dotted #94a6b4; text-underline-offset: 3px; cursor: help; }
+    .glossary-table td:nth-child(2), .glossary-table th:nth-child(2) { text-align: left; }
+    .glossary-table td:nth-child(3), .glossary-table th:nth-child(3) { text-align: left; }
+    .glossary-table td:nth-child(3) { color: var(--muted); }
+    .glossary-table td:first-child { font-weight: 800; white-space: nowrap; }
+    .chain { display: grid; gap: 10px; }
+    .chain-step { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; background: #f8fbfd; border: 1px solid var(--line); border-left: 4px solid var(--blue); border-radius: 10px; padding: 12px; }
+    .chain-num { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: white; font-weight: 800; font-size: 13px; }
+    .chain-step h4 { margin: 0 0 3px; font-size: 15px; }
+    .chain-step .eq-inline { font-family: Georgia, 'Times New Roman', serif; font-size: 15px; background: white; border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; display: inline-block; margin: 4px 0; }
+    .chain-step p { margin: 3px 0 0; font-size: 13px; }
+    .legend-box { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+    .tag-legend { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: start; font-size: 13px; }
+
     @media (max-width: 1100px) {
       .grid-4 { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .grid-3 { grid-template-columns: repeat(2, minmax(0,1fr)); }
@@ -401,6 +415,7 @@
       <button class="tab" role="tab" id="tab-routes" aria-controls="routes" aria-selected="false" data-tab="routes">Route data</button>
       <button class="tab" role="tab" id="tab-process" aria-controls="process" aria-selected="false" data-tab="process">Process &amp; equations</button>
       <button class="tab" role="tab" id="tab-audit" aria-controls="audit" aria-selected="false" data-tab="audit">Assumption audit</button>
+      <button class="tab" role="tab" id="tab-glossary" aria-controls="glossary" aria-selected="false" data-tab="glossary">Glossary &amp; how to read</button>
     </div>
   </nav>
 
@@ -501,6 +516,11 @@
         </div>
       </div>
       <article class="panel">
+        <div class="legend-box">
+          <span class="legend-item"><i class="swatch" style="background:#6da7d8"></i>input at its low end</span>
+          <span class="legend-item"><i class="swatch" style="background:#00539f"></i>input at its high end</span>
+          <span>Longest bar = biggest risk to the answer. The dashed line is the current result; the figure on the right is the half-width in $/t.</span>
+        </div>
         <svg class="tornado-svg" id="tornadoChart" role="img" aria-label="Tornado sensitivity chart"></svg>
       </article>
 
@@ -528,7 +548,14 @@
 
       <div class="audit-note info-note" id="basisExplainer"></div>
 
-      <article class="panel table-wrap" style="padding:0;margin-top:14px">
+      <div class="legend-box" style="margin-top:12px">
+        <span>Each cell reads: <strong>calculated value</strong>, then the published value beneath it, then the difference.</span>
+        <span class="legend-item"><span class="flag-ok">±10%</span> close</span>
+        <span class="legend-item"><span class="flag-warn">±25%</span> check it</span>
+        <span class="legend-item"><span class="flag-bad">beyond</span> does not reconcile</span>
+        <span>A value inside a published range reads as 0.0%.</span>
+      </div>
+      <article class="panel table-wrap" style="padding:0">
         <table class="comparison-table" id="validationTable"></table>
       </article>
 
@@ -681,6 +708,64 @@
       </div>
     </section>
 
+    <section class="tab-panel" id="glossary" role="tabpanel" aria-labelledby="tab-glossary">
+      <div class="section-head"><div><h2>Start here</h2><p>Every abbreviation this calculator uses, what it physically means, and how to read each chart.</p></div></div>
+
+      <article class="panel">
+        <h3>The one number this tool produces</h3>
+        <p style="margin-top:2px">Everything funnels into <strong>cost of ethylene (COO)</strong> — the all-in dollars it takes to make one tonne of C<sub>2</sub>H<sub>4</sub>. Build it in four steps:</p>
+        <div class="chain" style="margin-top:12px">
+          <div class="chain-step"><div class="chain-num">1</div><div>
+            <h4>What the equipment costs to buy and install</h4>
+            <span class="eq-inline">TOC = 2.5 × TBMC</span>
+            <p><strong>TBMC (total bare-module cost)</strong> is the price of the bare equipment — the columns, compressors and heat exchangers — as Aspen quotes them. Multiplying by 2.5 gives <strong>TOC (total overnight cost)</strong>: what it costs to actually have a working plant standing there, including piping, instruments, civil work and engineering. “Overnight” means the number ignores interest during construction, as if the plant appeared overnight.</p>
+          </div></div>
+          <div class="chain-step"><div class="chain-num">2</div><div>
+            <h4>Spreading that capital over the plant's life</h4>
+            <span class="eq-inline">CAPEX = TOC × CCF</span>
+            <p>You do not pay TOC every year. The <strong>CCF (capital charge factor)</strong> of 0.1 converts the one-time build cost into an equivalent annual payment — roughly “10% of the build cost per year” — covering repayment, interest and return to investors. So <strong>CAPEX</strong> here means the annualized capital charge, not the upfront spend.</p>
+          </div></div>
+          <div class="chain-step"><div class="chain-num">3</div><div>
+            <h4>What it costs to run for a year</h4>
+            <span class="eq-inline">OPEX = feed + utilities + treatment + CFP − coproduct credits</span>
+            <p><strong>OPEX (operating expenditure)</strong> is everything consumed per year: ethane feed, steam, refrigeration, electricity, water, TEG, wastewater treatment and CFP replacement. Then subtract <strong>coproduct credits</strong> — the plant also makes LPG and fuel gas, and selling those offsets the bill. <strong>C<sub>O&amp;M</sub></strong> adds maintenance (2.5% of TOC), insurance (5% of TOC) and $5 M/y of labor.</p>
+          </div></div>
+          <div class="chain-step"><div class="chain-num">4</div><div>
+            <h4>Divide by how much product you made</h4>
+            <span class="eq-inline">COO = (CAPEX + OPEX + C<sub>O&amp;M</sub>) / m<sub>C2H4</sub></span>
+            <p>Total annual dollars ÷ tonnes of ethylene per year = dollars per tonne. That is the headline figure on the dashboard and the thing compared against the manuscript.</p>
+          </div></div>
+        </div>
+      </article>
+
+      <div class="section-head"><div><h2>Every abbreviation</h2><p>Hover any dotted-underlined abbreviation elsewhere in the tool to see a short version of these.</p></div></div>
+      <article class="panel table-wrap" style="padding:0"><table class="comparison-table glossary-table" id="glossaryTable"></table></article>
+
+      <div class="section-head"><div><h2>How to read each chart</h2></div></div>
+      <div class="grid grid-2">
+        <article class="panel"><h3>Cost stack by route</h3><p>A horizontal bar per route, split into four cost blocks. The vertical line is zero. Costs grow to the <strong>right</strong>; the green <strong>coproduct credit</strong> bar grows to the <strong>left</strong>, on the same dollar scale — so if the green bar looks a tenth as long as the coloured stack, the credit really is about a tenth of the cost. The small black caret marks the <strong>net</strong> result: stack length minus credit length. Hover any block for its exact value.</p></article>
+        <article class="panel"><h3>Price sensitivity</h3><p>Four lines showing how each route's cost of ethylene rises as ethane gets more expensive. Each route has its own colour <em>and</em> its own dash pattern and marker shape, so the lines stay distinguishable in greyscale. The dashed vertical line is your current ethane price; the markers sit where each route lands at that price. The electricity slider moves all four lines up or down together.</p></article>
+        <article class="panel"><h3>Tornado</h3><p>Answers “which input actually matters?” Each row varies one input up and down by the chosen percentage while holding everything else fixed, and draws how far the cost of ethylene moves. Rows are sorted longest-first, so the top row is your biggest risk. The <span style="color:#6da7d8;font-weight:800">light blue</span> half is the low end of that input, the <span style="color:#00539f;font-weight:800">dark blue</span> half is the high end. The right-hand figure is the half-width in $/t.</p></article>
+        <article class="panel"><h3>Validation table</h3><p>Each cell shows the calculated value, the published value beneath it, and the percentage difference. <span class="flag-ok">Green</span> is within 10% of the manuscript, <span class="flag-warn">amber</span> within 25%, <span class="flag-bad">red</span> beyond that. Where the manuscript gives a range rather than one number, anything landing inside the range reads as 0.0%.</p></article>
+      </div>
+
+      <div class="section-head"><div><h2>What the four routes are</h2></div></div>
+      <article class="panel">
+        <div class="tag-legend" id="routeLegend"></div>
+      </article>
+
+      <div class="section-head"><div><h2>What the coloured tags mean</h2></div></div>
+      <article class="panel">
+        <div class="tag-legend">
+          <span class="source-tag published">Published</span><span>Printed in the paper or its Supporting Information. Change it only to test a scenario — the default is what the authors used.</span>
+          <span class="source-tag derived">Derived</span><span>Not printed anywhere, but calculable from published numbers by a stated rule. Capital comes from the published total capital investment; CFP mass comes from the reactor volume and the monthly replacement assumption.</span>
+          <span class="source-tag reconstructed">Reconstructed</span><span>Computed by this tool from the published inputs. These are results, not assumptions.</span>
+          <span class="source-tag screening">Screening</span><span>A placeholder the tool had to invent because the source cites a reference instead of printing a number. <strong>These are the values most likely to be wrong</strong> — replace them before trusting any result.</span>
+          <span class="source-tag required">Required</span><span>Nothing entered yet, and the result is incomplete without it.</span>
+        </div>
+      </article>
+    </section>
+
     <footer class="footer">
       <span>Source: Mittal, Kwak, Zheng, Ierapetritou &amp; Vlachos, “Short contact time, high temperature, internally-heated ethane crackers,” Chemical Engineering Journal 523 (2025) 168251, and its Supporting Information (Notes 2–3, Tables S4–S7).</span>
       <span>Offline single-file calculator · No external libraries or network calls</span>
@@ -745,6 +830,38 @@
         ['lpgCredit', 'LPG coproduct', 'kg/kg C₂H₄', true],
         ['cfp', 'CFP loading substrate', 'kg/kg C₂H₄ · LCA allocation, not costed', false]
       ];
+
+      // [abbreviation, full name, plain-language meaning, unit, where it comes from]
+      const glossary = [
+        ['COO','Cost of ethylene (cost of operation)','All-in cost to produce one tonne of ethylene: annualized capital + operating cost + maintenance, insurance and labor, divided by annual production. The headline output of this tool.','USD/t C₂H₄','Eq. S8'],
+        ['MSP','Minimum selling price','The price at which the plant breaks even. The source uses this term and COO interchangeably and gives only Eq. S8, so this tool treats them as the same quantity.','USD/t C₂H₄','Assumption 5 / Section 2.5'],
+        ['TBMC','Total bare-module cost','Purchase-and-install cost of the bare equipment itself — columns, compressors, exchangers — before piping, instruments and site work. Aspen Economic Analyzer produces it. Not printed in the SI.','USD M','Assumption 11'],
+        ['TOC','Total overnight cost','What a complete working plant costs to build, as if built instantly with no interest accruing. Here 2.5 × TBMC.','USD M','Assumption 11'],
+        ['TCI','Total capital investment','The manuscript\'s published capital figure. This tool assumes TCI ≈ TOC to back out TBMC, which is why capital has a default at all. TCI may also include working capital, so the equivalence is approximate.','USD M','Section 2.5'],
+        ['CCF','Capital charge factor','Converts one-time build cost into an equivalent annual payment. 0.1 means roughly 10% of the build cost is charged each year, covering repayment, interest and investor return.','fraction','Eq. S9'],
+        ['CAPEX','Capital expenditure (annualized)','TOC × CCF. In this tool it is always the yearly capital charge, never the upfront spend.','USD M/y','Eq. S9'],
+        ['OPEX','Operating expenditure','Annual cost of everything consumed: ethane, steam, refrigeration, electricity, water, TEG, wastewater treatment, CFP. "Net OPEX" has the coproduct credits already subtracted.','USD M/y','Eq. S8'],
+        ['O&M','Operating and maintenance cost','Maintenance (2.5% of TOC) + insurance (5% of TOC) + labor ($5 M/y). Fixed costs that do not scale with throughput.','USD M/y','Assumptions 8–10'],
+        ['TCM','Total cost of manufacturing','Everything it costs to run the plant for a year — net OPEX plus O&M — excluding the capital charge.','USD M/y','Section 2.5'],
+        ['CFP','Carbon fiber paper','The conductive substrate that is Joule-heated to crack the ethane. It sits inside the reactor tubes, glows when current passes through it, and is assumed replaced monthly. Only the Joule routes use it.','—','Assumption 7 / Methods 4.4'],
+        ['CJH','Continuous Joule heating','Current flows steadily through the CFP, holding it at a constant temperature. The heating mode modeled in the TEA.','—','SI Note 2 §3.1'],
+        ['MKM','Microkinetic model','A first-principles reaction model with 501 species and 9,286 elementary reactions, used to predict the product mixture. Two MKM scenarios are costed here.','—','Methods 4.1'],
+        ['RPlug / RStoic','Aspen reactor blocks','RPlug integrates real kinetics along a plug-flow reactor and models the conventional furnace. RStoic simply imposes a fixed reaction stoichiometry and conversion, and stands in for the Joule cases.','—','SI Note 2 §3.1'],
+        ['TEG','Triethylene glycol','The solvent that strips water out of the reactor effluent in column T1, then gets regenerated in T5 and recycled.','kg/kg C₂H₄','Assumption 3'],
+        ['LPG','Liquefied petroleum gas','A saleable coproduct (propane/butane range). Its sale is credited against operating cost at $550/t.','kg/kg C₂H₄','Assumption 5'],
+        ['LHV','Lower heating value','Energy released burning a fuel, excluding the heat recovered from condensing the water vapour produced. Converts fuel-gas mass into energy for pricing.','GJ/t','Screening input'],
+        ['L-1 / L-2 / L-5','Refrigeration levels','Aspen\'s cold utility tiers. Higher numbers mean colder and therefore more expensive per unit of heat removed — L-5 serves the −140 °C column that separates hydrogen and methane, which is why it dominates the utility bill.','MJ/kg C₂H₄','Table S6'],
+        ['X (conversion)','Ethane conversion','Fraction of the ethane fed that reacted, whatever it turned into.','%','Table S4'],
+        ['Y (yield)','Ethylene yield','Fraction of the ethane fed that ended up as ethylene specifically. Always lower than conversion, because some ethane becomes methane, hydrogen or coke.','%','Section 2.5'],
+        ['φ (phi)','Effective volume factor','Fraction of the tube volume that actually holds reacting gas. Assumption 7 says the CFP fills the tube, so the default is 1.','fraction','Assumption 7'],
+        ['τ (tau)','Residence time','How long gas spends in the hot zone. Together with flow rate it sets the reactor volume, which in turn sets tube length and CFP mass. Not reported in the SI.','ms','User input'],
+        ['LCA','Life-cycle assessment','Cradle-to-gate environmental accounting. Its inventory (Table S6) is a separate exercise from the TEA — the key caveat behind the Validation tab.','—','SI Note 3']
+      ];
+
+      const escapeHtml = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      const glossaryLookup = Object.fromEntries(glossary.map(g=>[g[0], g[1] + ' — ' + g[2].split('. ')[0].replace(/\.$/,'') + '.']));
+      // Wrap an abbreviation so its definition is available on hover and to screen readers.
+      const abbr = key => glossaryLookup[key] ? `<abbr title="${escapeHtml(glossaryLookup[key])}">${escapeHtml(key)}</abbr>` : escapeHtml(key);
 
       const categoryLabels = {
         ethane: 'Ethane feed', water: 'Process water', teg: 'TEG', lpSteam: 'L.P. steam', hpSteam: 'H.P. steam',
@@ -911,10 +1028,10 @@
         const pub = published[r];
         const dev = deviation(c.coo, pub.price);
         $('#kpiGrid').innerHTML = `
-          <article class="kpi"><span class="kpi-label">Cost of ethylene</span><div class="kpi-value">${money(c.coo,0)}<small style="font-size:14px">/t</small></div><span class="kpi-note">Published ${pubText(pub.price)}/t · <span class="${devClass(dev)}">${devText(dev)}</span></span></article>
-          <article class="kpi yellow"><span class="kpi-label">Net annual OPEX</span><div class="kpi-value">${money(c.netOpex/1e6,1)}<small style="font-size:14px"> M/y</small></div><span class="kpi-note">Gross ${money(c.grossOpex/1e6,1)} M − credits ${money(c.credits/1e6,1)} M</span></article>
-          <article class="kpi green"><span class="kpi-label">Ethane intensity</span><div class="kpi-value">${fmt(v.ethane,2)}<small style="font-size:14px"> t/t</small></div><span class="kpi-note">${money(v.ethane*state.economics.ethanePrice,0)}/t C₂H₄ at published feed price</span></article>
-          <article class="kpi purple"><span class="kpi-label">Electricity intensity</span><div class="kpi-value">${fmt(v.electricity,2)}<small style="font-size:14px"> MWh/t</small></div><span class="kpi-note">${c.usePublishedElec ? 'Published basis: ' + money(c.categories.electricity/1e6,1) + ' M/y' : money(v.electricity*1000*state.screening.electricityPrice,0) + '/t at current power price'}</span></article>`;
+          <article class="kpi" title="All-in cost per tonne of ethylene: annualized capital + operating cost + maintenance, insurance and labor, divided by annual production."><span class="kpi-label">Cost of ethylene (${abbr('COO')})</span><div class="kpi-value">${money(c.coo,0)}<small style="font-size:14px">/t</small></div><span class="kpi-note">Everything it costs to make one tonne. Published ${pubText(pub.price)}/t · <span class="${devClass(dev)}">${devText(dev)}</span></span></article>
+          <article class="kpi yellow" title="Annual cost of everything consumed, after subtracting income from selling LPG and fuel gas."><span class="kpi-label">Net annual ${abbr('OPEX')}</span><div class="kpi-value">${money(c.netOpex/1e6,1)}<small style="font-size:14px"> M/y</small></div><span class="kpi-note">Yearly running cost: gross ${money(c.grossOpex/1e6,1)} M − coproduct credits ${money(c.credits/1e6,1)} M</span></article>
+          <article class="kpi green" title="Tonnes of ethane fed per tonne of ethylene produced. Higher means more feed wasted to byproducts."><span class="kpi-label">Ethane intensity</span><div class="kpi-value">${fmt(v.ethane,2)}<small style="font-size:14px"> t/t</small></div><span class="kpi-note">Tonnes of feed per tonne of product — ${money(v.ethane*state.economics.ethanePrice,0)}/t at the published feed price</span></article>
+          <article class="kpi purple" title="Megawatt-hours of electricity per tonne of ethylene. 1 MWh/t is the same as 1 kWh/kg, the unit used in Table S6."><span class="kpi-label">Electricity intensity</span><div class="kpi-value">${fmt(v.electricity,2)}<small style="font-size:14px"> MWh/t</small></div><span class="kpi-note">Same as ${fmt(v.electricity,2)} kWh/kg in Table S6 · ${c.usePublishedElec ? 'published basis ' + money(c.categories.electricity/1e6,1) + ' M/y' : money(v.electricity*1000*state.screening.electricityPrice,0) + '/t at current power price'}</span></article>`;
       }
 
       function renderCostBars() {
@@ -950,11 +1067,16 @@
           const y = padTop + i * rowH, bh = 22;
           const vals = [c.annualCapital/c.cap, c.categories.ethane/c.cap, (c.grossOpex-c.categories.ethane)/c.cap, c.om/c.cap];
           const colors = ['#00539f','#ffd200','#6da7d8','#7851a9'];
-          const names = ['Annualized capital','Ethane feed','Other variable cost','O&M + labor'];
+          const names = ['Annualized capital (TOC × CCF)','Ethane feed','Other variable cost','O&M + labor (maintenance, insurance, labor)'];
+          // Spell out what the aggregated "other variable cost" block actually contains.
+          const breakdown = Object.entries(c.categories).filter(([k])=>k!=='ethane')
+            .map(([k,val])=>[categoryLabels[k], val/c.cap]).filter(([,val])=>val>0.005)
+            .sort((a,b)=>b[1]-a[1]).map(([n,val])=>`${n} ${money(val,1)}`).join(', ');
+          const tips = [names[0], names[1], `Other variable cost — ${breakdown||'none'}`, names[3]];
           let x = zeroX;
           vals.forEach((v,j)=>{
             const w = Math.max(0, v / maxPos * barW);
-            if (w > 0) out += `<rect x="${x}" y="${y}" width="${w}" height="${bh}" fill="${colors[j]}"><title>${names[j]}: ${money(v,1)}/t</title></rect>`;
+            if (w > 0) out += `<rect x="${x}" y="${y}" width="${w}" height="${bh}" fill="${colors[j]}"><title>${tips[j]}: ${money(v,1)}/t</title></rect>`;
             x += w;
           });
           const cw = Math.max(0, credTotals[i] * perUnit);
@@ -1003,7 +1125,7 @@
         const calcs = routeOrder.map(r=>calculateRoute(r));
         const finite = calcs.map(c=>c.coo).filter(Number.isFinite);
         const best = finite.length ? Math.min(...finite) : NaN;
-        $('#fullComparison').innerHTML = `<thead><tr><th>Route</th><th>TBMC<br>USD M</th><th>TOC<br>USD M</th><th>Annual CAPEX<br>USD M/y</th><th>Gross OPEX<br>USD M/y</th><th>Credits<br>USD M/y</th><th>O&M<br>USD M/y</th><th>COO<br>USD/t</th><th>Published<br>USD/t</th></tr></thead><tbody>${calcs.map(c=>{
+        $('#fullComparison').innerHTML = `<thead><tr><th>Route</th><th>${abbr('TBMC')}<br>USD M</th><th>${abbr('TOC')}<br>USD M</th><th>Annual ${abbr('CAPEX')}<br>USD M/y</th><th>Gross ${abbr('OPEX')}<br>USD M/y</th><th>Credits<br>USD M/y</th><th>${abbr('O&M')}<br>USD M/y</th><th>${abbr('COO')}<br>USD/t</th><th>Published<br>USD/t</th></tr></thead><tbody>${calcs.map(c=>{
           const pub = published[c.route];
           const dev = deviation(c.coo, pub.price);
           return `<tr><td><strong>${routeMeta[c.route].name}</strong><br><small>${c.capitalComplete?'Eq. S8 complete':'Operating floor'}</small></td><td class="${c.capitalComplete?'':'missing'}">${c.capitalComplete?fmt(c.tbmc/1e6,1):'Required'}</td><td>${fmt(c.toc/1e6,1)}</td><td>${fmt(c.annualCapital/1e6,1)}</td><td>${fmt(c.grossOpex/1e6,1)}</td><td>${fmt(c.credits/1e6,1)}</td><td>${fmt(c.om/1e6,1)}</td><td class="${c.coo===best?'best':''}"><strong>${money(c.coo,0)}</strong></td><td>${pubText(pub.price)} <span class="${devClass(dev)}">${devText(dev)}</span></td></tr>`;
@@ -1138,7 +1260,7 @@
             devElec: deviation(elecM, pub.elec), devPrice: deviation(c.coo, pub.price) };
         });
         const cell = (val, pubv, dev, digits=1) => `<td>${fmt(val,digits)}<br><small class="muted-cell">pub ${pubText(pubv)}</small><br><span class="${devClass(dev)}">${devText(dev)}</span></td>`;
-        $('#validationTable').innerHTML = `<thead><tr><th>Route</th><th>TOC vs published TCI<br>USD M</th><th>TCM<br>USD M/y</th><th>Electricity cost<br>USD M/y</th><th>Cost of ethylene<br>USD/t</th></tr></thead><tbody>${rows.map(x=>`<tr><td><strong>${routeMeta[x.r].name}</strong>${x.pub.tciNote?`<br><small class="muted-cell">TCI ${x.pub.tciNote}</small>`:''}</td>${cell(x.c.toc/1e6,x.pub.tci,x.devToc)}${cell(x.c.tcm/1e6,x.pub.tcm,x.devTcm)}${cell(x.elecM,x.pub.elec,x.devElec)}${cell(x.c.coo,x.pub.price,x.devPrice,0)}</tr>`).join('')}</tbody>`;
+        $('#validationTable').innerHTML = `<thead><tr><th>Route</th><th>${abbr('TOC')} vs published ${abbr('TCI')}<br>USD M</th><th>${abbr('TCM')}<br>USD M/y</th><th>Electricity cost<br>USD M/y</th><th>${abbr('COO')} — cost of ethylene<br>USD/t</th></tr></thead><tbody>${rows.map(x=>`<tr><td><strong>${routeMeta[x.r].name}</strong>${x.pub.tciNote?`<br><small class="muted-cell">TCI ${x.pub.tciNote}</small>`:''}</td>${cell(x.c.toc/1e6,x.pub.tci,x.devToc)}${cell(x.c.tcm/1e6,x.pub.tcm,x.devTcm)}${cell(x.elecM,x.pub.elec,x.devElec)}${cell(x.c.coo,x.pub.price,x.devPrice,0)}</tr>`).join('')}</tbody>`;
 
         const notes = [];
         const steam = rows.find(x=>x.r==='steam');
@@ -1324,6 +1446,17 @@
         $('#inventoryNote').innerHTML = `<strong>Table S6 is the LCA inventory</strong><p>It appears in SI Note 3, not in the TEA note. The CFP row is disabled because assumption 7 supplies the substrate consumption directly; see the Validation tab for where the remaining flows do and do not reconcile with the published costs.</p>`;
       }
 
+      function renderGlossary() {
+        $('#glossaryTable').innerHTML = `<thead><tr><th>Term</th><th>Full name</th><th>What it means</th><th>Unit</th><th>Source</th></tr></thead><tbody>${glossary.map(g=>`<tr><td>${g[0]}</td><td>${g[1]}</td><td>${g[2]}</td><td class="muted-cell">${g[3]}</td><td class="muted-cell">${g[4]}</td></tr>`).join('')}</tbody>`;
+        const routeBlurbs = {
+          steam: 'The industry benchmark. A fired furnace heats the tubes from the outside; the wall material limits how hot you can go. This is what the Joule cases must beat.',
+          mkmS: 'Joule heating tuned for <strong>selectivity</strong> — the operating point the microkinetic model says gives the best ethylene selectivity (80% conversion, 66% yield). It runs at 40 wt% steam to suppress acetylene, which enlarges the water-removal section.',
+          mkmX: 'Joule heating tuned for <strong>conversion</strong> — the microkinetic model\'s ~65% conversion point (56% yield). The "X" is the conversion symbol, the "S" above is selectivity.',
+          exp: 'The best composition actually measured in the lab reactor, rather than predicted. It carries more methane than the model cases because the reactor is not yet optimized, and methane is expensive to separate at −140 °C.'
+        };
+        $('#routeLegend').innerHTML = routeOrder.map(r=>`<span class="source-tag" style="background:${routeMeta[r].color};color:white">${routeMeta[r].name}</span><span>${routeBlurbs[r]}</span>`).join('');
+      }
+
       function renderReactionCards() {
         $('#reactionCards').innerHTML=['mkmS','mkmX','exp'].map(r=>`<article class="panel"><div class="panel-title-row"><h3>${routeMeta[r].name}</h3><span class="source-tag published">X<sub>C₂H₆</sub> = ${pct(routeMeta[r].conversion)}</span></div><div class="reaction">${reactions[r]}</div></article>`).join('');
       }
@@ -1392,7 +1525,7 @@
 
       function renderStructure() {
         renderFields(); renderCapitalCards(); renderHeatFields(); renderInventoryTable();
-        renderReactionCards(); renderOperatingTable(); renderGeometry(); renderRouteSwitch();
+        renderReactionCards(); renderOperatingTable(); renderGeometry(); renderGlossary(); renderRouteSwitch();
       }
 
       function resetGroup(group) {
