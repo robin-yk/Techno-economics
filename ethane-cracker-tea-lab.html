@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive reconstruction of the techno-economic analysis in Mittal, Kwak et al. using the published Supporting Information assumptions and inventory.">
+  <title>Ethane Cracker TEA Lab</title>
+  <style>
+    :root {
+      --blue: #00539f;
+      --blue-dark: #003b72;
+      --blue-soft: #e8f2fb;
+      --yellow: #ffd200;
+      --ink: #122231;
+      --muted: #5c6b78;
+      --line: #d7e0e8;
+      --panel: #ffffff;
+      --bg: #f3f6f9;
+      --green: #0b7a53;
+      --green-soft: #e7f6ef;
+      --amber: #9a6500;
+      --amber-soft: #fff6d8;
+      --red: #a53a3a;
+      --red-soft: #fbecec;
+      --purple: #7851a9;
+      --shadow: 0 12px 30px rgba(28, 53, 76, 0.08);
+      --radius: 16px;
+      --topbar-h: 76px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    sub { line-height: 0; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      color: white;
+      background: linear-gradient(105deg, var(--blue-dark), var(--blue));
+      border-bottom: 4px solid var(--yellow);
+      box-shadow: 0 6px 24px rgba(0, 45, 90, 0.2);
+    }
+    .topbar-inner {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 15px 28px 12px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand { min-width: 260px; }
+    .eyebrow {
+      margin: 0 0 2px;
+      color: rgba(255,255,255,.72);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(20px, 2.1vw, 30px);
+      line-height: 1.1;
+      letter-spacing: -.025em;
+    }
+    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .button {
+      border: 1px solid transparent;
+      border-radius: 9px;
+      padding: 9px 12px;
+      font-weight: 700;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    .button:hover { transform: translateY(-1px); }
+    .button-light { background: white; color: var(--blue-dark); }
+    .button-ghost { background: rgba(255,255,255,.1); color: white; border-color: rgba(255,255,255,.35); }
+    .button-outline { background: white; color: var(--blue); border-color: #aac3da; }
+    .button-small { padding: 6px 9px; font-size: 12px; }
+
+    .tabbar {
+      background: white;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: var(--topbar-h);
+      z-index: 40;
+    }
+    .tabs {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 0 28px;
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+    .tab {
+      border: 0;
+      border-bottom: 3px solid transparent;
+      background: transparent;
+      padding: 13px 17px 11px;
+      color: var(--muted);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .tab[aria-selected="true"] { color: var(--blue); border-bottom-color: var(--blue); }
+    .tab:focus-visible { outline: 2px solid var(--blue); outline-offset: -3px; }
+
+    .workspace { max-width: 1500px; margin: 0 auto; padding: 22px 28px 60px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fade .2s ease; }
+    @keyframes fade { from { opacity: .55; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+
+    .notice {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: start;
+      border: 1px solid #e8c963;
+      border-left: 5px solid var(--yellow);
+      background: #fffdf3;
+      border-radius: 12px;
+      padding: 13px 15px;
+      margin-bottom: 18px;
+    }
+    .notice-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: grid; place-items: center; background: var(--yellow); color: #3d3300; font-weight: 800;
+    }
+    .notice strong { display: block; margin-bottom: 2px; }
+    .notice p { margin: 0; color: #5f5a42; }
+    .status-chip, .source-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .01em;
+      white-space: nowrap;
+    }
+    .published { background: var(--green-soft); color: var(--green); }
+    .reconstructed { background: var(--blue-soft); color: var(--blue-dark); }
+    .screening { background: var(--amber-soft); color: var(--amber); }
+    .required { background: var(--red-soft); color: var(--red); }
+    .derived { background: #efe9f7; color: var(--purple); }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 22px 0 12px;
+    }
+    .section-head h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
+    .section-head p { margin: 3px 0 0; color: var(--muted); }
+    .section-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .grid { display: grid; gap: 15px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      min-width: 0;
+    }
+    .panel h3 { margin: 0 0 5px; font-size: 17px; }
+    .panel p { color: var(--muted); }
+    .panel-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .panel-title-row p { margin: 2px 0 0; font-size: 13px; }
+
+    .route-switch { display: flex; flex-wrap: wrap; gap: 7px; }
+    .route-pill {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 700;
+    }
+    .route-pill.active { color: white; background: var(--blue); border-color: var(--blue); }
+
+    .kpi {
+      background: white;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--blue);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .kpi-label { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
+    .kpi-value { margin: 5px 0 1px; font-size: clamp(24px, 2.4vw, 34px); font-weight: 800; letter-spacing: -.035em; }
+    .kpi-note { color: var(--muted); font-size: 12px; }
+    .kpi.yellow { border-top-color: var(--yellow); }
+    .kpi.green { border-top-color: var(--green); }
+    .kpi.purple { border-top-color: var(--purple); }
+
+    .bar-legend { display: flex; gap: 13px; flex-wrap: wrap; margin: 7px 0 15px; font-size: 12px; color: var(--muted); }
+    .legend-item { display: inline-flex; align-items: center; gap: 5px; }
+    .swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+    .cost-chart-svg { width: 100%; display: block; }
+
+    .comparison-table, .data-table { width: 100%; border-collapse: collapse; }
+    .comparison-table th, .comparison-table td, .data-table th, .data-table td {
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      vertical-align: middle;
+    }
+    .comparison-table th:first-child, .comparison-table td:first-child, .data-table th:first-child, .data-table td:first-child { text-align: left; }
+    .comparison-table thead th, .data-table thead th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; background: #f7f9fb; }
+    .comparison-table tbody tr:hover, .data-table tbody tr:hover { background: #f8fbfd; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+    .table-wrap table { min-width: 780px; }
+    .best { color: var(--green); font-weight: 800; }
+    .missing { color: var(--red); font-weight: 700; }
+    .flag-ok { color: var(--green); font-weight: 800; }
+    .flag-warn { color: var(--amber); font-weight: 800; }
+    .flag-bad { color: var(--red); font-weight: 800; }
+    .muted-cell { color: var(--muted); font-weight: 400; }
+
+    .field-grid { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px; }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      background: #fbfcfd;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      padding: 10px;
+      min-width: 0;
+    }
+    .field label { font-size: 12px; font-weight: 800; }
+    .field-meta { display: flex; justify-content: space-between; gap: 6px; align-items: center; color: var(--muted); font-size: 10px; }
+    .input-wrap { display: flex; align-items: stretch; }
+    .input-wrap input, .input-wrap select {
+      width: 100%; min-width: 0; border: 1px solid #bfcbd5; border-radius: 7px 0 0 7px; padding: 8px 9px; background: white; color: var(--ink); font-weight: 700;
+    }
+    .input-wrap input:focus, .input-wrap select:focus { outline: 2px solid rgba(0,83,159,.2); border-color: var(--blue); }
+    .unit { display: grid; place-items: center; padding: 0 8px; background: #eef3f7; border: 1px solid #bfcbd5; border-left: 0; border-radius: 0 7px 7px 0; color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .required-field { border-color: #e4a8a8; background: #fffafa; }
+    .published-field { border-left: 4px solid var(--green); }
+    .screening-field { border-left: 4px solid #e0a51d; }
+    .derived-field { border-left: 4px solid var(--purple); }
+
+    .capital-card { border-top: 4px solid var(--purple); }
+    .capital-card.complete { border-top-color: var(--green); }
+    .capital-card h3 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .mini-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+    .mini-metric { background: #f5f8fa; padding: 9px; border-radius: 8px; }
+    .mini-metric span { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
+    .mini-metric strong { display: block; margin-top: 2px; font-size: 13px; }
+
+    .range-row { display: grid; grid-template-columns: 180px 1fr 90px; align-items: center; gap: 10px; margin: 11px 0; }
+    input[type="range"] { width: 100%; accent-color: var(--blue); }
+    .range-value { text-align: right; font-weight: 800; }
+    .sensitivity-svg { width: 100%; min-height: 310px; display: block; }
+    .tornado-svg { width: 100%; display: block; }
+
+    .route-card { position: relative; overflow: hidden; }
+    .route-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--route-color, var(--blue)); }
+    .route-card h3 { padding-left: 4px; }
+    .route-card .route-type { margin: 0 0 13px 4px; color: var(--muted); font-size: 12px; }
+    .route-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .fact { background: #f5f8fa; border-radius: 9px; padding: 9px; }
+    .fact span { display: block; color: var(--muted); font-size: 10px; text-transform: uppercase; }
+    .fact strong { display: block; margin-top: 3px; font-size: 14px; }
+
+    .inventory-input { width: 88px; padding: 6px 7px; text-align: right; border: 1px solid #bfcbd5; border-radius: 6px; font-weight: 700; }
+    .inventory-input:focus { outline: 2px solid rgba(0,83,159,.2); border-color: var(--blue); }
+    .row-label { font-weight: 700; }
+    .row-label small { display: block; color: var(--muted); font-weight: 400; }
+    tr.inactive-row td { background: #fbfbfc; color: var(--muted); }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(110px, 1fr));
+      gap: 24px;
+      align-items: stretch;
+      overflow-x: auto;
+      padding: 6px 2px 18px;
+    }
+    .flow-node {
+      position: relative;
+      min-height: 105px;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--blue);
+      border-radius: 12px;
+      background: white;
+      padding: 11px;
+      box-shadow: 0 7px 18px rgba(28,53,76,.06);
+    }
+    .flow-node:not(:last-child)::after {
+      content: "→"; position: absolute; right: -22px; top: 36%; color: var(--blue); font-size: 23px; font-weight: 800;
+    }
+    .flow-code { color: var(--blue); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .flow-node strong { display: block; margin: 5px 0; }
+    .flow-node p { margin: 0; font-size: 11px; line-height: 1.35; }
+    .product-node { border-top-color: var(--yellow); }
+
+    .equation {
+      background: #f8fbfd;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--blue);
+      border-radius: 10px;
+      padding: 14px;
+      margin: 10px 0;
+    }
+    .equation .eq { font-family: Georgia, 'Times New Roman', serif; font-size: 18px; text-align: center; margin: 8px 0; }
+    .equation p { margin: 4px 0 0; font-size: 12px; }
+    .calc-result { background: var(--blue-dark); color: white; border-radius: 12px; padding: 15px; }
+    .calc-result span { display: block; color: rgba(255,255,255,.7); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+    .calc-result strong { display: block; font-size: 26px; margin-top: 2px; }
+
+    .reaction { font-family: Georgia, 'Times New Roman', serif; font-size: 16px; line-height: 1.6; }
+    .ledger-value { font-weight: 700; }
+    .audit-note { padding: 12px; border-radius: 10px; background: #f7f9fb; border: 1px solid var(--line); margin: 8px 0; }
+    .audit-note strong { display: block; margin-bottom: 3px; }
+    .audit-note p { margin: 0; font-size: 13px; }
+    .warning-note { background: var(--red-soft); border-color: #eabdbd; }
+    .info-note { background: var(--blue-soft); border-color: #b9d4ec; }
+
+    .basis-switch { display: flex; border: 1px solid #bfcbd5; border-radius: 9px; overflow: hidden; }
+    .basis-switch button { border: 0; background: white; color: var(--muted); padding: 8px 12px; font-size: 12px; font-weight: 700; }
+    .basis-switch button.active { background: var(--blue); color: white; }
+
+    .footer { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .toast { position: fixed; right: 18px; bottom: 18px; z-index: 100; background: var(--blue-dark); color: white; padding: 11px 14px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.2); transform: translateY(120px); opacity: 0; transition: .25s ease; }
+    .toast.show { transform: none; opacity: 1; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+    abbr[title] { text-decoration: underline dotted #94a6b4; text-underline-offset: 3px; cursor: help; }
+    .glossary-table td:nth-child(2), .glossary-table th:nth-child(2) { text-align: left; }
+    .glossary-table td:nth-child(3), .glossary-table th:nth-child(3) { text-align: left; }
+    .glossary-table td:nth-child(3) { color: var(--muted); }
+    .glossary-table td:first-child { font-weight: 800; white-space: nowrap; }
+    .chain { display: grid; gap: 10px; }
+    .chain-step { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; background: #f8fbfd; border: 1px solid var(--line); border-left: 4px solid var(--blue); border-radius: 10px; padding: 12px; }
+    .chain-num { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: white; font-weight: 800; font-size: 13px; }
+    .chain-step h4 { margin: 0 0 3px; font-size: 15px; }
+    .chain-step .eq-inline { font-family: Georgia, 'Times New Roman', serif; font-size: 15px; background: white; border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; display: inline-block; margin: 4px 0; }
+    .chain-step p { margin: 3px 0 0; font-size: 13px; }
+    .legend-box { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+    .tag-legend { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: start; font-size: 13px; }
+
+    @media (max-width: 1100px) {
+      .grid-4 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .grid-3 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .field-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 760px) {
+      .topbar-inner { align-items: flex-start; padding: 12px 16px 10px; }
+      .header-actions .button-ghost { display: none; }
+      .tabs { padding: 0 10px; }
+      .tab { padding-inline: 11px; }
+      .workspace { padding: 16px 12px 44px; }
+      .grid-4, .grid-3, .grid-2, .field-grid { grid-template-columns: 1fr; }
+      .notice { grid-template-columns: auto 1fr; }
+      .notice > .status-chip { grid-column: 2; justify-self: start; }
+      .section-head { align-items: flex-start; flex-direction: column; }
+      .range-row { grid-template-columns: 1fr 75px; }
+      .range-row label { grid-column: 1 / 3; }
+      .brand .eyebrow { display: none; }
+      .brand { min-width: 0; }
+      .brand h1 { font-size: 20px; }
+    }
+    @media print {
+      .topbar, .tabbar, .header-actions, .section-actions, button { display: none !important; }
+      body { background: white; }
+      .workspace { max-width: none; padding: 0; }
+      .tab-panel { display: block !important; page-break-before: always; }
+      .tab-panel:first-child { page-break-before: auto; }
+      .panel, .kpi { box-shadow: none; break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <p class="eyebrow">Mittal, Kwak et al. · Supporting Information reconstruction</p>
+        <h1>Ethane Cracker TEA Lab</h1>
+      </div>
+      <div class="header-actions">
+        <button class="button button-ghost" id="printBtn">Print / PDF</button>
+        <button class="button button-ghost" id="importBtn">Load inputs</button>
+        <input type="file" id="importFile" accept="application/json,.json" class="visually-hidden">
+        <button class="button button-ghost" id="exportJsonBtn">Save inputs</button>
+        <button class="button button-light" id="exportCsvBtn">Download results CSV</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabbar" aria-label="Calculator sections">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-dashboard" aria-controls="dashboard" aria-selected="true" data-tab="dashboard">Dashboard</button>
+      <button class="tab" role="tab" id="tab-validation" aria-controls="validation" aria-selected="false" data-tab="validation">Validation</button>
+      <button class="tab" role="tab" id="tab-inputs" aria-controls="inputs" aria-selected="false" data-tab="inputs">Cost inputs</button>
+      <button class="tab" role="tab" id="tab-routes" aria-controls="routes" aria-selected="false" data-tab="routes">Route data</button>
+      <button class="tab" role="tab" id="tab-process" aria-controls="process" aria-selected="false" data-tab="process">Process &amp; equations</button>
+      <button class="tab" role="tab" id="tab-audit" aria-controls="audit" aria-selected="false" data-tab="audit">Assumption audit</button>
+      <button class="tab" role="tab" id="tab-glossary" aria-controls="glossary" aria-selected="false" data-tab="glossary">Glossary &amp; how to read</button>
+    </div>
+  </nav>
+
+  <main class="workspace">
+    <section class="tab-panel active" id="dashboard" role="tabpanel" aria-labelledby="tab-dashboard">
+      <div class="notice">
+        <div class="notice-icon">!</div>
+        <div>
+          <strong>Reconstruction boundary</strong>
+          <p id="boundaryText"></p>
+        </div>
+        <span class="status-chip" id="capitalStatus"></span>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <h2>Route economics</h2>
+          <p>Costs update immediately from the selected assumptions and Table S6 inventory.</p>
+        </div>
+        <div class="route-switch" id="routeSwitch" aria-label="Select route"></div>
+      </div>
+
+      <div class="grid grid-4" id="kpiGrid"></div>
+
+      <div class="grid grid-2" style="margin-top:15px">
+        <article class="panel">
+          <div class="panel-title-row">
+            <div>
+              <h3>Cost stack by route</h3>
+              <p>Positive costs run right of the zero line; coproduct credits run left. The caret marks net cost of ethylene.</p>
+            </div>
+            <span class="source-tag reconstructed">Eq. S8 reconstruction</span>
+          </div>
+          <div class="bar-legend">
+            <span class="legend-item"><i class="swatch" style="background:#00539f"></i>Annualized capital</span>
+            <span class="legend-item"><i class="swatch" style="background:#ffd200"></i>Ethane feed</span>
+            <span class="legend-item"><i class="swatch" style="background:#6da7d8"></i>Other variable cost</span>
+            <span class="legend-item"><i class="swatch" style="background:#7851a9"></i>O&amp;M + labor</span>
+            <span class="legend-item"><i class="swatch" style="background:#0b7a53"></i>Coproduct credit</span>
+          </div>
+          <svg class="cost-chart-svg" id="costBars" role="img" aria-label="Cost stack by route"></svg>
+        </article>
+
+        <article class="panel">
+          <div class="panel-title-row">
+            <div>
+              <h3>Feed, power and steam intensity</h3>
+              <p>Published Table S6 inventory per tonne of ethylene, with published C<sub>2</sub>H<sub>4</sub> yield.</p>
+            </div>
+            <span class="source-tag published">Table S6</span>
+          </div>
+          <div class="table-wrap">
+            <table class="comparison-table" id="intensitySummary"></table>
+          </div>
+          <div id="intensityFlags"></div>
+        </article>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <h2>Price sensitivity</h2>
+          <p>Ethane price is swept across the selected range. Electricity price is shared across all routes.</p>
+        </div>
+      </div>
+      <article class="panel">
+        <div class="grid grid-3">
+          <div style="grid-column:span 1">
+            <div class="range-row">
+              <label for="sensElectricity"><strong>Electricity price</strong></label>
+              <input type="range" id="sensElectricity" min="0.02" max="0.16" step="0.005" value="0.07">
+              <span class="range-value" id="sensElectricityValue">$0.070/kWh</span>
+            </div>
+            <div class="range-row">
+              <label for="sensEthane"><strong>Current ethane price marker</strong></label>
+              <input type="range" id="sensEthane" min="100" max="400" step="5" value="200">
+              <span class="range-value" id="sensEthaneValue">$200/t</span>
+            </div>
+            <div class="audit-note">
+              <strong>How to read it</strong>
+              <p>Each curve holds every input fixed except ethane price. Its vertical position also changes with the electricity slider. The x-range follows the entered ethane price, so the marker always lands on the curve.</p>
+            </div>
+          </div>
+          <div style="grid-column:span 2; min-width:0">
+            <svg class="sensitivity-svg" id="sensitivityChart" viewBox="0 0 780 330" role="img" aria-label="Cost of ethylene sensitivity to ethane price"></svg>
+          </div>
+        </div>
+      </article>
+
+      <div class="section-head">
+        <div>
+          <h2>Tornado — what actually moves the answer</h2>
+          <p id="tornadoCaption">Each input is varied one at a time about its current value, holding everything else fixed.</p>
+        </div>
+        <div class="section-actions">
+          <label for="tornadoDelta" style="font-size:12px;font-weight:800;align-self:center">Variation ±</label>
+          <input type="number" id="tornadoDelta" value="30" min="1" max="90" step="5" style="width:70px;padding:6px 8px;border:1px solid #bfcbd5;border-radius:7px;font-weight:700">
+          <span style="align-self:center;color:var(--muted);font-size:12px">%</span>
+        </div>
+      </div>
+      <article class="panel">
+        <div class="legend-box">
+          <span class="legend-item"><i class="swatch" style="background:#6da7d8"></i>input at its low end</span>
+          <span class="legend-item"><i class="swatch" style="background:#00539f"></i>input at its high end</span>
+          <span>Longest bar = biggest risk to the answer. The dashed line is the current result; the figure on the right is the half-width in $/t.</span>
+        </div>
+        <svg class="tornado-svg" id="tornadoChart" role="img" aria-label="Tornado sensitivity chart"></svg>
+      </article>
+
+      <div class="section-head">
+        <div><h2>Complete comparison</h2><p>All dollar values are annualized and normalized to plant ethylene capacity.</p></div>
+      </div>
+      <article class="panel table-wrap" style="padding:0">
+        <table class="comparison-table" id="fullComparison"></table>
+      </article>
+    </section>
+
+    <section class="tab-panel" id="validation" role="tabpanel" aria-labelledby="tab-validation">
+      <div class="section-head">
+        <div>
+          <h2>Reconstruction vs published results</h2>
+          <p>The manuscript reports TCI, TCM, electricity cost and product cost in Section 2.5 and Fig. 7. This panel checks the reconstruction against them.</p>
+        </div>
+        <div class="section-actions">
+          <div class="basis-switch" id="elecBasisSwitch" role="group" aria-label="Electricity cost basis">
+            <button data-basis="inventory">Table S6 inventory</button>
+            <button data-basis="published">Published TEA electricity cost</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="audit-note info-note" id="basisExplainer"></div>
+
+      <div class="legend-box" style="margin-top:12px">
+        <span>Each cell reads: <strong>calculated value</strong>, then the published value beneath it, then the difference.</span>
+        <span class="legend-item"><span class="flag-ok">±10%</span> close</span>
+        <span class="legend-item"><span class="flag-warn">±25%</span> check it</span>
+        <span class="legend-item"><span class="flag-bad">beyond</span> does not reconcile</span>
+        <span>A value inside a published range reads as 0.0%.</span>
+      </div>
+      <article class="panel table-wrap" style="padding:0">
+        <table class="comparison-table" id="validationTable"></table>
+      </article>
+
+      <div class="section-head"><div><h2>Where the reconstruction breaks</h2></div></div>
+      <div class="grid grid-2" id="validationNotes"></div>
+
+      <div class="section-head">
+        <div>
+          <h2>Published product cost by electricity source</h2>
+          <p>Fig. 8b reports MKM-XC<sub>2</sub>H<sub>6</sub> product cost for each electricity source. The manuscript does not print the underlying $/kWh, so the right-hand column inverts the current model to show what price would reproduce each published figure.</p>
+        </div>
+      </div>
+      <article class="panel table-wrap" style="padding:0">
+        <table class="comparison-table" id="elecSourceTable"></table>
+      </article>
+    </section>
+
+    <section class="tab-panel" id="inputs" role="tabpanel" aria-labelledby="tab-inputs">
+      <div class="section-head">
+        <div>
+          <h2>Published economic assumptions</h2>
+          <p>Green-edged fields reproduce SI Note 2 §3.2 and Methods 4.3. Capacity defaults to the midpoint of the reported 600,000–620,000 t/y range.</p>
+        </div>
+        <div class="section-actions"><button class="button button-outline button-small" data-reset="economics">Reset published values</button></div>
+      </div>
+      <div class="panel"><div class="field-grid" id="publishedFields"></div><div id="capacityCheck"></div></div>
+
+      <div class="section-head">
+        <div>
+          <h2>Route-specific capital</h2>
+          <p>The SI does not print total bare-module cost. Defaults below are back-calculated from the TCI published in Section 2.5 using TOC = 2.5 × TBMC (assumption 11). Replace them with the Aspen Process Economic Analyzer V12 export when available.</p>
+        </div>
+        <div class="section-actions"><button class="button button-outline button-small" data-reset="capital">Reset to TCI-derived</button></div>
+      </div>
+      <div class="grid grid-4" id="capitalCards"></div>
+
+      <div class="section-head">
+        <div>
+          <h2>Utility and material prices</h2>
+          <p>Amber-edged fields are editable screening defaults. Replace them with the exact Seider basis used in the Aspen economic case (assumption 14).</p>
+        </div>
+        <div class="section-actions"><button class="button button-outline button-small" data-reset="screening">Reset screening values</button></div>
+      </div>
+      <div class="panel"><div class="field-grid" id="screeningFields"></div></div>
+
+      <div class="section-head">
+        <div>
+          <h2>CFP consumption <span class="source-tag published">SI assumption 7</span></h2>
+          <p>“We assume CFP completely occupies the tube… we assume monthly replacement.” Replacement mass is derived from the reactor geometry on the Process tab, not from the Table S6 LCA allocation.</p>
+        </div>
+      </div>
+      <div class="grid grid-2">
+        <article class="panel"><div class="field-grid" style="grid-template-columns:repeat(2,minmax(160px,1fr))" id="cfpFields"></div></article>
+        <article class="panel" id="cfpResults"></article>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <h2>Heating-efficiency side calculation</h2>
+          <p>Compares purchased energy for an identical net reactor heat duty. It is kept outside Eq. S8 because Table S6 already reports route-level utility use.</p>
+        </div>
+      </div>
+      <div class="grid grid-2">
+        <article class="panel">
+          <div class="field-grid" style="grid-template-columns:repeat(2,minmax(160px,1fr))" id="heatFields"></div>
+        </article>
+        <article class="panel" id="heatResults"></article>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="routes" role="tabpanel" aria-labelledby="tab-routes">
+      <div class="section-head">
+        <div>
+          <h2>Four modeled routes</h2>
+          <p>Reactor conversion and operating conditions are from Tables S4–S5; inventory is from Table S6; yields are from Section 2.5.</p>
+        </div>
+      </div>
+      <div class="grid grid-4" id="routeCards"></div>
+
+      <div class="section-head">
+        <div>
+          <h2>Inventory per 1 kg C<sub>2</sub>H<sub>4</sub></h2>
+          <p>Values are editable for scenario testing. Reset restores Table S6.</p>
+        </div>
+        <div class="section-actions"><button class="button button-outline button-small" data-reset="inventory">Reset Table S6</button></div>
+      </div>
+      <article class="panel table-wrap" style="padding:0"><table class="data-table" id="inventoryTable"></table></article>
+      <div class="audit-note" id="inventoryNote"></div>
+
+      <div class="section-head"><div><h2>Reaction definitions</h2><p>RStoic reactions and conversion reported in Table S4.</p></div></div>
+      <div class="grid grid-3" id="reactionCards"></div>
+
+      <div class="section-head"><div><h2>Main-unit operating conditions</h2><p>Temperatures, pressures, and reflux ratios reported in Table S5.</p></div></div>
+      <article class="panel table-wrap" style="padding:0"><table class="data-table" id="operatingTable"></table></article>
+    </section>
+
+    <section class="tab-panel" id="process" role="tabpanel" aria-labelledby="tab-process">
+      <div class="section-head"><div><h2>Aspen process sequence</h2><p>Fig. S12 and SI Note 2 §3.1 reduced to the cost-relevant unit operations.</p></div></div>
+      <div class="flow" aria-label="Ethane cracking process flow">
+        <div class="flow-node"><span class="flow-code">Feed</span><strong>C<sub>2</sub>H<sub>6</sub> + steam</strong><p>3:1 volume ratio; fresh ethane joins recycled ethane.</p></div>
+        <div class="flow-node"><span class="flow-code">E101</span><strong>Feed preheat</strong><p>Hot reactor effluent preheats the incoming feed.</p></div>
+        <div class="flow-node"><span class="flow-code">Reactor</span><strong>Cracking</strong><p>RPlug for industrial steam cracking; RStoic for CJH cases.</p></div>
+        <div class="flow-node"><span class="flow-code">T1 + T5</span><strong>Water removal</strong><p>TEG absorption at 25 °C and ambient pressure, followed by TEG regeneration.</p></div>
+        <div class="flow-node"><span class="flow-code">C1 + E102</span><strong>Compression</strong><p>Dry stream is compressed and cooled before cryogenic separation.</p></div>
+        <div class="flow-node"><span class="flow-code">T2</span><strong>Light ends</strong><p>At −140 °C and 30 bar, H<sub>2</sub> and CH<sub>4</sub> leave overhead.</p></div>
+        <div class="flow-node"><span class="flow-code">T3</span><strong>Ethylene recovery</strong><p>&gt;99.9 mol% C<sub>2</sub>H<sub>4</sub> leaves overhead.</p></div>
+        <div class="flow-node product-node"><span class="flow-code">T4 + D1</span><strong>Recycle + coproducts</strong><p>C<sub>2</sub>H<sub>6</sub> recycles; LPG and fuel gas receive credits.</p></div>
+      </div>
+
+      <div class="grid grid-2">
+        <article class="panel">
+          <div class="panel-title-row"><div><h3>Eq. S8–S9 cost chain</h3><p>Every result in the dashboard follows this sequence.</p></div><span class="source-tag published">SI Note 2 §3.2</span></div>
+          <div class="equation"><strong>Installed capital</strong><div class="eq">TOC = 2.5 × TBMC</div><p>Assumption 11. TBMC comes from Aspen Economic Analyzer V12.</p></div>
+          <div class="equation"><strong>Annualized capital</strong><div class="eq">CAPEX = TOC × CCF</div><p>Eq. S9. CCF = 0.1, consistent with 35% tax, 3% inflation, 20-year depreciation, 15% revenue interest, 5% debt interest and 8000 h/y operation (Methods 4.3).</p></div>
+          <div class="equation"><strong>Annual O&amp;M</strong><div class="eq">C<sub>O&amp;M</sub> = 0.025 TOC + 0.05 TOC + Labor</div><p>Assumptions 8–10. Maintenance, insurance, and $5 million/y labor.</p></div>
+          <div class="equation"><strong>Cost of ethylene</strong><div class="eq">COO = (CAPEX + OPEX + C<sub>O&amp;M</sub>) / m<sub>C2H4</sub></div><p>Eq. S8. OPEX is purchased feed, utilities, treatment, and CFP replacement minus LPG and fuel-gas credits.</p></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-title-row"><div><h3>144-tube sizing (assumption 6)</h3><p>Tube count and diameter are fixed by the SI; flow and residence time remain user inputs. The resulting volume also sets CFP replacement mass.</p></div><span class="source-tag reconstructed">Ideal-gas sizing</span></div>
+          <div class="field-grid" style="grid-template-columns:repeat(2,minmax(150px,1fr))" id="geometryFields"></div>
+          <div class="calc-result" style="margin-top:14px"><span>Calculated tube length</span><strong id="tubeLength">—</strong><small id="tubeVolumeNote"></small></div>
+          <div class="equation"><div class="eq">L = [ṅRT/P × τ] / [NπD²/4 × φ]</div><p>The SI does not report the recycle flow or the residence time, so both remain user inputs. φ = 1 reflects assumption 7 (“CFP completely occupies the tube”).</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="audit" role="tabpanel" aria-labelledby="tab-audit">
+      <div class="section-head"><div><h2>Assumption ledger</h2><p>Each input is tagged by evidence level so reported values stay separate from reconstruction choices.</p></div></div>
+      <div class="grid grid-4">
+        <article class="panel"><span class="source-tag published">Published SI value</span><h3 style="margin-top:10px">Directly reported</h3><p>Economic factors, commodity prices, route conversion, unit conditions, tube count/diameter, CFP replacement interval, efficiency, and Table S6 inventory.</p></article>
+        <article class="panel"><span class="source-tag derived">Derived from published</span><h3 style="margin-top:10px">Back-calculated</h3><p>TBMC from the TCI reported in Section 2.5, and CFP replacement mass from assumptions 6–7 with the H23 substrate specification.</p></article>
+        <article class="panel"><span class="source-tag reconstructed">Inventory reconstruction</span><h3 style="margin-top:10px">Calculated here</h3><p>Annual mass and energy flows, gross OPEX, coproduct credits, net OPEX, COO, price sensitivity, tornado, and tube-length equation.</p></article>
+        <article class="panel"><span class="source-tag screening">Editable screening value</span><h3 style="margin-top:10px">Needs case basis</h3><p>Utility prices, water purchase price, natural-gas energy price, fuel heating value, CFP unit price and substrate density.</p></article>
+      </div>
+
+      <div class="section-head"><div><h2>Line-by-line audit</h2><p>Current values are shown; fields update with the calculator.</p></div></div>
+      <article class="panel table-wrap" style="padding:0"><table class="data-table" id="auditTable"></table></article>
+
+      <div class="section-head"><div><h2>Known limitations</h2></div></div>
+      <div class="grid grid-2">
+        <article class="audit-note warning-note"><strong>1. Table S6 belongs to the LCA, not the TEA.</strong><p>SI Note 2 (TEA) contains no inventory table; Table S6 sits in SI Note 3 and is described as the inventory for the life-cycle assessment. Using it as the OPEX basis is this tool's reconstruction, and the Validation tab shows where that bridge fails.</p></article>
+        <article class="audit-note warning-note"><strong>2. Exact utility prices are referenced but not printed.</strong><p>Assumption 14 cites Seider et al. for utility costs. Numerical LP/HP steam, refrigeration, electricity, and water prices need the original Aspen/Seider basis. The Validation tab quantifies how far the screening defaults are off.</p></article>
+        <article class="audit-note warning-note"><strong>3. TBMC is not published.</strong><p>Defaults are back-calculated from the TCI reported in Section 2.5 assuming TCI ≈ TOC. That equivalence is an assumption; TCI may include working capital that TOC does not.</p></article>
+        <article class="audit-note"><strong>4. CFP replacement mass depends on unpublished geometry.</strong><p>Assumption 7 fixes the replacement interval and assumption 6 fixes tube count and diameter, but the reactor volume still depends on the inlet flow and residence time, which the SI does not report.</p></article>
+        <article class="audit-note"><strong>5. Efficiency is already embedded in modeled utilities.</strong><p>The 60% furnace and 95% Joule assumptions should not multiply the full Table S6 electricity inventory again. The separate heat-duty calculator avoids double counting.</p></article>
+        <article class="audit-note"><strong>6. Capacity is shared for route comparison.</strong><p>Assumption 1 gives 600,000–620,000 t/y and SI §3.1 gives ~77 t/h. The default 610,000 t/y is the range midpoint and can be changed.</p></article>
+        <article class="audit-note"><strong>7. COO and MSP are used interchangeably in the source.</strong><p>Assumption 5 speaks of a minimum selling price while assumption 13 defines COO, and only Eq. S8 is given. Comparisons on the Validation tab therefore put Eq. S8 output against the published product cost.</p></article>
+        <article class="audit-note"><strong>8. No uncertainty interval was reported.</strong><p>The sensitivity and tornado charts vary inputs deterministically. They do not provide a statistical confidence interval or an Aspen estimate class.</p></article>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="glossary" role="tabpanel" aria-labelledby="tab-glossary">
+      <div class="section-head"><div><h2>Start here</h2><p>Every abbreviation this calculator uses, what it physically means, and how to read each chart.</p></div></div>
+
+      <article class="panel">
+        <h3>The one number this tool produces</h3>
+        <p style="margin-top:2px">Everything funnels into <strong>cost of ethylene (COO)</strong> — the all-in dollars it takes to make one tonne of C<sub>2</sub>H<sub>4</sub>. Build it in four steps:</p>
+        <div class="chain" style="margin-top:12px">
+          <div class="chain-step"><div class="chain-num">1</div><div>
+            <h4>What the equipment costs to buy and install</h4>
+            <span class="eq-inline">TOC = 2.5 × TBMC</span>
+            <p><strong>TBMC (total bare-module cost)</strong> is the price of the bare equipment — the columns, compressors and heat exchangers — as Aspen quotes them. Multiplying by 2.5 gives <strong>TOC (total overnight cost)</strong>: what it costs to actually have a working plant standing there, including piping, instruments, civil work and engineering. “Overnight” means the number ignores interest during construction, as if the plant appeared overnight.</p>
+          </div></div>
+          <div class="chain-step"><div class="chain-num">2</div><div>
+            <h4>Spreading that capital over the plant's life</h4>
+            <span class="eq-inline">CAPEX = TOC × CCF</span>
+            <p>You do not pay TOC every year. The <strong>CCF (capital charge factor)</strong> of 0.1 converts the one-time build cost into an equivalent annual payment — roughly “10% of the build cost per year” — covering repayment, interest and return to investors. So <strong>CAPEX</strong> here means the annualized capital charge, not the upfront spend.</p>
+          </div></div>
+          <div class="chain-step"><div class="chain-num">3</div><div>
+            <h4>What it costs to run for a year</h4>
+            <span class="eq-inline">OPEX = feed + utilities + treatment + CFP − coproduct credits</span>
+            <p><strong>OPEX (operating expenditure)</strong> is everything consumed per year: ethane feed, steam, refrigeration, electricity, water, TEG, wastewater treatment and CFP replacement. Then subtract <strong>coproduct credits</strong> — the plant also makes LPG and fuel gas, and selling those offsets the bill. <strong>C<sub>O&amp;M</sub></strong> adds maintenance (2.5% of TOC), insurance (5% of TOC) and $5 M/y of labor.</p>
+          </div></div>
+          <div class="chain-step"><div class="chain-num">4</div><div>
+            <h4>Divide by how much product you made</h4>
+            <span class="eq-inline">COO = (CAPEX + OPEX + C<sub>O&amp;M</sub>) / m<sub>C2H4</sub></span>
+            <p>Total annual dollars ÷ tonnes of ethylene per year = dollars per tonne. That is the headline figure on the dashboard and the thing compared against the manuscript.</p>
+          </div></div>
+        </div>
+      </article>
+
+      <div class="section-head"><div><h2>Every abbreviation</h2><p>Hover any dotted-underlined abbreviation elsewhere in the tool to see a short version of these.</p></div></div>
+      <article class="panel table-wrap" style="padding:0"><table class="comparison-table glossary-table" id="glossaryTable"></table></article>
+
+      <div class="section-head"><div><h2>How to read each chart</h2></div></div>
+      <div class="grid grid-2">
+        <article class="panel"><h3>Cost stack by route</h3><p>A horizontal bar per route, split into four cost blocks. The vertical line is zero. Costs grow to the <strong>right</strong>; the green <strong>coproduct credit</strong> bar grows to the <strong>left</strong>, on the same dollar scale — so if the green bar looks a tenth as long as the coloured stack, the credit really is about a tenth of the cost. The small black caret marks the <strong>net</strong> result: stack length minus credit length. Hover any block for its exact value.</p></article>
+        <article class="panel"><h3>Price sensitivity</h3><p>Four lines showing how each route's cost of ethylene rises as ethane gets more expensive. Each route has its own colour <em>and</em> its own dash pattern and marker shape, so the lines stay distinguishable in greyscale. The dashed vertical line is your current ethane price; the markers sit where each route lands at that price. The electricity slider moves all four lines up or down together.</p></article>
+        <article class="panel"><h3>Tornado</h3><p>Answers “which input actually matters?” Each row varies one input up and down by the chosen percentage while holding everything else fixed, and draws how far the cost of ethylene moves. Rows are sorted longest-first, so the top row is your biggest risk. The <span style="color:#6da7d8;font-weight:800">light blue</span> half is the low end of that input, the <span style="color:#00539f;font-weight:800">dark blue</span> half is the high end. The right-hand figure is the half-width in $/t.</p></article>
+        <article class="panel"><h3>Validation table</h3><p>Each cell shows the calculated value, the published value beneath it, and the percentage difference. <span class="flag-ok">Green</span> is within 10% of the manuscript, <span class="flag-warn">amber</span> within 25%, <span class="flag-bad">red</span> beyond that. Where the manuscript gives a range rather than one number, anything landing inside the range reads as 0.0%.</p></article>
+      </div>
+
+      <div class="section-head"><div><h2>What the four routes are</h2></div></div>
+      <article class="panel">
+        <div class="tag-legend" id="routeLegend"></div>
+      </article>
+
+      <div class="section-head"><div><h2>What the coloured tags mean</h2></div></div>
+      <article class="panel">
+        <div class="tag-legend">
+          <span class="source-tag published">Published</span><span>Printed in the paper or its Supporting Information. Change it only to test a scenario — the default is what the authors used.</span>
+          <span class="source-tag derived">Derived</span><span>Not printed anywhere, but calculable from published numbers by a stated rule. Capital comes from the published total capital investment; CFP mass comes from the reactor volume and the monthly replacement assumption.</span>
+          <span class="source-tag reconstructed">Reconstructed</span><span>Computed by this tool from the published inputs. These are results, not assumptions.</span>
+          <span class="source-tag screening">Screening</span><span>A placeholder the tool had to invent because the source cites a reference instead of printing a number. <strong>These are the values most likely to be wrong</strong> — replace them before trusting any result.</span>
+          <span class="source-tag required">Required</span><span>Nothing entered yet, and the result is incomplete without it.</span>
+        </div>
+      </article>
+    </section>
+
+    <footer class="footer">
+      <span>Source: Mittal, Kwak, Zheng, Ierapetritou &amp; Vlachos, “Short contact time, high temperature, internally-heated ethane crackers,” Chemical Engineering Journal 523 (2025) 168251, and its Supporting Information (Notes 2–3, Tables S4–S7).</span>
+      <span>Offline single-file calculator · No external libraries or network calls</span>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const STORAGE_KEY = 'ethane-cracker-tea-lab.v2';
+
+      const routeOrder = ['steam', 'mkmS', 'mkmX', 'exp'];
+      const routeMeta = {
+        steam: { name: 'Steam cracking', type: 'Industrial furnace / RPlug', conversion: null, reactorT: 860, usesCfp: false, color: '#00539f', dash: 'none' },
+        mkmS: { name: 'MKM-SC₂H₄', type: 'Ideal CJH / RStoic', conversion: 80.2, reactorT: 1000, usesCfp: true, color: '#2f7fc1', dash: '9 5' },
+        mkmX: { name: 'MKM-XC₂H₆', type: 'Ideal CJH / RStoic', conversion: 64.7, reactorT: 1000, usesCfp: true, color: '#7851a9', dash: '2 4' },
+        exp: { name: 'Exp-Opt', type: 'Experimental CJH / RStoic', conversion: 80.0, reactorT: 1000, usesCfp: true, color: '#d99500', dash: '13 4 3 4' }
+      };
+      const markerShape = { steam: 'circle', mkmS: 'square', mkmX: 'triangle', exp: 'diamond' };
+
+      // Values printed in the manuscript (Section 2.5 / Fig. 7-8). Ranges are stored as [lo, hi]
+      // where the text gives a group range without assigning it to a single route.
+      const published = {
+        steam: { tci: 317, tcm: 404, price: 680, elec: 37.6, yieldC2H4: 53, netEnergy: 14.7 },
+        mkmS:  { tci: [242, 254], tcm: [504, 586], price: [815, 960], elec: [145, 154], yieldC2H4: 66, netEnergy: [7.4, 7.5] },
+        mkmX:  { tci: [242, 254], tcm: [504, 586], price: [815, 960], elec: [145, 154], yieldC2H4: 56, netEnergy: [7.4, 7.5] },
+        exp:   { tci: 317, tciNote: 'comparable to industry', tcm: [504, 586], price: [815, 960], elec: [145, 154], yieldC2H4: 56, netEnergy: 9.7 }
+      };
+      // Fig. 8b: product cost for MKM-XC2H6 by electricity source.
+      const elecSources = [['Coal', 1049], ['Offshore wind / solar / hydropower', [710, 835]], ['Onshore wind', 694]];
+
+      const defaultEconomics = {
+        capacity: 610000, operatingHours: 8000, ethanePrice: 200, tegPrice: 1320, wastewaterPrice: 1,
+        lpgCreditPrice: 550, fuelCreditPrice: 200, labor: 5000000, maintenanceRate: 0.025, insuranceRate: 0.05,
+        tocFactor: 2.5, ccf: 0.10, cfpReplacementMonths: 1, furnaceEfficiency: 0.60, jouleEfficiency: 0.95
+      };
+
+      const defaultScreening = {
+        waterPrice: 1.0, lpSteamPrice: 15, hpSteamPrice: 25, ref1Price: 6, ref2Price: 12, ref5Price: 24,
+        electricityPrice: 0.07, fuelEnergyPrice: 4, fuelLHV: 50, cfpPrice: 20, cfpDensity: 452
+      };
+
+      // TBMC back-calculated from the published TCI using TOC = 2.5 x TBMC (assumption 11).
+      const defaultCapital = { steam: 126.8, mkmS: 96.8, mkmX: 101.6, exp: 126.8 };
+
+      const defaultInventory = {
+        steam: { ethane: 1.19, water: 0.59, teg: 0.002, lpSteam: 0.0727, hpSteam: 3.78, ref1: 0.14, ref2: 1.61, ref5: 2.4, electricity: 3.41, fuelInput: 0.59, wastewater: 0.62, fuelCredit: 0.09, lpgCredit: 0.02, cfp: 0 },
+        mkmS: { ethane: 1.12, water: 0.52, teg: 0.000016, lpSteam: 0.0461, hpSteam: 2.03, ref1: 0.33, ref2: 1.55, ref5: 2.6, electricity: 3.58, fuelInput: 0, wastewater: 0.66, fuelCredit: 0.24, lpgCredit: 0.006, cfp: 9.2e-9 },
+        mkmX: { ethane: 1.27, water: 0.75, teg: 0.0001, lpSteam: 0.0445, hpSteam: 10.7, ref1: 0.75, ref2: 1.43, ref5: 2.45, electricity: 4.59, fuelInput: 0, wastewater: 0.44, fuelCredit: 0.35, lpgCredit: 0.03, cfp: 3e-9 },
+        exp: { ethane: 1.44, water: 0.83, teg: 0.0001, lpSteam: 0.052, hpSteam: 2.35, ref1: 0.25, ref2: 2.1, ref5: 2.45, electricity: 4.75, fuelInput: 0, wastewater: 0.88, fuelCredit: 0.081, lpgCredit: 0.117, cfp: 6.9e-8 }
+      };
+
+      const inventoryRows = [
+        ['ethane', 'C₂H₆', 'kg/kg C₂H₄', true], ['water', 'Water', 'kg/kg C₂H₄', true], ['teg', 'TEG', 'kg/kg C₂H₄', true],
+        ['lpSteam', 'L.P. steam', 'kg/kg C₂H₄', true], ['hpSteam', 'H.P. steam', 'kg/kg C₂H₄', true],
+        ['ref1', 'L-1 refrigerant', 'MJ/kg C₂H₄', true], ['ref2', 'L-2 refrigerant', 'MJ/kg C₂H₄', true], ['ref5', 'L-5 refrigerant', 'MJ/kg C₂H₄', true],
+        ['electricity', 'Electricity', 'kWh/kg C₂H₄', true], ['fuelInput', 'Fuel gas input', 'kg/kg C₂H₄', true],
+        ['wastewater', 'Wastewater output', 'kg/kg C₂H₄', true], ['fuelCredit', 'Fuel gas coproduct', 'kg/kg C₂H₄', true],
+        ['lpgCredit', 'LPG coproduct', 'kg/kg C₂H₄', true],
+        ['cfp', 'CFP loading substrate', 'kg/kg C₂H₄ · LCA allocation, not costed', false]
+      ];
+
+      // [abbreviation, full name, plain-language meaning, unit, where it comes from]
+      const glossary = [
+        ['COO','Cost of ethylene (cost of operation)','All-in cost to produce one tonne of ethylene: annualized capital + operating cost + maintenance, insurance and labor, divided by annual production. The headline output of this tool.','USD/t C₂H₄','Eq. S8'],
+        ['MSP','Minimum selling price','The price at which the plant breaks even. The source uses this term and COO interchangeably and gives only Eq. S8, so this tool treats them as the same quantity.','USD/t C₂H₄','Assumption 5 / Section 2.5'],
+        ['TBMC','Total bare-module cost','Purchase-and-install cost of the bare equipment itself — columns, compressors, exchangers — before piping, instruments and site work. Aspen Economic Analyzer produces it. Not printed in the SI.','USD M','Assumption 11'],
+        ['TOC','Total overnight cost','What a complete working plant costs to build, as if built instantly with no interest accruing. Here 2.5 × TBMC.','USD M','Assumption 11'],
+        ['TCI','Total capital investment','The manuscript\'s published capital figure. This tool assumes TCI ≈ TOC to back out TBMC, which is why capital has a default at all. TCI may also include working capital, so the equivalence is approximate.','USD M','Section 2.5'],
+        ['CCF','Capital charge factor','Converts one-time build cost into an equivalent annual payment. 0.1 means roughly 10% of the build cost is charged each year, covering repayment, interest and investor return.','fraction','Eq. S9'],
+        ['CAPEX','Capital expenditure (annualized)','TOC × CCF. In this tool it is always the yearly capital charge, never the upfront spend.','USD M/y','Eq. S9'],
+        ['OPEX','Operating expenditure','Annual cost of everything consumed: ethane, steam, refrigeration, electricity, water, TEG, wastewater treatment, CFP. "Net OPEX" has the coproduct credits already subtracted.','USD M/y','Eq. S8'],
+        ['O&M','Operating and maintenance cost','Maintenance (2.5% of TOC) + insurance (5% of TOC) + labor ($5 M/y). Fixed costs that do not scale with throughput.','USD M/y','Assumptions 8–10'],
+        ['TCM','Total cost of manufacturing','Everything it costs to run the plant for a year — net OPEX plus O&M — excluding the capital charge.','USD M/y','Section 2.5'],
+        ['CFP','Carbon fiber paper','The conductive substrate that is Joule-heated to crack the ethane. It sits inside the reactor tubes, glows when current passes through it, and is assumed replaced monthly. Only the Joule routes use it.','—','Assumption 7 / Methods 4.4'],
+        ['CJH','Continuous Joule heating','Current flows steadily through the CFP, holding it at a constant temperature. The heating mode modeled in the TEA.','—','SI Note 2 §3.1'],
+        ['MKM','Microkinetic model','A first-principles reaction model with 501 species and 9,286 elementary reactions, used to predict the product mixture. Two MKM scenarios are costed here.','—','Methods 4.1'],
+        ['RPlug / RStoic','Aspen reactor blocks','RPlug integrates real kinetics along a plug-flow reactor and models the conventional furnace. RStoic simply imposes a fixed reaction stoichiometry and conversion, and stands in for the Joule cases.','—','SI Note 2 §3.1'],
+        ['TEG','Triethylene glycol','The solvent that strips water out of the reactor effluent in column T1, then gets regenerated in T5 and recycled.','kg/kg C₂H₄','Assumption 3'],
+        ['LPG','Liquefied petroleum gas','A saleable coproduct (propane/butane range). Its sale is credited against operating cost at $550/t.','kg/kg C₂H₄','Assumption 5'],
+        ['LHV','Lower heating value','Energy released burning a fuel, excluding the heat recovered from condensing the water vapour produced. Converts fuel-gas mass into energy for pricing.','GJ/t','Screening input'],
+        ['L-1 / L-2 / L-5','Refrigeration levels','Aspen\'s cold utility tiers. Higher numbers mean colder and therefore more expensive per unit of heat removed — L-5 serves the −140 °C column that separates hydrogen and methane, which is why it dominates the utility bill.','MJ/kg C₂H₄','Table S6'],
+        ['X (conversion)','Ethane conversion','Fraction of the ethane fed that reacted, whatever it turned into.','%','Table S4'],
+        ['Y (yield)','Ethylene yield','Fraction of the ethane fed that ended up as ethylene specifically. Always lower than conversion, because some ethane becomes methane, hydrogen or coke.','%','Section 2.5'],
+        ['φ (phi)','Effective volume factor','Fraction of the tube volume that actually holds reacting gas. Assumption 7 says the CFP fills the tube, so the default is 1.','fraction','Assumption 7'],
+        ['τ (tau)','Residence time','How long gas spends in the hot zone. Together with flow rate it sets the reactor volume, which in turn sets tube length and CFP mass. Not reported in the SI.','ms','User input'],
+        ['LCA','Life-cycle assessment','Cradle-to-gate environmental accounting. Its inventory (Table S6) is a separate exercise from the TEA — the key caveat behind the Validation tab.','—','SI Note 3']
+      ];
+
+      const escapeHtml = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      const glossaryLookup = Object.fromEntries(glossary.map(g=>[g[0], g[1] + ' — ' + g[2].split('. ')[0].replace(/\.$/,'') + '.']));
+      // Wrap an abbreviation so its definition is available on hover and to screen readers.
+      const abbr = key => glossaryLookup[key] ? `<abbr title="${escapeHtml(glossaryLookup[key])}">${escapeHtml(key)}</abbr>` : escapeHtml(key);
+
+      const categoryLabels = {
+        ethane: 'Ethane feed', water: 'Process water', teg: 'TEG', lpSteam: 'L.P. steam', hpSteam: 'H.P. steam',
+        ref1: 'L-1 refrigeration', ref2: 'L-2 refrigeration', ref5: 'L-5 refrigeration', electricity: 'Electricity',
+        furnaceFuel: 'Furnace fuel', wastewater: 'Wastewater treatment', cfp: 'CFP replacement'
+      };
+      const categoryInventoryKey = { water:'water', teg:'teg', lpSteam:'lpSteam', hpSteam:'hpSteam', ref1:'ref1', ref2:'ref2', ref5:'ref5', electricity:'electricity', furnaceFuel:'fuelInput', wastewater:'wastewater' };
+
+      const operating = {
+        steam: { Reactor: [860,1,'—'], T1: [40,1,'—'], T2: [-140,30,2.715], T3: [50,30,25], T4: [100,25,0.5636], T5: [50,0.1,1] },
+        mkmS: { Reactor: [1000,1,'—'], T1: [40,1,'—'], T2: [-140,30,3.33], T3: [50,30,25], T4: [100,25,0.66], T5: [160,0.1,3] },
+        mkmX: { Reactor: [1000,1,'—'], T1: [40,1,'—'], T2: [-140,30,3.75], T3: [50,30,24], T4: [100,25,0.75], T5: [40,0.1,0.1] },
+        exp: { Reactor: [1000,1,'—'], T1: [40,1,'—'], T2: [-140,30,1.95], T3: [50,30,33], T4: [100,25,16], T5: [40,0.1,0.5] }
+      };
+
+      const reactions = {
+        mkmS: 'C₂H₆ → 0.88C₂H₄ + 0.07CH₄ + 0.016C₄H₈ + 0.008C₂H₂ + 0.006C₃H₆ + 0.01C₆H₆ + 0.99H₂',
+        mkmX: 'C₂H₆ → 0.92C₂H₄ + 0.05CH₄ + 0.001C₄H₈ + 0.007C₂H₂ + 0.006C₃H₆ + 0.004C₆H₆ + 0.01C₄H₆ + 0.97H₂',
+        exp: '0.99C₂H₆ → 0.75C₂H₄ + 0.23CH₄ + 0.01C₄H₈ + 0.003C₂H₂ + 0.01C₃H₆ + 0.016C₆H₆ + 1.31H₂'
+      };
+
+      const clone = obj => JSON.parse(JSON.stringify(obj));
+      const defaultState = () => ({
+        economics: clone(defaultEconomics),
+        screening: clone(defaultScreening),
+        capital: clone(defaultCapital),
+        inventory: clone(defaultInventory),
+        selectedRoute: 'steam',
+        electricityBasis: 'inventory',
+        tornadoDelta: 30,
+        heatDuty: 10,
+        geometry: { molarFlow: 1000, residenceMs: 100, temperature: 1000, pressure: 1, tubes: 144, diameter: 0.12, volumeFactor: 1 }
+      });
+      let state = defaultState();
+
+      const publishedFieldDefs = [
+        ['capacity','Plant capacity','t C₂H₄/y',1000,'Assumption 1'],
+        ['operatingHours','Operating period','h/y',100,'Methods 4.3'],
+        ['ethanePrice','Ethane price','USD/t',1,'Assumption 2'],
+        ['tegPrice','TEG price','USD/t',10,'Assumption 3'],
+        ['wastewaterPrice','Wastewater treatment','USD/m³',0.1,'Assumption 4'],
+        ['lpgCreditPrice','LPG credit','USD/t',10,'Assumption 5'],
+        ['fuelCreditPrice','Fuel-gas credit','USD/t',10,'Assumption 5'],
+        ['labor','Labor','USD/y',100000,'Assumption 8'],
+        ['maintenanceRate','Maintenance / TOC','fraction',0.005,'Assumption 9'],
+        ['insuranceRate','Insurance / TOC','fraction',0.005,'Assumption 10'],
+        ['tocFactor','TOC / TBMC','multiplier',0.1,'Assumption 11'],
+        ['ccf','Capital charge factor','fraction',0.01,'Eq. S9'],
+        ['cfpReplacementMonths','CFP replacement interval','months',1,'Assumption 7'],
+        ['furnaceEfficiency','Furnace efficiency','fraction',0.01,'Assumption 15'],
+        ['jouleEfficiency','Joule efficiency','fraction',0.01,'Assumption 15']
+      ];
+      const screeningFieldDefs = [
+        ['waterPrice','Process water','USD/m³',0.1], ['lpSteamPrice','L.P. steam','USD/t',1], ['hpSteamPrice','H.P. steam','USD/t',1],
+        ['ref1Price','L-1 refrigeration','USD/GJ',1], ['ref2Price','L-2 refrigeration','USD/GJ',1], ['ref5Price','L-5 refrigeration','USD/GJ',1],
+        ['electricityPrice','Electricity','USD/kWh',0.005], ['fuelEnergyPrice','Furnace fuel energy','USD/GJ',0.25], ['fuelLHV','Fuel-gas LHV','GJ/t',1]
+      ];
+      const cfpFieldDefs = [['cfpPrice','CFP unit price','USD/kg',1], ['cfpDensity','CFP bulk density','kg/m³',10]];
+
+      const $ = sel => document.querySelector(sel);
+      const $$ = sel => Array.from(document.querySelectorAll(sel));
+      const fmt = (n, digits=0) => Number.isFinite(n) ? n.toLocaleString('en-US',{minimumFractionDigits:digits,maximumFractionDigits:digits}) : '—';
+      const money = (n, digits=0) => Number.isFinite(n) ? '$' + fmt(n,digits) : '—';
+      const pct = n => Number.isFinite(n) ? fmt(n,1) + '%' : 'Not reported';
+      const escapeCsv = v => '"' + String(v).replaceAll('"','""') + '"';
+      const lo = x => Array.isArray(x) ? x[0] : x;
+      const hi = x => Array.isArray(x) ? x[1] : x;
+      const pubText = (x, digits=0) => x == null ? '—' : (Array.isArray(x) ? money(x[0],digits) + '–' + money(x[1],digits) : money(x,digits));
+      const plain = s => String(s).replace(/\$/g,'');
+      // Signed deviation from a published value; zero when the value falls inside a published range.
+      const deviation = (val, x) => {
+        if (x == null || !Number.isFinite(val)) return NaN;
+        if (Array.isArray(x)) return val < x[0] ? (val-x[0])/x[0]*100 : val > x[1] ? (val-x[1])/x[1]*100 : 0;
+        return (val-x)/x*100;
+      };
+      const devClass = d => !Number.isFinite(d) ? '' : Math.abs(d) <= 10 ? 'flag-ok' : Math.abs(d) <= 25 ? 'flag-warn' : 'flag-bad';
+      const devText = d => !Number.isFinite(d) ? '—' : (d > 0 ? '+' : '') + fmt(d,1) + '%';
+
+      // ---------- engine ----------
+
+      function reactorVolume(g) {
+        const T = g.temperature + 273.15, P = g.pressure * 100;
+        if (!(P > 0) || !(T > 0)) return NaN;
+        const Q = g.molarFlow * 8.314 * T / P / 3600;   // m3/s, ideal gas
+        return Q * (g.residenceMs / 1000);              // m3 of reacting volume
+      }
+
+      // Assumptions 6 + 7: CFP fills the tube volume and is replaced on a fixed interval.
+      function cfpAnnualMass(e, s) {
+        const V = reactorVolume(state.geometry);
+        if (!Number.isFinite(V) || !(e.cfpReplacementMonths > 0)) return NaN;
+        return V * state.geometry.volumeFactor * s.cfpDensity * (12 / e.cfpReplacementMonths);
+      }
+
+      function calculateRoute(route, overrides={}) {
+        const e = { ...state.economics, ...(overrides.economics || {}) };
+        const s = { ...state.screening, ...(overrides.screening || {}) };
+        const capitalMap = { ...state.capital, ...(overrides.capital || {}) };
+        const v = state.inventory[route];
+        const cap = e.capacity;
+        const tbmc = capitalMap[route] * 1e6;
+        const toc = tbmc * e.tocFactor;
+        const annualCapital = toc * e.ccf;
+        const maintenance = toc * e.maintenanceRate;
+        const insurance = toc * e.insuranceRate;
+
+        const pub = published[route];
+        const basis = overrides.electricityBasis || state.electricityBasis;
+        const usePublishedElec = basis === 'published' && pub && pub.elec != null;
+        const inventoryElec = v.electricity * 1000 * cap * s.electricityPrice;
+        const publishedElec = usePublishedElec ? (lo(pub.elec) + hi(pub.elec)) / 2 * 1e6 : NaN;
+
+        const cfpKg = routeMeta[route].usesCfp ? cfpAnnualMass(e, s) : 0;
+        const cfpCost = Number.isFinite(cfpKg) ? cfpKg * s.cfpPrice : 0;
+
+        const categories = {
+          ethane: v.ethane * cap * e.ethanePrice,
+          water: v.water * cap * s.waterPrice,
+          teg: v.teg * cap * e.tegPrice,
+          lpSteam: v.lpSteam * cap * s.lpSteamPrice,
+          hpSteam: v.hpSteam * cap * s.hpSteamPrice,
+          ref1: v.ref1 * cap * s.ref1Price,
+          ref2: v.ref2 * cap * s.ref2Price,
+          ref5: v.ref5 * cap * s.ref5Price,
+          electricity: usePublishedElec ? publishedElec : inventoryElec,
+          furnaceFuel: v.fuelInput * cap * s.fuelLHV * s.fuelEnergyPrice,
+          wastewater: v.wastewater * cap * e.wastewaterPrice,
+          cfp: cfpCost
+        };
+        const grossOpex = Object.values(categories).reduce((a,b)=>a+b,0);
+        const fuelCredit = v.fuelCredit * cap * e.fuelCreditPrice;
+        const lpgCredit = v.lpgCredit * cap * e.lpgCreditPrice;
+        const credits = fuelCredit + lpgCredit;
+        const netOpex = grossOpex - credits;
+        const om = maintenance + insurance + e.labor;
+        const tcm = netOpex + om;                    // total cost of manufacturing, excludes the capital charge
+        const annualTotal = annualCapital + netOpex + om;
+        const coo = cap > 0 ? annualTotal / cap : NaN;
+        return { route, cap, tbmc, toc, annualCapital, maintenance, insurance, om, tcm, categories,
+                 grossOpex, credits, netOpex, annualTotal, coo, cfpKg, usePublishedElec, capitalComplete: tbmc > 0 };
+      }
+
+      const validCapacity = () => state.economics.capacity > 0;
+
+      // ---------- dashboard ----------
+
+      function renderRouteSwitch() {
+        $('#routeSwitch').innerHTML = routeOrder.map(r=>`<button class="route-pill ${state.selectedRoute===r?'active':''}" data-route="${r}" aria-pressed="${state.selectedRoute===r}">${routeMeta[r].name}</button>`).join('');
+        $$('#routeSwitch .route-pill').forEach(btn=>btn.addEventListener('click',()=>{ state.selectedRoute=btn.dataset.route; persist(); renderRouteSwitch(); renderDynamic(); }));
+      }
+
+      function renderBoundary() {
+        const complete = routeOrder.every(r=>state.capital[r] > 0);
+        $('#boundaryText').textContent = 'SI Note 2 gives Eq. S8–S9, the economic assumptions and the process conditions, but not the total bare-module costs or the numerical Seider utility prices. Capital defaults are back-calculated from the TCI published in Section 2.5, and CFP replacement follows assumption 7. Check the Validation tab before quoting any number.';
+        const chip = $('#capitalStatus');
+        chip.className = 'status-chip ' + (complete ? 'derived' : 'required');
+        chip.textContent = complete ? 'Capital from published TCI' : 'Capital incomplete';
+      }
+
+      function renderKpis() {
+        const r = state.selectedRoute;
+        const c = calculateRoute(r);
+        const v = state.inventory[r];
+        const pub = published[r];
+        const dev = deviation(c.coo, pub.price);
+        $('#kpiGrid').innerHTML = `
+          <article class="kpi" title="All-in cost per tonne of ethylene: annualized capital + operating cost + maintenance, insurance and labor, divided by annual production."><span class="kpi-label">Cost of ethylene (${abbr('COO')})</span><div class="kpi-value">${money(c.coo,0)}<small style="font-size:14px">/t</small></div><span class="kpi-note">Everything it costs to make one tonne. Published ${pubText(pub.price)}/t · <span class="${devClass(dev)}">${devText(dev)}</span></span></article>
+          <article class="kpi yellow" title="Annual cost of everything consumed, after subtracting income from selling LPG and fuel gas."><span class="kpi-label">Net annual ${abbr('OPEX')}</span><div class="kpi-value">${money(c.netOpex/1e6,1)}<small style="font-size:14px"> M/y</small></div><span class="kpi-note">Yearly running cost: gross ${money(c.grossOpex/1e6,1)} M − coproduct credits ${money(c.credits/1e6,1)} M</span></article>
+          <article class="kpi green" title="Tonnes of ethane fed per tonne of ethylene produced. Higher means more feed wasted to byproducts."><span class="kpi-label">Ethane intensity</span><div class="kpi-value">${fmt(v.ethane,2)}<small style="font-size:14px"> t/t</small></div><span class="kpi-note">Tonnes of feed per tonne of product — ${money(v.ethane*state.economics.ethanePrice,0)}/t at the published feed price</span></article>
+          <article class="kpi purple" title="Megawatt-hours of electricity per tonne of ethylene. 1 MWh/t is the same as 1 kWh/kg, the unit used in Table S6."><span class="kpi-label">Electricity intensity</span><div class="kpi-value">${fmt(v.electricity,2)}<small style="font-size:14px"> MWh/t</small></div><span class="kpi-note">Same as ${fmt(v.electricity,2)} kWh/kg in Table S6 · ${c.usePublishedElec ? 'published basis ' + money(c.categories.electricity/1e6,1) + ' M/y' : money(v.electricity*1000*state.screening.electricityPrice,0) + '/t at current power price'}</span></article>`;
+      }
+
+      function renderCostBars() {
+        const svg = $('#costBars');
+        if (!validCapacity()) { svg.setAttribute('viewBox','0 0 700 40'); svg.innerHTML = `<text x="6" y="24" font-size="13" fill="#a53a3a">Enter a plant capacity above zero to draw the cost stack.</text>`; return; }
+        const calcs = routeOrder.map(r=>calculateRoute(r));
+        const posTotals = calcs.map(c => (c.annualCapital + c.grossOpex + c.om) / c.cap);
+        const credTotals = calcs.map(c => c.credits / c.cap);
+        const maxPos = Math.max(...posTotals, 1);
+        const maxCred = Math.max(...credTotals, 0);
+
+        // Credits share the positive scale so the two sides are directly comparable by length.
+        const W = 700, rowH = 62, padTop = 30, padBottom = 40;
+        const H = padTop + calcs.length * rowH + padBottom;
+        const labelW = 116, gap = 10, plotW = W - labelW - gap - 92;
+        const perUnit = plotW / (maxPos + maxCred);
+        const credW = maxCred * perUnit;
+        const zeroX = labelW + gap + credW;
+        const barW = maxPos * perUnit;
+        const sxPos = v => zeroX + v * perUnit;
+        const sxCred = v => zeroX - v * perUnit;
+
+        let out = '';
+        for (let i = 0; i <= 4; i++) {
+          const val = maxPos * i / 4, x = sxPos(val);
+          out += `<line x1="${x}" y1="${padTop-8}" x2="${x}" y2="${H-padBottom+4}" stroke="${i?'#eef2f5':'#8293a1'}"/>`;
+          out += `<text x="${x}" y="${H-padBottom+18}" text-anchor="middle" font-size="10" fill="#5c6b78">$${fmt(val,0)}</text>`;
+        }
+        out += `<text x="${zeroX + barW/2}" y="${H-4}" text-anchor="middle" font-size="11" font-weight="700" fill="#314554">USD per tonne C₂H₄</text>`;
+        if (credW > 24) out += `<text x="${sxCred(maxCred/2)}" y="${padTop-14}" text-anchor="middle" font-size="10" font-weight="700" fill="#0b7a53">credit</text>`;
+
+        calcs.forEach((c,i)=>{
+          const y = padTop + i * rowH, bh = 22;
+          const vals = [c.annualCapital/c.cap, c.categories.ethane/c.cap, (c.grossOpex-c.categories.ethane)/c.cap, c.om/c.cap];
+          const colors = ['#00539f','#ffd200','#6da7d8','#7851a9'];
+          const names = ['Annualized capital (TOC × CCF)','Ethane feed','Other variable cost','O&M + labor (maintenance, insurance, labor)'];
+          // Spell out what the aggregated "other variable cost" block actually contains.
+          const breakdown = Object.entries(c.categories).filter(([k])=>k!=='ethane')
+            .map(([k,val])=>[categoryLabels[k], val/c.cap]).filter(([,val])=>val>0.005)
+            .sort((a,b)=>b[1]-a[1]).map(([n,val])=>`${n} ${money(val,1)}`).join(', ');
+          const tips = [names[0], names[1], `Other variable cost — ${breakdown||'none'}`, names[3]];
+          let x = zeroX;
+          vals.forEach((v,j)=>{
+            const w = Math.max(0, v / maxPos * barW);
+            if (w > 0) out += `<rect x="${x}" y="${y}" width="${w}" height="${bh}" fill="${colors[j]}"><title>${tips[j]}: ${money(v,1)}/t</title></rect>`;
+            x += w;
+          });
+          const cw = Math.max(0, credTotals[i] * perUnit);
+          out += `<rect x="${zeroX-cw}" y="${y}" width="${cw}" height="${bh}" fill="#0b7a53" opacity=".85"><title>Coproduct credit: ${money(credTotals[i],1)}/t</title></rect>`;
+          const nx = sxPos(c.coo);
+          out += `<line x1="${nx}" y1="${y-3}" x2="${nx}" y2="${y+bh+3}" stroke="#122231" stroke-width="1.5" stroke-dasharray="3 2"/>`;
+          out += `<path d="M${nx} ${y+bh+3} l-5 8 l10 0 z" fill="#122231"><title>Net cost of ethylene ${money(c.coo,1)}/t</title></path>`;
+          out += `<text x="0" y="${y+13}" font-size="12" font-weight="800" fill="#122231">${routeMeta[c.route].name}</text>`;
+          out += `<text x="0" y="${y+27}" font-size="10" fill="#5c6b78">${c.capitalComplete?'capital included':'TBMC missing'}</text>`;
+          out += `<text x="${W-84}" y="${y+16}" font-size="13" font-weight="800" fill="#122231">${money(c.coo,0)}/t</text>`;
+          out += `<text x="${W-84}" y="${y+30}" font-size="10" fill="#5c6b78">net</text>`;
+        });
+        svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+        svg.innerHTML = out;
+      }
+
+      function renderIntensitySummary() {
+        const rows = routeOrder.map(r=>({r,v:state.inventory[r]}));
+        const minEth = Math.min(...rows.map(x=>x.v.ethane));
+        const minElec = Math.min(...rows.map(x=>x.v.electricity));
+        const sortedHp = rows.map(x=>x.v.hpSteam).slice().sort((a,b)=>a-b);
+        const medianHp = (sortedHp[1]+sortedHp[2])/2;
+        $('#intensitySummary').innerHTML = `<thead><tr><th>Route</th><th>Ethane<br>t/t</th><th>Electricity<br>MWh/t</th><th>HP steam<br>t/t</th><th>Credits<br>kg/kg</th><th>Yield<br>%</th></tr></thead><tbody>${rows.map(({r,v})=>`<tr><td><strong>${routeMeta[r].name}</strong></td><td class="${v.ethane===minEth?'best':''}">${fmt(v.ethane,3)}</td><td class="${v.electricity===minElec?'best':''}">${fmt(v.electricity,2)}</td><td class="${medianHp>0 && v.hpSteam>3*medianHp?'flag-bad':''}">${fmt(v.hpSteam,3)}</td><td>${fmt(v.fuelCredit+v.lpgCredit,3)}</td><td>${published[r].yieldC2H4}</td></tr>`).join('')}</tbody>`;
+
+        // Flag inventory lines that are outliers against the other routes AND carry real cost weight.
+        // A high cost share alone is not remarkable — electricity dominating a Joule route is the point of the paper.
+        const flags = [];
+        routeOrder.forEach(r=>{
+          const c = calculateRoute(r);
+          if (!(c.grossOpex > 0)) return;
+          Object.entries(categoryInventoryKey).forEach(([catKey,invKey])=>{
+            if (invKey === 'electricity') return;              // expected to differ by design
+            const mine = state.inventory[r][invKey];
+            const others = routeOrder.filter(o=>o!==r).map(o=>state.inventory[o][invKey]).sort((a,b)=>a-b);
+            const median = (others[0]+others[others.length-1])/2;
+            const share = c.categories[catKey] / c.grossOpex;
+            if (median > 0 && mine > 3*median && share > 0.15) {
+              flags.push(`<strong>${routeMeta[r].name}: ${categoryLabels[catKey]} is a ${fmt(mine/median,1)}× outlier</strong><p>Table S6 gives ${fmt(mine,3)} for this route against ${others.map(o=>fmt(o,2)).join(' / ')} for the others, and it carries ${fmt(share*100,0)}% of gross OPEX. This single value decides where the route ranks — confirm it with the authors before quoting the result.</p>`);
+            }
+          });
+        });
+        $('#intensityFlags').innerHTML = flags.map(f=>`<div class="audit-note warning-note">${f}</div>`).join('');
+      }
+
+      function renderFullComparison() {
+        const calcs = routeOrder.map(r=>calculateRoute(r));
+        const finite = calcs.map(c=>c.coo).filter(Number.isFinite);
+        const best = finite.length ? Math.min(...finite) : NaN;
+        $('#fullComparison').innerHTML = `<thead><tr><th>Route</th><th>${abbr('TBMC')}<br>USD M</th><th>${abbr('TOC')}<br>USD M</th><th>Annual ${abbr('CAPEX')}<br>USD M/y</th><th>Gross ${abbr('OPEX')}<br>USD M/y</th><th>Credits<br>USD M/y</th><th>${abbr('O&M')}<br>USD M/y</th><th>${abbr('COO')}<br>USD/t</th><th>Published<br>USD/t</th></tr></thead><tbody>${calcs.map(c=>{
+          const pub = published[c.route];
+          const dev = deviation(c.coo, pub.price);
+          return `<tr><td><strong>${routeMeta[c.route].name}</strong><br><small>${c.capitalComplete?'Eq. S8 complete':'Operating floor'}</small></td><td class="${c.capitalComplete?'':'missing'}">${c.capitalComplete?fmt(c.tbmc/1e6,1):'Required'}</td><td>${fmt(c.toc/1e6,1)}</td><td>${fmt(c.annualCapital/1e6,1)}</td><td>${fmt(c.grossOpex/1e6,1)}</td><td>${fmt(c.credits/1e6,1)}</td><td>${fmt(c.om/1e6,1)}</td><td class="${c.coo===best?'best':''}"><strong>${money(c.coo,0)}</strong></td><td>${pubText(pub.price)} <span class="${devClass(dev)}">${devText(dev)}</span></td></tr>`;
+        }).join('')}</tbody>`;
+      }
+
+      function marker3(x,y,color,shape,title) {
+        const t = title ? `<title>${title}</title>` : '';
+        const common = `fill="white" stroke="${color}" stroke-width="2.5"`;
+        if (shape==='square') return `<rect x="${x-4.5}" y="${y-4.5}" width="9" height="9" ${common}>${t}</rect>`;
+        if (shape==='triangle') return `<path d="M${x} ${y-5.5} L${x+5} ${y+4} L${x-5} ${y+4} Z" ${common}>${t}</path>`;
+        if (shape==='diamond') return `<path d="M${x} ${y-5.5} L${x+5} ${y} L${x} ${y+5.5} L${x-5} ${y} Z" ${common}>${t}</path>`;
+        return `<circle cx="${x}" cy="${y}" r="4.5" ${common}>${t}</circle>`;
+      }
+
+      function renderSensitivity() {
+        const svg = $('#sensitivityChart');
+        const elec = +$('#sensElectricity').value;
+        const marker = +$('#sensEthane').value;
+        $('#sensElectricityValue').textContent = money(elec,3) + '/kWh';
+        $('#sensEthaneValue').textContent = money(marker,0) + '/t';
+        if (!validCapacity()) { svg.innerHTML = `<text x="20" y="40" font-size="13" fill="#a53a3a">Enter a plant capacity above zero to draw the sensitivity curves.</text>`; return; }
+
+        // x-range follows the marker so the marker always sits on the curve
+        const xMin = Math.min(100, Math.floor(marker/50)*50);
+        const xMax = Math.max(400, Math.ceil(marker/50)*50);
+        const steps = 6;
+        const xVals = Array.from({length:steps+1},(_,i)=>xMin+(xMax-xMin)*i/steps);
+        const series = routeOrder.map(r=>({r, pts:xVals.map(x=>({x,y:calculateRoute(r,{economics:{ethanePrice:x},screening:{electricityPrice:elec}}).coo}))}));
+        const allY = series.flatMap(s=>s.pts.map(p=>p.y)).filter(Number.isFinite);
+        if (!allY.length) { svg.innerHTML = ''; return; }
+        let yMin = Math.floor(Math.min(...allY)/100)*100;
+        let yMax = Math.ceil(Math.max(...allY)/100)*100;
+        if (yMax===yMin) yMax=yMin+100;
+        const W=780,H=330,L=65,R=130,T=22,B=48,pw=W-L-R,ph=H-T-B;
+        const sx=x=>L+(x-xMin)/(xMax-xMin)*pw, sy=y=>T+(yMax-y)/(yMax-yMin)*ph;
+        let out='';
+        for(let i=0;i<=5;i++){ const y=yMin+(yMax-yMin)*i/5, yy=sy(y); out+=`<line x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}" stroke="#dfe6ec"/><text x="${L-9}" y="${yy+4}" text-anchor="end" font-size="11" fill="#5c6b78">$${fmt(y,0)}</text>`; }
+        xVals.forEach(x=>{ const xx=sx(x); out+=`<line x1="${xx}" y1="${T}" x2="${xx}" y2="${H-B}" stroke="#edf1f4"/><text x="${xx}" y="${H-B+20}" text-anchor="middle" font-size="11" fill="#5c6b78">$${fmt(x,0)}</text>`; });
+        out+=`<line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="#8293a1"/><line x1="${L}" y1="${T}" x2="${L}" y2="${H-B}" stroke="#8293a1"/><text x="${L+pw/2}" y="${H-7}" text-anchor="middle" font-size="12" font-weight="700" fill="#314554">Ethane price (USD/t)</text><text transform="translate(16 ${T+ph/2}) rotate(-90)" text-anchor="middle" font-size="12" font-weight="700" fill="#314554">Cost of ethylene (USD/t)</text>`;
+        series.forEach((s,idx)=>{
+          const color=routeMeta[s.r].color, dash=routeMeta[s.r].dash;
+          const d=s.pts.map((p,i)=>(i?'L':'M')+sx(p.x)+' '+sy(p.y)).join(' ');
+          const my=calculateRoute(s.r,{economics:{ethanePrice:marker},screening:{electricityPrice:elec}}).coo;
+          out+=`<path d="${d}" fill="none" stroke="${color}" stroke-width="2.6" stroke-dasharray="${dash}"/>`;
+          out+=marker3(sx(marker),sy(my),color,markerShape[s.r],`${routeMeta[s.r].name}: ${money(my,1)}/t`);
+          const ly=45+idx*28;
+          out+=`<line x1="${W-R+13}" y1="${ly}" x2="${W-R+39}" y2="${ly}" stroke="${color}" stroke-width="3" stroke-dasharray="${dash}"/>`;
+          out+=marker3(W-R+26,ly,color,markerShape[s.r],'');
+          out+=`<text x="${W-R+45}" y="${ly+4}" font-size="11" font-weight="700" fill="#314554">${routeMeta[s.r].name}</text>`;
+        });
+        out+=`<line x1="${sx(marker)}" y1="${T}" x2="${sx(marker)}" y2="${H-B}" stroke="#1a2a36" stroke-dasharray="4 4" opacity=".5"/>`;
+        svg.innerHTML=out;
+      }
+
+      function renderTornado() {
+        const svg = $('#tornadoChart');
+        const r = state.selectedRoute;
+        const d = Math.min(90, Math.max(1, state.tornadoDelta)) / 100;
+        $('#tornadoCaption').textContent = `Each input is varied ±${fmt(d*100,0)}% about its current value for ${routeMeta[r].name}, holding everything else fixed.`;
+        const fail = msg => { svg.setAttribute('viewBox','0 0 700 40'); svg.innerHTML = `<text x="6" y="24" font-size="13" fill="#a53a3a">${msg}</text>`; };
+        if (!validCapacity()) return fail('Enter a plant capacity above zero to draw the tornado.');
+
+        const base = calculateRoute(r).coo;
+        const vars = [
+          ['Ethane price', f=>({economics:{ethanePrice:state.economics.ethanePrice*f}})],
+          ['Electricity price', f=>({screening:{electricityPrice:state.screening.electricityPrice*f}})],
+          ['H.P. steam price', f=>({screening:{hpSteamPrice:state.screening.hpSteamPrice*f}})],
+          ['L-5 refrigeration price', f=>({screening:{ref5Price:state.screening.ref5Price*f}})],
+          ['L-2 refrigeration price', f=>({screening:{ref2Price:state.screening.ref2Price*f}})],
+          ['TBMC (capital)', f=>({capital:{[r]:state.capital[r]*f}})],
+          ['Capital charge factor', f=>({economics:{ccf:state.economics.ccf*f}})],
+          ['CFP replacement interval', f=>({economics:{cfpReplacementMonths:state.economics.cfpReplacementMonths*f}})],
+          ['CFP unit price', f=>({screening:{cfpPrice:state.screening.cfpPrice*f}})],
+          ['LPG credit price', f=>({economics:{lpgCreditPrice:state.economics.lpgCreditPrice*f}})],
+          ['Fuel-gas credit price', f=>({economics:{fuelCreditPrice:state.economics.fuelCreditPrice*f}})],
+          ['Labor', f=>({economics:{labor:state.economics.labor*f}})],
+          ['Plant capacity', f=>({economics:{capacity:state.economics.capacity*f}})]
+        ];
+        const rows = vars.map(([label,mk])=>{
+          const a = calculateRoute(r, mk(1-d)).coo;
+          const b = calculateRoute(r, mk(1+d)).coo;
+          return { label, low: Math.min(a,b), high: Math.max(a,b), span: Math.abs(b-a) };
+        }).filter(x=>Number.isFinite(x.span) && x.span > 0.005).sort((a,b)=>b.span-a.span);
+
+        if (!rows.length) return fail('No input moves the result at this variation.');
+
+        const W=700, rowH=26, top=34, bottom=42, labelW=196;
+        const H = top + rows.length*rowH + bottom;
+        const plotW = W - labelW - 84;
+        const minV = Math.min(...rows.map(x=>x.low), base);
+        const maxV = Math.max(...rows.map(x=>x.high), base);
+        const pad = (maxV-minV)*0.08 || 1;
+        const x0 = minV-pad, x1 = maxV+pad;
+        const sx = v => labelW + (v-x0)/(x1-x0)*plotW;
+
+        let out = '';
+        for (let i=0;i<=4;i++){ const v=x0+(x1-x0)*i/4, x=sx(v);
+          out += `<line x1="${x}" y1="${top-10}" x2="${x}" y2="${H-bottom+4}" stroke="#eef2f5"/><text x="${x}" y="${H-bottom+18}" text-anchor="middle" font-size="10" fill="#5c6b78">$${fmt(v,0)}</text>`; }
+        out += `<line x1="${sx(base)}" y1="${top-10}" x2="${sx(base)}" y2="${H-bottom+4}" stroke="#122231" stroke-dasharray="4 3"/>`;
+        out += `<text x="${sx(base)}" y="${top-16}" text-anchor="middle" font-size="10" font-weight="700" fill="#122231">base ${money(base,0)}/t</text>`;
+        out += `<text x="${labelW+plotW/2}" y="${H-6}" text-anchor="middle" font-size="11" font-weight="700" fill="#314554">Cost of ethylene (USD/t)</text>`;
+        rows.forEach((x,i)=>{
+          const y = top + i*rowH, xa = sx(x.low), xb = sx(x.high), xb0 = sx(base);
+          out += `<rect x="${Math.min(xa,xb0)}" y="${y}" width="${Math.abs(xb0-xa)}" height="16" fill="#6da7d8"><title>${x.label} low end: ${money(x.low,1)}/t</title></rect>`;
+          out += `<rect x="${xb0}" y="${y}" width="${Math.max(0,xb-xb0)}" height="16" fill="#00539f"><title>${x.label} high end: ${money(x.high,1)}/t</title></rect>`;
+          out += `<text x="${labelW-8}" y="${y+12}" text-anchor="end" font-size="11" fill="#122231">${x.label}</text>`;
+          out += `<text x="${W-78}" y="${y+12}" font-size="11" font-weight="700" fill="#5c6b78">±${money(x.span/2,0)}/t</text>`;
+        });
+        svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+        svg.innerHTML = out;
+      }
+
+      // ---------- validation ----------
+
+      function renderBasisSwitch() {
+        $$('#elecBasisSwitch button').forEach(b=>{
+          const on = b.dataset.basis === state.electricityBasis;
+          b.classList.toggle('active', on);
+          b.setAttribute('aria-pressed', String(on));
+        });
+        $('#basisExplainer').innerHTML = state.electricityBasis === 'inventory'
+          ? `<strong>Basis: Table S6 inventory × electricity price.</strong><p>Table S6 sits in SI Note 3 and is described as the inventory for the <em>life-cycle assessment</em>. SI Note 2 (TEA) contains no inventory table, so treating these flows as purchased utilities is this tool's reconstruction. For the Joule routes it lands close to the published electricity cost; for the steam-cracking benchmark it does not.</p>`
+          : `<strong>Basis: published TEA electricity cost.</strong><p>Electricity is charged at the figure printed in Section 2.5 rather than derived from Table S6. Where the manuscript gives a group range, the midpoint is used. Every other utility still comes from the Table S6 inventory.</p>`;
+      }
+
+      function renderValidation() {
+        const rows = routeOrder.map(r=>{
+          const c = calculateRoute(r), pub = published[r], elecM = c.categories.electricity/1e6;
+          return { r, c, pub, elecM,
+            devToc: deviation(c.toc/1e6, pub.tci), devTcm: deviation(c.tcm/1e6, pub.tcm),
+            devElec: deviation(elecM, pub.elec), devPrice: deviation(c.coo, pub.price) };
+        });
+        const cell = (val, pubv, dev, digits=1) => `<td>${fmt(val,digits)}<br><small class="muted-cell">pub ${pubText(pubv)}</small><br><span class="${devClass(dev)}">${devText(dev)}</span></td>`;
+        $('#validationTable').innerHTML = `<thead><tr><th>Route</th><th>${abbr('TOC')} vs published ${abbr('TCI')}<br>USD M</th><th>${abbr('TCM')}<br>USD M/y</th><th>Electricity cost<br>USD M/y</th><th>${abbr('COO')} — cost of ethylene<br>USD/t</th></tr></thead><tbody>${rows.map(x=>`<tr><td><strong>${routeMeta[x.r].name}</strong>${x.pub.tciNote?`<br><small class="muted-cell">TCI ${x.pub.tciNote}</small>`:''}</td>${cell(x.c.toc/1e6,x.pub.tci,x.devToc)}${cell(x.c.tcm/1e6,x.pub.tcm,x.devTcm)}${cell(x.elecM,x.pub.elec,x.devElec)}${cell(x.c.coo,x.pub.price,x.devPrice,0)}</tr>`).join('')}</tbody>`;
+
+        const notes = [];
+        const steam = rows.find(x=>x.r==='steam');
+        if (state.electricityBasis === 'inventory' && Math.abs(steam.devElec) > 25) {
+          const kwh = state.inventory.steam.electricity * 1000 * state.economics.capacity;
+          const implied = kwh > 0 ? 37.6e6 / kwh : NaN;
+          notes.push(['warning','Benchmark electricity does not reconcile',
+            `Charging the Table S6 electricity inventory at ${money(state.screening.electricityPrice,3)}/kWh gives ${money(steam.elecM,1)} M/y against the published ${money(37.6,1)} M/y. Reproducing the published figure would need ${money(implied,4)}/kWh, which is not a credible industrial rate. The LCA inventory evidently carries electricity-equivalents for utilities the TEA charged separately. Switch the basis above to see the effect.`]);
+        }
+        rows.forEach(x=>{
+          if (Number.isFinite(x.devTcm) && Math.abs(x.devTcm) > 10) {
+            notes.push([Math.abs(x.devTcm) > 25 ? 'warning' : 'plain', `${routeMeta[x.r].name}: TCM off by ${devText(x.devTcm)}`,
+              `Computed ${money(x.c.tcm/1e6,1)} M/y against the published ${pubText(x.pub.tcm)} M/y. Feed, credits, capital and labor are all published, so the residual points at the screening utility prices — assumption 14 cites Seider et al. without printing the numbers.`]);
+          }
+        });
+        if (!notes.length) notes.push(['plain','Reconstruction is within tolerance','Every published quantity is matched within 10% at the current inputs.']);
+        $('#validationNotes').innerHTML = notes.slice(0,6).map(([kind,title,body])=>`<article class="audit-note ${kind==='warning'?'warning-note':''}"><strong>${title}</strong><p>${body}</p></article>`).join('');
+
+        // Fig. 8b inversion: COO is linear in electricity price, so solve for the price reproducing each figure.
+        const mkmX = calculateRoute('mkmX');
+        const kwhPerYear = state.inventory.mkmX.electricity * 1000 * state.economics.capacity;
+        const basePrice = state.screening.electricityPrice;
+        const impliedFor = target => (kwhPerYear > 0 && validCapacity() && Number.isFinite(mkmX.coo))
+          ? basePrice + (target - mkmX.coo) * state.economics.capacity / kwhPerYear : NaN;
+        $('#elecSourceTable').innerHTML = `<thead><tr><th>Electricity source</th><th>Published cost of C₂H₄<br>USD/t</th><th>Implied electricity price<br>USD/kWh</th></tr></thead><tbody>${elecSources.map(([name,val])=>{
+          const a = impliedFor(lo(val)), b = impliedFor(hi(val));
+          return `<tr><td><strong>${name}</strong></td><td>${pubText(val)}</td><td>${Array.isArray(val) ? money(a,4)+' – '+money(b,4) : money(a,4)}</td></tr>`;
+        }).join('')}<tr><td colspan="3" class="muted-cell" style="text-align:left;font-size:12px">Inverted from the current MKM-XC₂H₆ model (${money(mkmX.coo,0)}/t at ${money(basePrice,3)}/kWh, ${fmt(state.inventory.mkmX.electricity,2)} kWh/kg). The manuscript does not print $/kWh by source; these are derived, not published.</td></tr></tbody>`;
+      }
+
+      // ---------- inputs ----------
+
+      function fieldHTML(scope, def, source='published') {
+        const [key,label,unit,step,note] = def;
+        const meta = note || (source === 'published' ? 'SI Note 2' : 'Editable price basis');
+        return `<div class="field ${source}-field"><label for="${scope}-${key}">${label}</label><div class="input-wrap"><input id="${scope}-${key}" type="number" data-scope="${scope}" data-key="${key}" value="${state[scope][key]}" step="${step}" min="0"><span class="unit">${unit}</span></div><div class="field-meta"><span>${meta}</span><span class="source-tag ${source}">${source === 'published' ? 'Published' : 'Screening'}</span></div></div>`;
+      }
+
+      function renderFields() {
+        $('#publishedFields').innerHTML = publishedFieldDefs.map(d=>fieldHTML('economics',d,'published')).join('');
+        $('#screeningFields').innerHTML = screeningFieldDefs.map(d=>fieldHTML('screening',d,'screening')).join('');
+        $('#cfpFields').innerHTML = cfpFieldDefs.map(d=>fieldHTML('screening',d,'screening')).join('')
+          + fieldHTML('economics',['cfpReplacementMonths','Replacement interval','months',1,'Assumption 7'],'published')
+          .replace('id="economics-cfpReplacementMonths"','id="cfp-economics-cfpReplacementMonths"')
+          .replace('for="economics-cfpReplacementMonths"','for="cfp-economics-cfpReplacementMonths"');
+        bindScopedInputs();
+        renderCapacityCheck();
+      }
+
+      function bindScopedInputs() {
+        $$('[data-scope]').forEach(inp=>{
+          if (inp.dataset.bound) return;
+          inp.dataset.bound = '1';
+          inp.addEventListener('input', e=>{
+            const scope=e.target.dataset.scope, key=e.target.dataset.key;
+            state[scope][key]=Number(e.target.value)||0;
+            syncScopedInputs(e.target);
+            if(key==='electricityPrice'){ $('#sensElectricity').value=Math.min(.16,Math.max(.02,state.screening.electricityPrice)); }
+            if(key==='ethanePrice'){ $('#sensEthane').value=Math.min(400,Math.max(100,state.economics.ethanePrice)); }
+            persist();
+            renderDynamic();
+          });
+        });
+      }
+
+      // Keep duplicate inputs bound to the same state key in step without touching the focused one.
+      function syncScopedInputs(origin) {
+        const { scope, key } = origin.dataset;
+        $$(`[data-scope="${scope}"][data-key="${key}"]`).forEach(el=>{ if (el !== origin) el.value = state[scope][key]; });
+      }
+
+      function syncAllScopedInputs() {
+        $$('[data-scope]').forEach(el=>{ if (el !== document.activeElement) el.value = state[el.dataset.scope][el.dataset.key]; });
+      }
+
+      function renderCapacityCheck() {
+        const e = state.economics;
+        const rate = e.operatingHours > 0 ? e.capacity / e.operatingHours : NaN;
+        const capOk = e.capacity >= 600000 && e.capacity <= 620000;
+        const rateOk = Number.isFinite(rate) && Math.abs(rate - 77) / 77 <= 0.1;
+        $('#capacityCheck').innerHTML = `<div class="audit-note ${capOk && rateOk ? '' : 'warning-note'}" style="margin-top:14px"><strong>Capacity consistency</strong><p>${fmt(e.capacity,0)} t/y over ${fmt(e.operatingHours,0)} h/y is <strong>${fmt(rate,1)} t/h</strong>. Assumption 1 gives 600,000–620,000 t/y ${capOk?'✓':'✗'} and SI §3.1 reports ~77 t/h ${rateOk?'✓':'✗'}.</p></div>`;
+      }
+
+      function renderCapitalCards() {
+        $('#capitalCards').innerHTML = routeOrder.map(r=>{
+          const pub = published[r];
+          return `<article class="panel capital-card" data-card="${r}" style="--route-color:${routeMeta[r].color}"><h3>${routeMeta[r].name}<span class="source-tag" data-tag="${r}"></span></h3><p>Total bare-module cost for all equipment in this route. Published TCI ${pubText(pub.tci)} M${pub.tciNote?' ('+pub.tciNote+')':''}.</p><div class="field" data-capfield="${r}"><label for="capital-${r}">Total Bare-Module Cost</label><div class="input-wrap"><input id="capital-${r}" type="number" data-capital="${r}" value="${state.capital[r]}" step="1" min="0" placeholder="Enter Aspen result"><span class="unit">USD M</span></div></div><div class="mini-metrics" data-mini="${r}"></div></article>`;
+        }).join('');
+        // Bound once. The handler never re-renders the card that owns the focused input.
+        $$('[data-capital]').forEach(inp=>inp.addEventListener('input',e=>{
+          state.capital[e.target.dataset.capital]=Number(e.target.value)||0;
+          persist();
+          renderDynamic();
+        }));
+        updateCapitalMetrics();
+      }
+
+      function updateCapitalMetrics() {
+        routeOrder.forEach(r=>{
+          const c = calculateRoute(r);
+          const complete = state.capital[r] > 0;
+          const derived = Math.abs(state.capital[r] - defaultCapital[r]) < 1e-9;
+          const host = document.querySelector(`[data-mini="${r}"]`);
+          if (host) host.innerHTML = `<div class="mini-metric"><span>TOC</span><strong>${money(c.toc/1e6,1)} M</strong></div><div class="mini-metric"><span>Annual CAPEX</span><strong>${money(c.annualCapital/1e6,1)} M/y</strong></div><div class="mini-metric"><span>Maint. + ins.</span><strong>${money((c.maintenance+c.insurance)/1e6,1)} M/y</strong></div>`;
+          const tag = document.querySelector(`[data-tag="${r}"]`);
+          if (tag) {
+            tag.className = 'source-tag ' + (complete ? (derived ? 'derived' : 'reconstructed') : 'required');
+            tag.textContent = complete ? (derived ? 'From TCI' : 'Entered') : 'Required';
+          }
+          const card = document.querySelector(`[data-card="${r}"]`);
+          if (card) card.classList.toggle('complete', complete);
+          const fieldEl = document.querySelector(`[data-capfield="${r}"]`);
+          if (fieldEl) { fieldEl.classList.toggle('derived-field', complete); fieldEl.classList.toggle('required-field', !complete); }
+          const input = document.getElementById('capital-'+r);
+          if (input && input !== document.activeElement) input.value = state.capital[r];
+        });
+      }
+
+      function renderCfpResults() {
+        const e = state.economics, s = state.screening;
+        const V = reactorVolume(state.geometry) * state.geometry.volumeFactor;
+        const charge = Number.isFinite(V) ? V * s.cfpDensity : NaN;
+        const annual = cfpAnnualMass(e, s);
+        const cost = Number.isFinite(annual) ? annual * s.cfpPrice : NaN;
+        const perTonne = validCapacity() && Number.isFinite(cost) ? cost / e.capacity : NaN;
+        const lcaEquivalent = state.inventory.mkmS.cfp * e.capacity * 1000 * s.cfpPrice;
+        $('#cfpResults').innerHTML = `<div class="panel-title-row"><div><h3>Replacement charge</h3><p>Derived from the tube volume on the Process tab, not from Table S6.</p></div><span class="source-tag derived">Assumptions 6 + 7</span></div>
+          <div class="grid grid-2"><div class="calc-result"><span>CFP charge in reactor</span><strong>${fmt(charge,0)} kg</strong><small>${fmt(V,3)} m³ at ${fmt(s.cfpDensity,0)} kg/m³</small></div><div class="calc-result" style="background:#00539f"><span>Annual replacement</span><strong>${fmt(annual/1000,1)} t/y</strong><small>${money(cost/1e6,2)} M/y · ${money(perTonne,2)}/t C₂H₄</small></div></div>
+          <div class="audit-note warning-note" style="margin-top:12px"><strong>Why Table S6 is not used here</strong><p>Costing the Table S6 CFP allocation instead would give ${money(lcaEquivalent,0)}/y for MKM-SC₂H₄. That column is a mass-allocated LCA figure, not the TEA's substrate consumption. Assumption 7 states monthly replacement, so the charge above follows from the reactor volume.</p></div>
+          <div class="equation"><div class="eq">ṁ<sub>CFP</sub> = V<sub>reactor</sub> · φ · ρ<sub>CFP</sub> · (12 / t<sub>replace</sub>)</div><p>Default density 452 kg/m³ is the Freudenberg H23 specification quoted in Methods 4.4 (95 g/m² over 0.21 mm). Only the Joule routes carry this cost.</p></div>`;
+      }
+
+      const heatDefs = [
+        ['heatDuty','Net reactor heat duty','GJ/t C₂H₄',0.5,()=>state.heatDuty,v=>{state.heatDuty=v;},null],
+        ['heatGas','Natural-gas price','USD/GJ',0.25,()=>state.screening.fuelEnergyPrice,v=>{state.screening.fuelEnergyPrice=v;},['screening','fuelEnergyPrice']],
+        ['heatElec','Electricity price','USD/kWh',0.005,()=>state.screening.electricityPrice,v=>{state.screening.electricityPrice=v;},['screening','electricityPrice']],
+        ['heatFurnaceEff','Furnace efficiency','fraction',0.01,()=>state.economics.furnaceEfficiency,v=>{state.economics.furnaceEfficiency=v;},['economics','furnaceEfficiency']],
+        ['heatJouleEff','Joule efficiency','fraction',0.01,()=>state.economics.jouleEfficiency,v=>{state.economics.jouleEfficiency=v;},['economics','jouleEfficiency']]
+      ];
+
+      function renderHeatFields() {
+        $('#heatFields').innerHTML = heatDefs.map(d=>`<div class="field"><label for="${d[0]}">${d[1]}</label><div class="input-wrap"><input id="${d[0]}" type="number" value="${d[4]()}" step="${d[3]}" min="0"><span class="unit">${d[2]}</span></div></div>`).join('');
+        heatDefs.forEach(d=>$('#'+d[0]).addEventListener('input',e=>{
+          d[5](Number(e.target.value)||0);
+          if (d[6]) { const [sc,k]=d[6]; $$(`[data-scope="${sc}"][data-key="${k}"]`).forEach(el=>el.value=state[sc][k]); }
+          if (d[0]==='heatElec') $('#sensElectricity').value = Math.min(.16, Math.max(.02, state.screening.electricityPrice));
+          persist(); renderDynamic();
+        }));
+        renderHeatResults();
+      }
+
+      // Mirror the shared values back into the heat panel without stealing focus.
+      function syncHeatFields() {
+        heatDefs.forEach(d=>{ const el=$('#'+d[0]); if (el && el!==document.activeElement) el.value = d[4](); });
+      }
+
+      function renderHeatResults() {
+        const e = state.economics, s = state.screening;
+        const duty = state.heatDuty, gas = s.fuelEnergyPrice, elec = s.electricityPrice;
+        const ef = e.furnaceEfficiency, ej = e.jouleEfficiency;
+        const furnacePurchased = ef ? duty/ef : NaN, joulePurchased = ej ? duty/ej : NaN;
+        const furnaceCost = furnacePurchased*gas, jouleCost = joulePurchased*elec*277.7778;
+        const breakEven = (ef && ej) ? gas*ej/ef/277.7778 : NaN;
+        $('#heatResults').innerHTML=`<div class="panel-title-row"><div><h3>Identical-duty comparison</h3><p>Purchased energy after reported device efficiency.</p></div><span class="source-tag published">Assumption 15</span></div><div class="grid grid-2"><div class="calc-result"><span>Furnace purchased energy</span><strong>${fmt(furnacePurchased,2)} GJ/t</strong><small>${money(furnaceCost,1)}/t at current gas price</small></div><div class="calc-result" style="background:#00539f"><span>Joule purchased energy</span><strong>${fmt(joulePurchased,2)} GJ/t</strong><small>${money(jouleCost,1)}/t at current power price</small></div></div><div class="equation"><strong>Break-even electricity price</strong><div class="eq">${money(breakEven,4)}/kWh</div><p>At this electricity price, purchased reactor heat costs match for the entered natural-gas price. Separation utilities are excluded.</p></div><div class="audit-note"><strong>Published net specific energy</strong><p>Section 2.5 reports 14.7 GJ/t for the benchmark, 7.4–7.5 GJ/t for the MKM cases and 9.7 GJ/t for Exp-Opt. Those are whole-process figures, so they are not directly comparable to the reactor-only duty above.</p></div>`;
+      }
+
+      // ---------- routes / process ----------
+
+      function renderRouteCards() {
+        $('#routeCards').innerHTML=routeOrder.map(r=>{
+          const m=routeMeta[r], v=state.inventory[r], pub=published[r];
+          const eff = m.usesCfp ? state.economics.jouleEfficiency : state.economics.furnaceEfficiency;
+          return `<article class="panel route-card" style="--route-color:${m.color}"><h3>${m.name}</h3><p class="route-type">${m.type}</p><div class="route-facts"><div class="fact"><span>Conversion X<sub>C₂H₆</sub></span><strong>${pct(m.conversion)}</strong></div><div class="fact"><span>C₂H₄ yield</span><strong>${pub.yieldC2H4}%</strong></div><div class="fact"><span>Reactor</span><strong>${m.reactorT} °C</strong></div><div class="fact"><span>Efficiency</span><strong>${fmt(eff*100,0)}%</strong></div><div class="fact"><span>Electricity</span><strong>${fmt(v.electricity,2)} MWh/t</strong></div><div class="fact"><span>Net energy</span><strong>${plain(pubText(pub.netEnergy,1))} GJ/t</strong></div></div></article>`;
+        }).join('');
+      }
+
+      function renderInventoryTable() {
+        $('#inventoryTable').innerHTML=`<thead><tr><th>Flow</th>${routeOrder.map(r=>`<th>${routeMeta[r].name}</th>`).join('')}</tr></thead><tbody>${inventoryRows.map(([key,label,unit,costed])=>`<tr class="${costed?'':'inactive-row'}"><td class="row-label">${label}<small>${unit}</small></td>${routeOrder.map(r=>`<td><input class="inventory-input" aria-label="${label}, ${routeMeta[r].name}" type="number" data-inventory-route="${r}" data-inventory-key="${key}" value="${state.inventory[r][key]}" step="any" min="0"${costed?'':' disabled'}></td>`).join('')}</tr>`).join('')}</tbody>`;
+        $$('[data-inventory-route]').forEach(inp=>inp.addEventListener('input',e=>{
+          state.inventory[e.target.dataset.inventoryRoute][e.target.dataset.inventoryKey]=Number(e.target.value)||0;
+          persist(); renderDynamic();
+        }));
+        $('#inventoryNote').innerHTML = `<strong>Table S6 is the LCA inventory</strong><p>It appears in SI Note 3, not in the TEA note. The CFP row is disabled because assumption 7 supplies the substrate consumption directly; see the Validation tab for where the remaining flows do and do not reconcile with the published costs.</p>`;
+      }
+
+      function renderGlossary() {
+        $('#glossaryTable').innerHTML = `<thead><tr><th>Term</th><th>Full name</th><th>What it means</th><th>Unit</th><th>Source</th></tr></thead><tbody>${glossary.map(g=>`<tr><td>${g[0]}</td><td>${g[1]}</td><td>${g[2]}</td><td class="muted-cell">${g[3]}</td><td class="muted-cell">${g[4]}</td></tr>`).join('')}</tbody>`;
+        const routeBlurbs = {
+          steam: 'The industry benchmark. A fired furnace heats the tubes from the outside; the wall material limits how hot you can go. This is what the Joule cases must beat.',
+          mkmS: 'Joule heating tuned for <strong>selectivity</strong> — the operating point the microkinetic model says gives the best ethylene selectivity (80% conversion, 66% yield). It runs at 40 wt% steam to suppress acetylene, which enlarges the water-removal section.',
+          mkmX: 'Joule heating tuned for <strong>conversion</strong> — the microkinetic model\'s ~65% conversion point (56% yield). The "X" is the conversion symbol, the "S" above is selectivity.',
+          exp: 'The best composition actually measured in the lab reactor, rather than predicted. It carries more methane than the model cases because the reactor is not yet optimized, and methane is expensive to separate at −140 °C.'
+        };
+        $('#routeLegend').innerHTML = routeOrder.map(r=>`<span class="source-tag" style="background:${routeMeta[r].color};color:white">${routeMeta[r].name}</span><span>${routeBlurbs[r]}</span>`).join('');
+      }
+
+      function renderReactionCards() {
+        $('#reactionCards').innerHTML=['mkmS','mkmX','exp'].map(r=>`<article class="panel"><div class="panel-title-row"><h3>${routeMeta[r].name}</h3><span class="source-tag published">X<sub>C₂H₆</sub> = ${pct(routeMeta[r].conversion)}</span></div><div class="reaction">${reactions[r]}</div></article>`).join('');
+      }
+
+      function renderOperatingTable() {
+        const units=['Reactor','T1','T2','T3','T4','T5'];
+        $('#operatingTable').innerHTML=`<thead><tr><th>Route / unit</th><th>T (°C)</th><th>P (bar)</th><th>Reflux ratio</th></tr></thead><tbody>${routeOrder.map(r=>units.map((u,i)=>{const x=operating[r][u];return `<tr><td>${i===0?'<strong>'+routeMeta[r].name+'</strong> · ':''}${u}</td><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td></tr>`}).join('')).join('')}</tbody>`;
+      }
+
+      function renderGeometry() {
+        const defs=[['molarFlow','Total reactor inlet flow','kmol/h',10],['residenceMs','Residence time','ms',10],['temperature','Inlet temperature','°C',10],['pressure','Pressure','bar',0.1],['tubes','Tube count','count',1],['diameter','Tube ID','m',0.01],['volumeFactor','Effective volume factor φ','fraction',0.05]];
+        $('#geometryFields').innerHTML=defs.map(d=>`<div class="field ${['tubes','diameter'].includes(d[0])?'published-field':''}"><label for="geo-${d[0]}">${d[1]}</label><div class="input-wrap"><input id="geo-${d[0]}" type="number" data-geo="${d[0]}" value="${state.geometry[d[0]]}" step="${d[3]}" min="0"><span class="unit">${d[2]}</span></div></div>`).join('');
+        $$('[data-geo]').forEach(inp=>inp.addEventListener('input',e=>{
+          state.geometry[e.target.dataset.geo]=Number(e.target.value)||0;
+          persist(); renderDynamic();
+        }));
+        renderGeometryResult();
+      }
+
+      function renderGeometryResult() {
+        const g=state.geometry;
+        const V=reactorVolume(g);
+        const A=g.tubes*Math.PI*g.diameter*g.diameter/4*g.volumeFactor;
+        const L=A>0?V/A:NaN;
+        const Q=g.residenceMs>0 ? V/(g.residenceMs/1000) : NaN;
+        $('#tubeLength').textContent=Number.isFinite(L)?fmt(L,3)+' m':'—';
+        $('#tubeVolumeNote').textContent=Number.isFinite(V)?`Total reacting volume ${fmt(V,3)} m³; ideal-gas flow ${fmt(Q,3)} m³/s. This volume also sets the CFP replacement charge.`:'Enter positive pressure, tube count, diameter, and volume factor.';
+      }
+
+      // ---------- audit ----------
+
+      function renderAudit() {
+        const e = state.economics;
+        const rows=[
+          ['Plant capacity',fmt(e.capacity,0)+' t/y','SI Note 2, assumption 1','Published range 600,000–620,000 t/y; midpoint default'],
+          ['Operating period',fmt(e.operatingHours,0)+' h/y','Methods 4.3','Cross-checks capacity against the ~77 t/h in SI §3.1'],
+          ['Ethane price',money(e.ethanePrice,0)+'/t','SI Note 2, assumption 2','Direct feed-cost driver'],
+          ['TEG price',money(e.tegPrice,0)+'/t','SI Note 2, assumption 3','Applied to Table S6 TEG intensity'],
+          ['Wastewater treatment',money(e.wastewaterPrice,2)+'/m³','SI Note 2, assumption 4','1,000 kg/m³ density assumed for conversion'],
+          ['LPG credit',money(e.lpgCreditPrice,0)+'/t','SI Note 2, assumption 5','Subtracted from gross OPEX'],
+          ['Fuel-gas credit',money(e.fuelCreditPrice,0)+'/t','SI Note 2, assumption 5','Subtracted from gross OPEX'],
+          ['Reactor tubes','144 × 0.12 m ID','SI Note 2, assumption 6','Tube length back-calculated from flow and residence time'],
+          ['CFP replacement',fmt(e.cfpReplacementMonths,1)+' month(s)','SI Note 2, assumption 7','Substrate mass from reactor volume × density; the Table S6 CFP column is not costed'],
+          ['Labor',money(e.labor/1e6,1)+' M/y','SI Note 2, assumption 8','Shared annual fixed cost'],
+          ['Maintenance',fmt(e.maintenanceRate*100,1)+'% TOC','SI Note 2, assumption 9','Annual O&M'],
+          ['Insurance',fmt(e.insuranceRate*100,1)+'% TOC','SI Note 2, assumption 10','Annual O&M'],
+          ['TOC factor',fmt(e.tocFactor,2)+' × TBMC','SI Note 2, assumption 11','Installed capital multiplier'],
+          ['CCF',fmt(e.ccf,2),'SI Note 2, Eq. S9','Annualizes TOC; consistent with 35% tax, 3% inflation, 20-y depreciation, 15% revenue and 5% debt interest (Methods 4.3)'],
+          ['Furnace / Joule efficiency',fmt(e.furnaceEfficiency*100,0)+'% / '+fmt(e.jouleEfficiency*100,0)+'%','SI Note 2, assumption 15','Side heat-duty calculation; no double counting'],
+          ['Utility prices','Editable','SI Note 2, assumption 14 — Seider et al. cited, values absent','Screening defaults require replacement; the Validation tab quantifies the gap'],
+          ['TBMC',routeOrder.map(r=>routeMeta[r].name+': '+(state.capital[r]?money(state.capital[r],1)+' M':'missing')).join(' · '),'Not in the SI; back-calculated from the TCI in Section 2.5','Assumes TCI ≈ TOC'],
+          ['Electricity basis',state.electricityBasis==='inventory'?'Table S6 inventory':'Published TEA cost','SI Note 3 Table S6 / Section 2.5','See the Validation tab'],
+          ['Route inventories','Editable Table S6 values','SI Note 3, Table S6','LCA inventory used here for route-resolved OPEX reconstruction']
+        ];
+        $('#auditTable').innerHTML=`<thead><tr><th>Assumption</th><th>Current value</th><th>Evidence</th><th>Calculation role</th></tr></thead><tbody>${rows.map(r=>`<tr><td><strong>${r[0]}</strong></td><td class="ledger-value">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</tbody>`;
+      }
+
+      // ---------- orchestration ----------
+
+      function renderDynamic() {
+        renderBoundary(); renderKpis(); renderCostBars(); renderIntensitySummary(); renderFullComparison();
+        renderSensitivity(); renderTornado(); renderRouteCards(); renderValidation(); renderBasisSwitch();
+        renderAudit(); renderCapacityCheck(); renderCfpResults(); renderHeatResults(); renderGeometryResult();
+        updateCapitalMetrics(); syncHeatFields();
+      }
+
+      function renderStructure() {
+        renderFields(); renderCapitalCards(); renderHeatFields(); renderInventoryTable();
+        renderReactionCards(); renderOperatingTable(); renderGeometry(); renderGlossary(); renderRouteSwitch();
+      }
+
+      function resetGroup(group) {
+        if(group==='economics') state.economics=clone(defaultEconomics);
+        if(group==='screening') state.screening=clone(defaultScreening);
+        if(group==='inventory') state.inventory=clone(defaultInventory);
+        if(group==='capital') state.capital=clone(defaultCapital);
+        persist();
+        syncAllScopedInputs();
+        renderInventoryTable();
+        $('#sensElectricity').value = Math.min(.16, Math.max(.02, state.screening.electricityPrice));
+        $('#sensEthane').value = Math.min(400, Math.max(100, state.economics.ethanePrice));
+        renderDynamic();
+        showToast('Values reset');
+      }
+
+      function showToast(msg) {
+        const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(showToast.timer); showToast.timer=setTimeout(()=>t.classList.remove('show'),2200);
+      }
+
+      function persist() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (err) { /* storage unavailable */ }
+      }
+
+      function mergeState(saved) {
+        const base = defaultState();
+        return {
+          ...base,
+          economics:{ ...base.economics, ...(saved.economics||{}) },
+          screening:{ ...base.screening, ...(saved.screening||{}) },
+          capital:{ ...base.capital, ...(saved.capital||{}) },
+          geometry:{ ...base.geometry, ...(saved.geometry||{}) },
+          inventory: Object.fromEntries(routeOrder.map(r=>[r,{ ...base.inventory[r], ...((saved.inventory||{})[r]||{}) }])),
+          heatDuty: Number.isFinite(saved.heatDuty) ? saved.heatDuty : base.heatDuty,
+          electricityBasis: saved.electricityBasis === 'published' ? 'published' : 'inventory',
+          selectedRoute: routeOrder.includes(saved.selectedRoute) ? saved.selectedRoute : base.selectedRoute,
+          tornadoDelta: Number.isFinite(saved.tornadoDelta) ? saved.tornadoDelta : base.tornadoDelta
+        };
+      }
+
+      function restore() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) state = mergeState(JSON.parse(raw));
+        } catch (err) { state = defaultState(); }
+      }
+
+      function exportJson() {
+        const data = {
+          metadata:{ title:'Ethane Cracker TEA Lab assumptions', source:'Mittal, Kwak et al., CEJ 523 (2025) 168251 and Supporting Information Notes 2-3', exported:new Date().toISOString(), schema:2 },
+          economics:state.economics, screening:state.screening, capital:state.capital,
+          inventory:state.inventory, geometry:state.geometry, heatDuty:state.heatDuty,
+          electricityBasis:state.electricityBasis, selectedRoute:state.selectedRoute, tornadoDelta:state.tornadoDelta
+        };
+        download('ethane-cracker-tea-inputs.json',JSON.stringify(data,null,2),'application/json');
+      }
+
+      function importJson(file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            state = mergeState(JSON.parse(reader.result));
+            persist();
+            $('#tornadoDelta').value = state.tornadoDelta;
+            $('#sensElectricity').value = Math.min(.16, Math.max(.02, state.screening.electricityPrice));
+            $('#sensEthane').value = Math.min(400, Math.max(100, state.economics.ethanePrice));
+            syncAllScopedInputs();
+            renderInventoryTable();
+            $$('[data-geo]').forEach(el=>el.value = state.geometry[el.dataset.geo]);
+            routeOrder.forEach(r=>{ const el=document.getElementById('capital-'+r); if (el) el.value = state.capital[r]; });
+            renderRouteSwitch(); renderDynamic();
+            showToast('Inputs loaded');
+          } catch (err) { showToast('Could not read that file'); }
+        };
+        reader.readAsText(file);
+      }
+
+      function exportCsv() {
+        const header=['Route','Electricity basis','Capacity (t/y)','TBMC (USD M)','TOC (USD M)','Published TCI (USD M)','Annual CAPEX (USD/y)','Gross OPEX (USD/y)','Coproduct credits (USD/y)','Net OPEX (USD/y)','O&M incl labor (USD/y)','TCM (USD/y)','Published TCM (USD M/y)','Electricity cost (USD/y)','Published electricity (USD M/y)','CFP replacement (kg/y)','COO (USD/t)','Published cost (USD/t)','Deviation (%)','Ethane (kg/kg)','Electricity (kWh/kg)','HP steam (kg/kg)'];
+        const lines=[header.map(escapeCsv).join(',')];
+        routeOrder.forEach(r=>{
+          const c=calculateRoute(r), v=state.inventory[r], p=published[r];
+          lines.push([routeMeta[r].name, c.usePublishedElec?'published':'Table S6', c.cap, state.capital[r], c.toc/1e6, plain(pubText(p.tci)),
+            c.annualCapital, c.grossOpex, c.credits, c.netOpex, c.om, c.tcm, plain(pubText(p.tcm)),
+            c.categories.electricity, plain(pubText(p.elec)), Number.isFinite(c.cfpKg)?c.cfpKg:0,
+            c.coo, plain(pubText(p.price)), fmt(deviation(c.coo,p.price),1),
+            v.ethane, v.electricity, v.hpSteam].map(escapeCsv).join(','));
+        });
+        lines.push('', escapeCsv('Screening utility prices'));
+        Object.entries(state.screening).forEach(([k,v])=>lines.push([escapeCsv(k),escapeCsv(v)].join(',')));
+        lines.push('', escapeCsv('Geometry (sets CFP replacement mass)'));
+        Object.entries(state.geometry).forEach(([k,v])=>lines.push([escapeCsv(k),escapeCsv(v)].join(',')));
+        // BOM keeps subscript characters readable when the file is opened in Excel
+        download('ethane-cracker-tea-results.csv','﻿'+lines.join('\r\n'),'text/csv;charset=utf-8');
+      }
+
+      function download(name,text,type) {
+        const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob); const a=document.createElement('a');
+        a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),1000); showToast(name+' downloaded');
+      }
+
+      function selectTab(name) {
+        $$('.tab').forEach(t=>t.setAttribute('aria-selected', String(t.dataset.tab===name)));
+        $$('.tab-panel').forEach(p=>p.classList.toggle('active', p.id===name));
+      }
+
+      function initTabs() {
+        const tabs = $$('.tab');
+        tabs.forEach((tab,i)=>{
+          tab.addEventListener('click',()=>{ selectTab(tab.dataset.tab); window.scrollTo({top:0,behavior:'smooth'}); });
+          tab.addEventListener('keydown',ev=>{
+            const step = ev.key==='ArrowRight' ? 1 : ev.key==='ArrowLeft' ? -1 : 0;
+            let target = null;
+            if (step) target = tabs[(i+step+tabs.length)%tabs.length];
+            else if (ev.key==='Home') target = tabs[0];
+            else if (ev.key==='End') target = tabs[tabs.length-1];
+            if (!target) return;
+            ev.preventDefault();
+            target.focus(); selectTab(target.dataset.tab);
+          });
+        });
+      }
+
+      // Keep the sticky tab bar pinned to the real header height at every width.
+      function syncStickyOffset() {
+        document.documentElement.style.setProperty('--topbar-h', document.querySelector('.topbar').offsetHeight + 'px');
+      }
+
+      function init() {
+        restore();
+        initTabs();
+        syncStickyOffset();
+        if (window.ResizeObserver) new ResizeObserver(syncStickyOffset).observe(document.querySelector('.topbar'));
+        window.addEventListener('resize', syncStickyOffset);
+
+        renderStructure();
+
+        $('#sensElectricity').value = Math.min(.16, Math.max(.02, state.screening.electricityPrice));
+        $('#sensEthane').value = Math.min(400, Math.max(100, state.economics.ethanePrice));
+        $('#tornadoDelta').value = state.tornadoDelta;
+
+        $('#sensElectricity').addEventListener('input',()=>{ state.screening.electricityPrice = +$('#sensElectricity').value; syncAllScopedInputs(); persist(); renderDynamic(); });
+        $('#sensEthane').addEventListener('input',()=>{ state.economics.ethanePrice = +$('#sensEthane').value; syncAllScopedInputs(); persist(); renderDynamic(); });
+        $('#tornadoDelta').addEventListener('input',e=>{ state.tornadoDelta = Number(e.target.value)||30; persist(); renderTornado(); });
+        $$('#elecBasisSwitch button').forEach(b=>b.addEventListener('click',()=>{ state.electricityBasis=b.dataset.basis; persist(); renderDynamic(); }));
+        $$('[data-reset]').forEach(b=>b.addEventListener('click',()=>resetGroup(b.dataset.reset)));
+        $('#exportJsonBtn').addEventListener('click',exportJson);
+        $('#exportCsvBtn').addEventListener('click',exportCsv);
+        $('#importBtn').addEventListener('click',()=>$('#importFile').click());
+        $('#importFile').addEventListener('change',e=>{ if(e.target.files[0]) importJson(e.target.files[0]); e.target.value=''; });
+        $('#printBtn').addEventListener('click',()=>window.print());
+
+        renderDynamic();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
