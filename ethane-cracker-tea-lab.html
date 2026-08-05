@@ -433,7 +433,7 @@
       <div class="section-head">
         <div>
           <h2>Route economics</h2>
-          <p>Costs update immediately from the selected assumptions and Table S6 inventory.</p>
+          <p>Every figure below recalculates as you change an input. Pick a route to see its detail.</p>
         </div>
         <div class="route-switch" id="routeSwitch" aria-label="Select route"></div>
       </div>
@@ -445,7 +445,7 @@
           <div class="panel-title-row">
             <div>
               <h3>Cost stack by route</h3>
-              <p>Positive costs run right of the zero line; coproduct credits run left. The caret marks net cost of ethylene.</p>
+              <p>Costs extend to the right of the zero line. The green bar extending left is income from selling the byproducts, drawn on the same scale. The small triangle marks what is left after subtracting it.</p>
             </div>
             <span class="source-tag reconstructed">Eq. S8 reconstruction</span>
           </div>
@@ -463,7 +463,7 @@
           <div class="panel-title-row">
             <div>
               <h3>Feed, power and steam intensity</h3>
-              <p>Published Table S6 inventory per tonne of ethylene, with published C<sub>2</sub>H<sub>4</sub> yield.</p>
+              <p>What each route consumes to make one tonne of ethylene, and how much of the ethane fed ends up as product.</p>
             </div>
             <span class="source-tag published">Table S6</span>
           </div>
@@ -477,7 +477,7 @@
       <div class="section-head">
         <div>
           <h2>Price sensitivity</h2>
-          <p>Ethane price is swept across the selected range. Electricity price is shared across all routes.</p>
+          <p>Feedstock is the largest single cost, so its price sets the slope of every route. The electricity slider moves all four lines together.</p>
         </div>
       </div>
       <article class="panel">
@@ -495,7 +495,7 @@
             </div>
             <div class="audit-note">
               <strong>How to read it</strong>
-              <p>Each curve holds every input fixed except ethane price. Its vertical position also changes with the electricity slider. The x-range follows the entered ethane price, so the marker always lands on the curve.</p>
+              <p>Each line answers one question: if ethane cost this much, what would ethylene cost? Everything else stays fixed. The markers show where each route sits at the price you have entered.</p>
             </div>
           </div>
           <div style="grid-column:span 2; min-width:0">
@@ -525,7 +525,7 @@
       </article>
 
       <div class="section-head">
-        <div><h2>Complete comparison</h2><p>All dollar values are annualized and normalized to plant ethylene capacity.</p></div>
+        <div><h2>Complete comparison</h2><p>Annual figures for the whole plant, with the final column converted to cost per tonne of product.</p></div>
       </div>
       <article class="panel table-wrap" style="padding:0">
         <table class="comparison-table" id="fullComparison"></table>
@@ -536,7 +536,7 @@
       <div class="section-head">
         <div>
           <h2>Reconstruction vs published results</h2>
-          <p>The manuscript reports TCI, TCM, electricity cost and product cost in Section 2.5 and Fig. 7. This panel checks the reconstruction against them.</p>
+          <p>The paper prints four numbers this calculator can be measured against: what the plant costs to build, what it costs to run each year, what its electricity bill is, and what a tonne of ethylene ends up costing. Every row below puts the computed value next to the published one.</p>
         </div>
         <div class="section-actions">
           <div class="basis-switch" id="elecBasisSwitch" role="group" aria-label="Electricity cost basis">
@@ -565,7 +565,7 @@
       <div class="section-head">
         <div>
           <h2>Published product cost by electricity source</h2>
-          <p>Fig. 8b reports MKM-XC<sub>2</sub>H<sub>6</sub> product cost for each electricity source. The manuscript does not print the underlying $/kWh, so the right-hand column inverts the current model to show what price would reproduce each published figure.</p>
+          <p>Where the power comes from changes the answer more than anything else in the study. The paper gives the resulting cost for each source but never the price per kilowatt-hour behind it, so the last column runs the model backwards to recover it.</p>
         </div>
       </div>
       <article class="panel table-wrap" style="padding:0">
@@ -577,7 +577,7 @@
       <div class="section-head">
         <div>
           <h2>Published economic assumptions</h2>
-          <p>Green-edged fields reproduce SI Note 2 §3.2 and Methods 4.3. Capacity defaults to the midpoint of the reported 600,000–620,000 t/y range.</p>
+          <p>These are the authors’ own numbers, reproduced as published. Change one only to test a scenario, and expect the Validation tab to move when you do. Plant capacity was given as a range, so the midpoint is used.</p>
         </div>
         <div class="section-actions"><button class="button button-outline button-small" data-reset="economics">Reset published values</button></div>
       </div>
@@ -586,7 +586,7 @@
       <div class="section-head">
         <div>
           <h2>Route-specific capital</h2>
-          <p>The SI does not print total bare-module cost. Defaults below are back-calculated from the TCI published in Section 2.5 using TOC = 2.5 × TBMC (assumption 11). Replace them with the Aspen Process Economic Analyzer V12 export when available.</p>
+          <p>Equipment cost is the one large input the Supporting Information leaves out. The paper does report the total capital investment, and the SI gives the factor tying the two together, so the values below are recovered from it rather than left blank. Replace them if you have the original Aspen output.</p>
         </div>
         <div class="section-actions"><button class="button button-outline button-small" data-reset="capital">Reset to TCI-derived</button></div>
       </div>
@@ -595,7 +595,7 @@
       <div class="section-head">
         <div>
           <h2>Utility and material prices</h2>
-          <p>Amber-edged fields are editable screening defaults. Replace them with the exact Seider basis used in the Aspen economic case (assumption 14).</p>
+          <p>The paper cites a textbook for these prices instead of printing them, so the values below are stand-ins. They are the least reliable thing on this page, and the gap they leave is visible on the Validation tab.</p>
         </div>
         <div class="section-actions"><button class="button button-outline button-small" data-reset="screening">Reset screening values</button></div>
       </div>
@@ -604,7 +604,7 @@
       <div class="section-head">
         <div>
           <h2>CFP consumption <span class="source-tag published">SI assumption 7</span></h2>
-          <p>“We assume CFP completely occupies the tube… we assume monthly replacement.” Replacement mass is derived from the reactor geometry on the Process tab, not from the Table S6 LCA allocation.</p>
+          <p>The heating element burns out and gets replaced. The SI sets the schedule at once a month and says the element fills the tube, so the quantity consumed follows from the reactor volume you set on the Process tab.</p>
         </div>
       </div>
       <div class="grid grid-2">
@@ -615,7 +615,7 @@
       <div class="section-head">
         <div>
           <h2>Heating-efficiency side calculation</h2>
-          <p>Compares purchased energy for an identical net reactor heat duty. It is kept outside Eq. S8 because Table S6 already reports route-level utility use.</p>
+          <p>A side calculation, deliberately kept out of the main cost model. It asks a narrower question: to deliver the same heat into the reactor, is gas or electricity cheaper?</p>
         </div>
       </div>
       <div class="grid grid-2">
@@ -630,7 +630,7 @@
       <div class="section-head">
         <div>
           <h2>Four modeled routes</h2>
-          <p>Reactor conversion and operating conditions are from Tables S4–S5; inventory is from Table S6; yields are from Section 2.5.</p>
+          <p>Four ways of making the same product. The first is today’s industry standard; the other three heat the gas electrically. See the Glossary tab for what separates them.</p>
         </div>
       </div>
       <div class="grid grid-4" id="routeCards"></div>
@@ -638,7 +638,7 @@
       <div class="section-head">
         <div>
           <h2>Inventory per 1 kg C<sub>2</sub>H<sub>4</sub></h2>
-          <p>Values are editable for scenario testing. Reset restores Table S6.</p>
+          <p>What each route consumes and produces per kilogram of ethylene. Edit any cell to test a scenario; Reset restores the published values.</p>
         </div>
         <div class="section-actions"><button class="button button-outline button-small" data-reset="inventory">Reset Table S6</button></div>
       </div>
@@ -648,12 +648,12 @@
       <div class="section-head"><div><h2>Reaction definitions</h2><p>RStoic reactions and conversion reported in Table S4.</p></div></div>
       <div class="grid grid-3" id="reactionCards"></div>
 
-      <div class="section-head"><div><h2>Main-unit operating conditions</h2><p>Temperatures, pressures, and reflux ratios reported in Table S5.</p></div></div>
+      <div class="section-head"><div><h2>Main-unit operating conditions</h2><p>How each column and the reactor are run. Reflux ratio is how much of a column’s overhead product is sent back down to sharpen the separation — higher means purer product and a larger energy bill.</p></div></div>
       <article class="panel table-wrap" style="padding:0"><table class="data-table" id="operatingTable"></table></article>
     </section>
 
     <section class="tab-panel" id="process" role="tabpanel" aria-labelledby="tab-process">
-      <div class="section-head"><div><h2>Aspen process sequence</h2><p>Fig. S12 and SI Note 2 §3.1 reduced to the cost-relevant unit operations.</p></div></div>
+      <div class="section-head"><div><h2>Aspen process sequence</h2><p>The plant, left to right, showing only the steps that carry real cost. Ethane enters at one end; ethylene and saleable byproducts leave at the other.</p></div></div>
       <div class="flow" aria-label="Ethane cracking process flow">
         <div class="flow-node"><span class="flow-code">Feed</span><strong>C<sub>2</sub>H<sub>6</sub> + steam</strong><p>3:1 volume ratio; fresh ethane joins recycled ethane.</p></div>
         <div class="flow-node"><span class="flow-code">E101</span><strong>Feed preheat</strong><p>Hot reactor effluent preheats the incoming feed.</p></div>
@@ -684,12 +684,12 @@
     </section>
 
     <section class="tab-panel" id="audit" role="tabpanel" aria-labelledby="tab-audit">
-      <div class="section-head"><div><h2>Assumption ledger</h2><p>Each input is tagged by evidence level so reported values stay separate from reconstruction choices.</p></div></div>
+      <div class="section-head"><div><h2>Assumption ledger</h2><p>Every input is labelled by how well it is supported, so the authors' numbers never blur into this tool's guesses.</p></div></div>
       <div class="grid grid-4">
-        <article class="panel"><span class="source-tag published">Published SI value</span><h3 style="margin-top:10px">Directly reported</h3><p>Economic factors, commodity prices, route conversion, unit conditions, tube count/diameter, CFP replacement interval, efficiency, and Table S6 inventory.</p></article>
-        <article class="panel"><span class="source-tag derived">Derived from published</span><h3 style="margin-top:10px">Back-calculated</h3><p>TBMC from the TCI reported in Section 2.5, and CFP replacement mass from assumptions 6–7 with the H23 substrate specification.</p></article>
-        <article class="panel"><span class="source-tag reconstructed">Inventory reconstruction</span><h3 style="margin-top:10px">Calculated here</h3><p>Annual mass and energy flows, gross OPEX, coproduct credits, net OPEX, COO, price sensitivity, tornado, and tube-length equation.</p></article>
-        <article class="panel"><span class="source-tag screening">Editable screening value</span><h3 style="margin-top:10px">Needs case basis</h3><p>Utility prices, water purchase price, natural-gas energy price, fuel heating value, CFP unit price and substrate density.</p></article>
+        <article class="panel"><span class="source-tag published">Published SI value</span><h3 style="margin-top:10px">Directly reported</h3><p>Printed in the paper or its Supporting Information: the economic factors, commodity prices, conversions, operating conditions, reactor geometry, replacement schedule, heating efficiencies and the full consumption inventory.</p></article>
+        <article class="panel"><span class="source-tag derived">Derived from published</span><h3 style="margin-top:10px">Back-calculated</h3><p>Not printed anywhere, but recoverable from published numbers: equipment cost comes from the reported capital investment, and heating-element consumption from the reactor geometry plus the monthly replacement schedule.</p></article>
+        <article class="panel"><span class="source-tag reconstructed">Inventory reconstruction</span><h3 style="margin-top:10px">Calculated here</h3><p>Outputs, not assumptions: the annual flows, operating costs, byproduct credits, final cost per tonne, and everything the two charts display.</p></article>
+        <article class="panel"><span class="source-tag screening">Editable screening value</span><h3 style="margin-top:10px">Needs case basis</h3><p>Stand-ins this tool had to invent because the paper cites a reference instead of printing a number: every utility price, the gas price, the fuel heating value, and the element's price and density. Replace these first.</p></article>
       </div>
 
       <div class="section-head"><div><h2>Line-by-line audit</h2><p>Current values are shown; fields update with the calculator.</p></div></div>
@@ -697,14 +697,14 @@
 
       <div class="section-head"><div><h2>Known limitations</h2></div></div>
       <div class="grid grid-2">
-        <article class="audit-note warning-note"><strong>1. Table S6 belongs to the LCA, not the TEA.</strong><p>SI Note 2 (TEA) contains no inventory table; Table S6 sits in SI Note 3 and is described as the inventory for the life-cycle assessment. Using it as the OPEX basis is this tool's reconstruction, and the Validation tab shows where that bridge fails.</p></article>
-        <article class="audit-note warning-note"><strong>2. Exact utility prices are referenced but not printed.</strong><p>Assumption 14 cites Seider et al. for utility costs. Numerical LP/HP steam, refrigeration, electricity, and water prices need the original Aspen/Seider basis. The Validation tab quantifies how far the screening defaults are off.</p></article>
-        <article class="audit-note warning-note"><strong>3. TBMC is not published.</strong><p>Defaults are back-calculated from the TCI reported in Section 2.5 assuming TCI ≈ TOC. That equivalence is an assumption; TCI may include working capital that TOC does not.</p></article>
-        <article class="audit-note"><strong>4. CFP replacement mass depends on unpublished geometry.</strong><p>Assumption 7 fixes the replacement interval and assumption 6 fixes tube count and diameter, but the reactor volume still depends on the inlet flow and residence time, which the SI does not report.</p></article>
-        <article class="audit-note"><strong>5. Efficiency is already embedded in modeled utilities.</strong><p>The 60% furnace and 95% Joule assumptions should not multiply the full Table S6 electricity inventory again. The separate heat-duty calculator avoids double counting.</p></article>
-        <article class="audit-note"><strong>6. Capacity is shared for route comparison.</strong><p>Assumption 1 gives 600,000–620,000 t/y and SI §3.1 gives ~77 t/h. The default 610,000 t/y is the range midpoint and can be changed.</p></article>
-        <article class="audit-note"><strong>7. COO and MSP are used interchangeably in the source.</strong><p>Assumption 5 speaks of a minimum selling price while assumption 13 defines COO, and only Eq. S8 is given. Comparisons on the Validation tab therefore put Eq. S8 output against the published product cost.</p></article>
-        <article class="audit-note"><strong>8. No uncertainty interval was reported.</strong><p>The sensitivity and tornado charts vary inputs deterministically. They do not provide a statistical confidence interval or an Aspen estimate class.</p></article>
+        <article class="audit-note warning-note"><strong>1. The consumption table was written for the environmental study.</strong><p>The cost section of the Supporting Information contains no inventory of its own, so this calculator borrows the one from the life-cycle section and prices it. That bridge is this tool's construction, not the authors'. It holds for the electrically heated routes and fails for the conventional benchmark, as the Validation tab shows.</p></article>
+        <article class="audit-note warning-note"><strong>2. The utility prices are stand-ins.</strong><p>The paper points to a textbook for steam, refrigeration, electricity and water prices rather than listing them, so this tool supplies plausible values. They are the largest remaining source of error, and the Validation tab measures how much they cost you.</p></article>
+        <article class="audit-note warning-note"><strong>3. Equipment cost is recovered, not read.</strong><p>It is worked backwards from the capital investment the paper reports, which requires treating that figure as equivalent to the installed plant cost. If the published number also covers working capital, the equipment cost here is overstated.</p></article>
+        <article class="audit-note"><strong>4. Element consumption rests on an unpublished reactor size.</strong><p>The replacement schedule, tube count and tube diameter are all given. The reactor volume is not, because it depends on the gas flow and residence time the paper never states — so those remain yours to set on the Process tab.</p></article>
+        <article class="audit-note"><strong>5. Heating efficiency is already inside the consumption figures.</strong><p>Applying the 60% and 95% efficiencies to the inventory a second time would charge for the same losses twice. The heat-duty comparison is kept separate from the cost model for exactly that reason.</p></article>
+        <article class="audit-note"><strong>6. All four routes are sized identically.</strong><p>Comparing cost per tonne only makes sense at equal output. The paper gives a range rather than one capacity, so the midpoint is used; you can change it, and the consistency check under the input will tell you whether the result still matches the paper.</p></article>
+        <article class="audit-note"><strong>7. The source uses two names for one number.</strong><p>One assumption calls it the minimum selling price, another calls it the cost of ethylene, and only one equation is ever given. This tool treats them as the same quantity, which is what the paper's own arithmetic implies.</p></article>
+        <article class="audit-note"><strong>8. Nothing here is a confidence interval.</strong><p>Both charts move inputs by amounts you choose and report what happens. That shows which assumptions matter, not how likely any answer is. The paper reports no uncertainty range either.</p></article>
       </div>
     </section>
 
@@ -1015,7 +1015,7 @@
 
       function renderBoundary() {
         const complete = routeOrder.every(r=>state.capital[r] > 0);
-        $('#boundaryText').textContent = 'SI Note 2 gives Eq. S8–S9, the economic assumptions and the process conditions, but not the total bare-module costs or the numerical Seider utility prices. Capital defaults are back-calculated from the TCI published in Section 2.5, and CFP replacement follows assumption 7. Check the Validation tab before quoting any number.';
+        $('#boundaryText').textContent = 'This calculator rebuilds the paper’s cost analysis from what its Supporting Information actually prints. Two inputs are missing there: what the equipment costs, and what the utilities cost. Equipment cost is filled in by working backwards from the capital investment the paper does report. Utility prices are placeholders, and they are the reason results still drift from the published figures. Read the Validation tab before quoting any number from this page.';
         const chip = $('#capitalStatus');
         chip.className = 'status-chip ' + (complete ? 'derived' : 'required');
         chip.textContent = complete ? 'Capital from published TCI' : 'Capital incomplete';
@@ -1114,7 +1114,7 @@
             const median = (others[0]+others[others.length-1])/2;
             const share = c.categories[catKey] / c.grossOpex;
             if (median > 0 && mine > 3*median && share > 0.15) {
-              flags.push(`<strong>${routeMeta[r].name}: ${categoryLabels[catKey]} is a ${fmt(mine/median,1)}× outlier</strong><p>Table S6 gives ${fmt(mine,3)} for this route against ${others.map(o=>fmt(o,2)).join(' / ')} for the others, and it carries ${fmt(share*100,0)}% of gross OPEX. This single value decides where the route ranks — confirm it with the authors before quoting the result.</p>`);
+              flags.push(`<strong>${routeMeta[r].name} uses ${fmt(mine/median,1)}× more ${categoryLabels[catKey].toLowerCase()} than the other routes</strong><p>It consumes ${fmt(mine,3)} where the others use ${others.map(o=>fmt(o,2)).join(', ')}, and that one line carries ${fmt(share*100,0)}% of this route's operating cost. The value is transcribed correctly from the paper, but it alone decides where this route ranks — worth confirming with the authors before quoting the result.</p>`);
             }
           });
         });
@@ -1185,7 +1185,7 @@
         const svg = $('#tornadoChart');
         const r = state.selectedRoute;
         const d = Math.min(90, Math.max(1, state.tornadoDelta)) / 100;
-        $('#tornadoCaption').textContent = `Each input is varied ±${fmt(d*100,0)}% about its current value for ${routeMeta[r].name}, holding everything else fixed.`;
+        $('#tornadoCaption').textContent = `Which assumptions actually decide the answer for ${routeMeta[r].name}. Each input is moved ±${fmt(d*100,0)}% while everything else is held still; the longest bar is the one worth getting right.`;
         const fail = msg => { svg.setAttribute('viewBox','0 0 700 40'); svg.innerHTML = `<text x="6" y="24" font-size="13" fill="#a53a3a">${msg}</text>`; };
         if (!validCapacity()) return fail('Enter a plant capacity above zero to draw the tornado.');
 
@@ -1248,8 +1248,8 @@
           b.setAttribute('aria-pressed', String(on));
         });
         $('#basisExplainer').innerHTML = state.electricityBasis === 'inventory'
-          ? `<strong>Basis: Table S6 inventory × electricity price.</strong><p>Table S6 sits in SI Note 3 and is described as the inventory for the <em>life-cycle assessment</em>. SI Note 2 (TEA) contains no inventory table, so treating these flows as purchased utilities is this tool's reconstruction. For the Joule routes it lands close to the published electricity cost; for the steam-cracking benchmark it does not.</p>`
-          : `<strong>Basis: published TEA electricity cost.</strong><p>Electricity is charged at the figure printed in Section 2.5 rather than derived from Table S6. Where the manuscript gives a group range, the midpoint is used. Every other utility still comes from the Table S6 inventory.</p>`;
+          ? `<strong>Basis: the Table S6 inventory.</strong><p>Table S6 lists what each route consumes per kilogram of ethylene, and this calculator prices those flows as if the plant bought them. That step is this tool's own assumption. The table belongs to the paper's environmental assessment, and the cost analysis has no equivalent table of its own. The assumption holds for the three Joule routes, whose computed electricity bill matches the published one. It breaks for the conventional benchmark, which comes out roughly four times too high.</p>`
+          : `<strong>Basis: the paper's own electricity cost.</strong><p>Electricity is charged at the figure the paper prints instead of being derived from the inventory, using the midpoint where a range is given. Everything else still comes from Table S6. This is the setting that reproduces the published benchmark, and switching to it shows how much of the disagreement traced to that single line.</p>`;
       }
 
       function renderValidation() {
@@ -1268,12 +1268,12 @@
           const kwh = state.inventory.steam.electricity * 1000 * state.economics.capacity;
           const implied = kwh > 0 ? 37.6e6 / kwh : NaN;
           notes.push(['warning','Benchmark electricity does not reconcile',
-            `Charging the Table S6 electricity inventory at ${money(state.screening.electricityPrice,3)}/kWh gives ${money(steam.elecM,1)} M/y against the published ${money(37.6,1)} M/y. Reproducing the published figure would need ${money(implied,4)}/kWh, which is not a credible industrial rate. The LCA inventory evidently carries electricity-equivalents for utilities the TEA charged separately. Switch the basis above to see the effect.`]);
+            `Pricing the inventory's electricity at ${money(state.screening.electricityPrice,3)}/kWh produces a bill of ${money(steam.elecM,1)} M/y. The paper reports ${money(37.6,1)} M/y. Matching it would take ${money(implied,4)}/kWh — far below any industrial power price, which means the two figures are not counting the same thing. The environmental inventory appears to include the electricity used to generate this route's steam and refrigeration, which the cost analysis paid for separately as utilities. Switch the basis above to charge the published figure instead.`]);
         }
         rows.forEach(x=>{
           if (Number.isFinite(x.devTcm) && Math.abs(x.devTcm) > 10) {
             notes.push([Math.abs(x.devTcm) > 25 ? 'warning' : 'plain', `${routeMeta[x.r].name}: TCM off by ${devText(x.devTcm)}`,
-              `Computed ${money(x.c.tcm/1e6,1)} M/y against the published ${pubText(x.pub.tcm)} M/y. Feed, credits, capital and labor are all published, so the residual points at the screening utility prices — assumption 14 cites Seider et al. without printing the numbers.`]);
+              `This tool computes ${money(x.c.tcm/1e6,1)} M/y; the paper reports ${pubText(x.pub.tcm)} M/y. Feed price, byproduct credits, capital and labor all come straight from published values, so the difference has to sit in the utility prices — the one input group the paper cites a textbook for rather than printing. Entering the real prices should close this gap.`]);
           }
         });
         if (!notes.length) notes.push(['plain','Reconstruction is within tolerance','Every published quantity is matched within 10% at the current inputs.']);
@@ -1341,13 +1341,13 @@
         const rate = e.operatingHours > 0 ? e.capacity / e.operatingHours : NaN;
         const capOk = e.capacity >= 600000 && e.capacity <= 620000;
         const rateOk = Number.isFinite(rate) && Math.abs(rate - 77) / 77 <= 0.1;
-        $('#capacityCheck').innerHTML = `<div class="audit-note ${capOk && rateOk ? '' : 'warning-note'}" style="margin-top:14px"><strong>Capacity consistency</strong><p>${fmt(e.capacity,0)} t/y over ${fmt(e.operatingHours,0)} h/y is <strong>${fmt(rate,1)} t/h</strong>. Assumption 1 gives 600,000–620,000 t/y ${capOk?'✓':'✗'} and SI §3.1 reports ~77 t/h ${rateOk?'✓':'✗'}.</p></div>`;
+        $('#capacityCheck').innerHTML = `<div class="audit-note ${capOk && rateOk ? '' : 'warning-note'}" style="margin-top:14px"><strong>Does this still match the paper?</strong><p>Producing ${fmt(e.capacity,0)} t/y over ${fmt(e.operatingHours,0)} operating hours works out to <strong>${fmt(rate,1)} tonnes per hour</strong>. The paper states a capacity of 600,000–620,000 t/y ${capOk?'✓ matches':'✗ outside the range'} and a production rate of about 77 t/h ${rateOk?'✓ matches':'✗ does not match'}.</p></div>`;
       }
 
       function renderCapitalCards() {
         $('#capitalCards').innerHTML = routeOrder.map(r=>{
           const pub = published[r];
-          return `<article class="panel capital-card" data-card="${r}" style="--route-color:${routeMeta[r].color}"><h3>${routeMeta[r].name}<span class="source-tag" data-tag="${r}"></span></h3><p>Total bare-module cost for all equipment in this route. Published TCI ${pubText(pub.tci)} M${pub.tciNote?' ('+pub.tciNote+')':''}.</p><div class="field" data-capfield="${r}"><label for="capital-${r}">Total Bare-Module Cost</label><div class="input-wrap"><input id="capital-${r}" type="number" data-capital="${r}" value="${state.capital[r]}" step="1" min="0" placeholder="Enter Aspen result"><span class="unit">USD M</span></div></div><div class="mini-metrics" data-mini="${r}"></div></article>`;
+          return `<article class="panel capital-card" data-card="${r}" style="--route-color:${routeMeta[r].color}"><h3>${routeMeta[r].name}<span class="source-tag" data-tag="${r}"></span></h3><p>What this route's equipment costs before installation. Recovered from the ${pubText(pub.tci)} M capital investment the paper reports${pub.tciNote?', '+pub.tciNote:''}.</p><div class="field" data-capfield="${r}"><label for="capital-${r}">Total Bare-Module Cost</label><div class="input-wrap"><input id="capital-${r}" type="number" data-capital="${r}" value="${state.capital[r]}" step="1" min="0" placeholder="Enter Aspen result"><span class="unit">USD M</span></div></div><div class="mini-metrics" data-mini="${r}"></div></article>`;
         }).join('');
         // Bound once. The handler never re-renders the card that owns the focused input.
         $$('[data-capital]').forEach(inp=>inp.addEventListener('input',e=>{
@@ -1387,10 +1387,10 @@
         const cost = Number.isFinite(annual) ? annual * s.cfpPrice : NaN;
         const perTonne = validCapacity() && Number.isFinite(cost) ? cost / e.capacity : NaN;
         const lcaEquivalent = state.inventory.mkmS.cfp * e.capacity * 1000 * s.cfpPrice;
-        $('#cfpResults').innerHTML = `<div class="panel-title-row"><div><h3>Replacement charge</h3><p>Derived from the tube volume on the Process tab, not from Table S6.</p></div><span class="source-tag derived">Assumptions 6 + 7</span></div>
+        $('#cfpResults').innerHTML = `<div class="panel-title-row"><div><h3>Replacement charge</h3><p>How much heating element the plant gets through in a year, and what that costs.</p></div><span class="source-tag derived">Assumptions 6 + 7</span></div>
           <div class="grid grid-2"><div class="calc-result"><span>CFP charge in reactor</span><strong>${fmt(charge,0)} kg</strong><small>${fmt(V,3)} m³ at ${fmt(s.cfpDensity,0)} kg/m³</small></div><div class="calc-result" style="background:#00539f"><span>Annual replacement</span><strong>${fmt(annual/1000,1)} t/y</strong><small>${money(cost/1e6,2)} M/y · ${money(perTonne,2)}/t C₂H₄</small></div></div>
-          <div class="audit-note warning-note" style="margin-top:12px"><strong>Why Table S6 is not used here</strong><p>Costing the Table S6 CFP allocation instead would give ${money(lcaEquivalent,0)}/y for MKM-SC₂H₄. That column is a mass-allocated LCA figure, not the TEA's substrate consumption. Assumption 7 states monthly replacement, so the charge above follows from the reactor volume.</p></div>
-          <div class="equation"><div class="eq">ṁ<sub>CFP</sub> = V<sub>reactor</sub> · φ · ρ<sub>CFP</sub> · (12 / t<sub>replace</sub>)</div><p>Default density 452 kg/m³ is the Freudenberg H23 specification quoted in Methods 4.4 (95 g/m² over 0.21 mm). Only the Joule routes carry this cost.</p></div>`;
+          <div class="audit-note warning-note" style="margin-top:12px"><strong>Why the Table S6 figure is not used here</strong><p>Taking the element quantity from Table S6 instead would put the annual bill at ${money(lcaEquivalent,0)} — for a part the paper says is replaced twelve times a year. That column divides the element's environmental footprint across every kilogram of product; it was never a purchase quantity. The figure above comes from the reactor volume and the monthly schedule instead.</p></div>
+          <div class="equation"><div class="eq">ṁ<sub>CFP</sub> = V<sub>reactor</sub> · φ · ρ<sub>CFP</sub> · (12 / t<sub>replace</sub>)</div><p>The default density comes from the paper’s own material: 95 g/m² spread over 0.21 mm of thickness. Only the Joule routes carry this cost, since the conventional furnace has no element inside the tube.</p></div>`;
       }
 
       const heatDefs = [
@@ -1424,7 +1424,7 @@
         const furnacePurchased = ef ? duty/ef : NaN, joulePurchased = ej ? duty/ej : NaN;
         const furnaceCost = furnacePurchased*gas, jouleCost = joulePurchased*elec*277.7778;
         const breakEven = (ef && ej) ? gas*ej/ef/277.7778 : NaN;
-        $('#heatResults').innerHTML=`<div class="panel-title-row"><div><h3>Identical-duty comparison</h3><p>Purchased energy after reported device efficiency.</p></div><span class="source-tag published">Assumption 15</span></div><div class="grid grid-2"><div class="calc-result"><span>Furnace purchased energy</span><strong>${fmt(furnacePurchased,2)} GJ/t</strong><small>${money(furnaceCost,1)}/t at current gas price</small></div><div class="calc-result" style="background:#00539f"><span>Joule purchased energy</span><strong>${fmt(joulePurchased,2)} GJ/t</strong><small>${money(jouleCost,1)}/t at current power price</small></div></div><div class="equation"><strong>Break-even electricity price</strong><div class="eq">${money(breakEven,4)}/kWh</div><p>At this electricity price, purchased reactor heat costs match for the entered natural-gas price. Separation utilities are excluded.</p></div><div class="audit-note"><strong>Published net specific energy</strong><p>Section 2.5 reports 14.7 GJ/t for the benchmark, 7.4–7.5 GJ/t for the MKM cases and 9.7 GJ/t for Exp-Opt. Those are whole-process figures, so they are not directly comparable to the reactor-only duty above.</p></div>`;
+        $('#heatResults').innerHTML=`<div class="panel-title-row"><div><h3>Identical-duty comparison</h3><p>Purchased energy after reported device efficiency.</p></div><span class="source-tag published">Assumption 15</span></div><div class="grid grid-2"><div class="calc-result"><span>Furnace purchased energy</span><strong>${fmt(furnacePurchased,2)} GJ/t</strong><small>${money(furnaceCost,1)}/t at current gas price</small></div><div class="calc-result" style="background:#00539f"><span>Joule purchased energy</span><strong>${fmt(joulePurchased,2)} GJ/t</strong><small>${money(jouleCost,1)}/t at current power price</small></div></div><div class="equation"><strong>Break-even electricity price</strong><div class="eq">${money(breakEven,4)}/kWh</div><p>Below this power price, Joule heating delivers reactor heat more cheaply than a gas furnace. Above it, the furnace wins. Separation costs are not included in this comparison.</p></div><div class="audit-note"><strong>Published net specific energy</strong><p>For reference, the paper reports 14.7 GJ/t for the conventional plant against 7.4–7.5 for the model Joule cases and 9.7 for the experimental one. Those cover the entire process, so they sit well above the reactor-only duty used here.</p></div>`;
       }
 
       // ---------- routes / process ----------
@@ -1443,7 +1443,7 @@
           state.inventory[e.target.dataset.inventoryRoute][e.target.dataset.inventoryKey]=Number(e.target.value)||0;
           persist(); renderDynamic();
         }));
-        $('#inventoryNote').innerHTML = `<strong>Table S6 is the LCA inventory</strong><p>It appears in SI Note 3, not in the TEA note. The CFP row is disabled because assumption 7 supplies the substrate consumption directly; see the Validation tab for where the remaining flows do and do not reconcile with the published costs.</p>`;
+        $('#inventoryNote').innerHTML = `<strong>This table was built for the environmental study, not the cost study</strong><p>The paper places it in the life-cycle section, and the cost section has no equivalent. Pricing these flows as purchased utilities is therefore this calculator's assumption rather than the authors'. The heating-element row is greyed out because that quantity is set directly by the monthly replacement schedule instead. The Validation tab shows which of the remaining flows reconcile with the published costs and which do not.</p>`;
       }
 
       function renderGlossary() {
