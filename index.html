@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,12 +12,10 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{
-  background:var(--background);color:var(--ink);
-  font-family:Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Helvetica,Arial,sans-serif;
-  font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%;
-}
-.wrap{max-width:1240px;margin:0 auto;padding:0 24px 64px}
+body{background:var(--background);color:var(--ink);
+  font-family:Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px 56px}
 header .wrap{padding-bottom:0}
 header{position:sticky;top:0;z-index:20;background:var(--background);
   border-bottom:1px solid var(--hairline);padding:14px 0 0}
@@ -27,33 +25,27 @@ h1 b{font-weight:700}
 .grade{font-size:11.5px;color:var(--secondary);border:1px solid var(--hairline);
   border-radius:6px;padding:2px 8px;white-space:nowrap}
 nav{display:flex;gap:18px;margin-top:9px;flex-wrap:wrap}
-nav button{background:none;border:0;border-bottom:2px solid transparent;
-  padding:0 0 7px;font:inherit;font-size:13px;color:var(--secondary);
-  cursor:pointer;text-transform:lowercase}
+nav button{background:none;border:0;border-bottom:2px solid transparent;padding:0 0 7px;
+  font:inherit;font-size:13px;color:var(--secondary);cursor:pointer}
 nav button:hover{color:var(--ink)}
 nav button.active{color:var(--accent);font-weight:500;border-bottom-color:var(--accent)}
-nav button.keep{text-transform:none}
 
-/* kpi */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:0 24px;padding:14px 0 0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0 24px;padding:14px 0 0}
 .kpi{border-bottom:1px solid var(--hairline);padding-bottom:10px}
-.kpi .lab{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary)}
-.kpi .val{font-family:var(--mono);font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.25}
+.kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary)}
+.kpi .val{font-family:var(--mono);font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
 .kpi .sub{font-size:11.5px;color:var(--secondary)}
 
-/* control strip — 모든 탭에서 보인다 */
 .strip{border-bottom:1px solid var(--hairline);padding:12px 0 14px}
-.striprow{display:flex;gap:22px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
-.seg{display:flex;gap:14px}
+.striprow{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.seg{display:flex;gap:13px}
 .seg button{background:none;border:0;border-bottom:2px solid transparent;padding:0 0 4px;
   font:inherit;font-size:12.5px;color:var(--secondary);cursor:pointer}
 .seg button.active{color:var(--accent);font-weight:500;border-bottom-color:var(--accent)}
-.seglab{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary)}
+.seglab{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary)}
 .ck{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--secondary);cursor:pointer}
 .ck input{accent-color:var(--accent);width:14px;height:14px}
 .knobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0 22px}
-.knob{}
 .knob .kh{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
 .knob .kh label{font-size:12.5px;font-weight:500}
 .knob .kh .v{font-family:var(--mono);font-size:12.5px;font-weight:500}
@@ -65,57 +57,48 @@ input[type=range]{width:100%;margin:4px 0 0;height:16px;accent-color:var(--accen
 .knob .ks{font-size:11px;color:var(--secondary);margin-top:3px;min-height:15px}
 .knob .ks b{color:var(--ink);font-family:var(--mono);font-weight:500}
 details{margin-top:12px}
-summary{cursor:pointer;font-size:11.5px;color:var(--secondary);font-weight:500;
+summary{cursor:pointer;font-size:11px;color:var(--secondary);font-weight:500;
   text-transform:uppercase;letter-spacing:.06em;list-style:none}
 summary::-webkit-details-marker{display:none}
 summary::before{content:"+ "}
-details[open] summary::before{content:"− "}
+details[open] summary::before{content:"\2212 "}
 
-/* tabs */
 .tab{display:none;padding-top:20px}
 .tab.on{display:block}
-h2{font-size:16px;font-weight:300;margin:0 0 3px;letter-spacing:-.01em}
-h2 b{font-weight:700}
-h3{font-size:11.5px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;
-   color:var(--secondary);margin:0 0 9px}
-p{margin:0 0 11px;color:var(--secondary);font-size:13px;max-width:74ch}
-.cap{font-size:12px;color:var(--secondary);font-weight:500}
+h2{font-size:14px;font-weight:500;margin:0 0 12px;letter-spacing:-.005em}
+h3{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;
+   color:var(--secondary);margin:22px 0 9px}
+.cap{font-size:12px;color:var(--secondary);margin-top:8px;max-width:88ch}
+.cap b{color:var(--ink);font-family:var(--mono);font-weight:500}
 
-/* plant tab: 좌 그림 | 우 표 */
-.plant{display:grid;grid-template-columns:1fr 380px;gap:34px;align-items:start}
+.plant{display:grid;grid-template-columns:1fr 372px;gap:36px;align-items:start}
 @media(max-width:940px){.plant{grid-template-columns:1fr}}
 
-/* tables */
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;font-size:11px;font-weight:500;text-transform:uppercase;
-  letter-spacing:.05em;color:var(--secondary);padding:0 8px 6px 0;
-  border-bottom:1px solid var(--hairline)}
+th{text-align:left;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--secondary);padding:0 8px 6px 0;border-bottom:1px solid var(--hairline)}
 td{padding:7px 8px 7px 0;border-bottom:1px solid var(--hairline);vertical-align:top}
 th.r,td.r{text-align:right;padding-right:0}
 td.r{font-family:var(--mono);font-variant-numeric:tabular-nums}
-td .why{display:block;color:var(--secondary);font-size:12px;margin-top:2px;max-width:62ch}
 tr.tot td{border-bottom:0;border-top:1px solid var(--ink);font-weight:700;padding-top:9px}
 tr.ref td{border-bottom:0;color:var(--secondary)}
 td.cr{color:var(--accent)}
 .badge{display:inline-block;font-size:10.5px;font-weight:500;padding:1px 6px;
   border:1px solid currentColor;border-radius:4px;white-space:nowrap}
 .b-pass{color:var(--accent)} .b-warn{color:var(--warning)} .b-fail{color:var(--error)}
-.b-free{color:var(--accent)} .b-fixed{color:var(--secondary)}
 
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:640px}
 @media(max-width:640px){.cards{grid-template-columns:1fr}}
 .card{border:1px solid var(--hairline);border-radius:8px;padding:16px}
-.card:hover{border-color:var(--accent)}
 .card.on{border-color:var(--accent)}
-.card h4{margin:0;font-size:12.5px;font-weight:500;color:var(--secondary)}
-.card .big{font-family:var(--mono);font-size:26px;font-weight:700;letter-spacing:-.02em;margin-top:2px}
-.card .d{font-size:12px;color:var(--secondary);margin-top:4px}
-.note{border-left:2px solid var(--hairline);padding-left:14px;font-size:13px;
-  color:var(--secondary);margin-top:16px;max-width:76ch}
-.note b{color:var(--ink);font-family:var(--mono);font-weight:500}
-.foot{border-top:1px solid var(--hairline);margin-top:34px;padding-top:14px;
-  font-size:12px;color:var(--secondary);max-width:86ch}
+.card h4{margin:0;font-size:12px;font-weight:500;color:var(--secondary);
+  text-transform:uppercase;letter-spacing:.05em}
+.card .big{font-family:var(--mono);font-size:26px;font-weight:700;letter-spacing:-.02em;margin-top:3px}
+.card .d{font-size:12px;color:var(--secondary);margin-top:5px}
+.foot{border-top:1px solid var(--hairline);margin-top:30px;padding-top:14px;
+  font-size:12px;color:var(--secondary);max-width:92ch}
 svg{display:block;width:100%;height:auto}
+#ladder,#tornado{max-width:820px}
 </style>
 </head>
 <body>
@@ -124,7 +107,7 @@ svg{display:block;width:100%;height:auto}
   <div class="wrap">
     <div class="htop">
       <h1>Techno-economics of <b>Ethane Cracker</b></h1>
-      <span class="grade">스크리닝 도구 · AACE Class 5 · ±40%</span>
+      <span class="grade">screening estimate &middot; AACE Class 5 &middot; &plusmn;40%</span>
     </div>
     <nav id="nav"></nav>
   </div>
@@ -133,100 +116,93 @@ svg{display:block;width:100%;height:auto}
 <div class="wrap">
   <div class="kpis" id="kpis"></div>
 
-  <!-- 조작부: 모든 탭에서 상시 노출 -->
   <div class="strip">
     <div class="striprow">
-      <span class="seglab">가열</span>
-      <div class="seg"><button id="mCH" class="active">연소 CH</button><button id="mJH">주울 JH</button></div>
-      <span class="seglab">선택도</span>
-      <div class="seg"><button id="selCalc" class="active">T · τ 에서 계산</button><button id="selDirect">직접 지정</button></div>
-      <label class="ck"><input type="checkbox" id="tTle" checked><span>TLE 열회수</span></label>
+      <span class="seglab">Heating</span>
+      <div class="seg"><button id="mCH" class="active">fired</button><button id="mJH">Joule</button></div>
+      <span class="seglab">Selectivity</span>
+      <div class="seg"><button id="selCalc" class="active">from kinetics</button><button id="selDirect">set directly</button></div>
+      <label class="ck"><input type="checkbox" id="tTle" checked><span>TLE heat recovery</span></label>
     </div>
     <div class="knobs">
-      <div class="knob"><div class="kh"><label>코일 출구온도</label><span class="v" id="vCot"></span></div>
+      <div class="knob"><div class="kh"><label>Coil outlet temperature</label><span class="v" id="vCot"></span></div>
         <input type="range" id="sCot" min="760" max="950" step="2" value="850">
         <div class="band" id="bCot"></div><div class="ks" id="nCot"></div></div>
-      <div class="knob"><div class="kh"><label>체류시간</label><span class="v" id="vTau"></span></div>
+      <div class="knob"><div class="kh"><label>Residence time</label><span class="v" id="vTau"></span></div>
         <input type="range" id="sTau" min="0" max="1000" step="1" value="500">
         <div class="band" id="bTau"></div><div class="ks" id="nTau"></div></div>
-      <div class="knob"><div class="kh"><label>희석 스팀</label><span class="v" id="vDil"></span></div>
+      <div class="knob"><div class="kh"><label>Steam dilution</label><span class="v" id="vDil"></span></div>
         <input type="range" id="sDil" min="0.15" max="0.70" step="0.01" value="0.35">
         <div class="band" id="bDil"></div><div class="ks" id="nDil"></div></div>
-      <div class="knob"><div class="kh"><label>규모</label><span class="v" id="vCap"></span></div>
+      <div class="knob"><div class="kh"><label>Capacity</label><span class="v" id="vCap"></span></div>
         <input type="range" id="sCap" min="150" max="1400" step="10" value="610">
         <div class="band" id="bCap"></div><div class="ks" id="nCap"></div></div>
-      <div class="knob"><div class="kh"><label>가열 효율</label><span class="v" id="vEff"></span></div>
+      <div class="knob"><div class="kh"><label>Heating efficiency</label><span class="v" id="vEff"></span></div>
         <input type="range" id="sEff" min="40" max="98" step="1" value="60">
         <div class="band" id="bEff"></div><div class="ks" id="nEff"></div></div>
-      <div class="knob" id="selKnob" style="display:none"><div class="kh"><label>선택도 · 질량</label><span class="v" id="vSel"></span></div>
+      <div class="knob" id="selKnob" style="display:none"><div class="kh"><label>Selectivity, mass</label><span class="v" id="vSel"></span></div>
         <input type="range" id="sSel" min="70" max="96" step="0.5" value="84">
         <div class="band" id="bSel"></div><div class="ks" id="nSel"></div></div>
     </div>
     <details>
-      <summary>가격 가정</summary>
+      <summary>Prices</summary>
       <div class="knobs" style="margin-top:10px">
-        <div class="knob"><div class="kh"><label>에탄</label><span class="v" id="vEthane"></span></div>
+        <div class="knob"><div class="kh"><label>Ethane</label><span class="v" id="vEthane"></span></div>
           <input type="range" id="sEthane" min="0" max="1000" step="1"><div class="ks" id="nEthane"></div></div>
-        <div class="knob"><div class="kh"><label>전기</label><span class="v" id="vElec"></span></div>
+        <div class="knob"><div class="kh"><label>Power</label><span class="v" id="vElec"></span></div>
           <input type="range" id="sElec" min="0" max="1000" step="1"><div class="ks" id="nElec"></div></div>
-        <div class="knob"><div class="kh"><label>천연가스</label><span class="v" id="vGas"></span></div>
+        <div class="knob"><div class="kh"><label>Natural gas</label><span class="v" id="vGas"></span></div>
           <input type="range" id="sGas" min="0" max="1000" step="1"><div class="ks" id="nGas"></div></div>
       </div>
     </details>
   </div>
 
-  <!-- TAB 1 : PLANT -->
   <div class="tab on" id="t-plant">
     <div class="plant">
       <div>
-        <h2>공장 <b>흐름</b></h2>
-        <p>반응기가 뱉은 조성이 아래로 흐릅니다. 후단은 제품 규격이 고정이라 스스로 다시 풉니다 — 환류비는 입력이 아니라 결과입니다.</p>
+        <h2>Process flow</h2>
         <svg id="pfd" viewBox="0 0 760 330" role="img" aria-label="Ethane cracker process flow"></svg>
+        <div class="cap">Only the reactor carries degrees of freedom. The three downstream columns hold fixed
+          product specifications and re-solve, so reflux ratio is an output.</div>
       </div>
       <div>
-        <h2>원가 <b>표</b></h2>
-        <p>모든 항목을 톤당 달러로 환산했습니다. 물리 단위는 각 행에 마우스를 올리면 나옵니다.</p>
-        <table><thead><tr><th>항목</th><th class="r">USD per t</th><th class="r" style="width:64px">비중</th></tr></thead>
+        <h2>Cost breakdown</h2>
+        <table><thead><tr><th>Item</th><th class="r">USD/t</th><th class="r" style="width:58px">Share</th></tr></thead>
           <tbody id="costBody"></tbody></table>
-        <div class="note" id="plantNote"></div>
+        <div class="cap" id="plantNote"></div>
       </div>
     </div>
   </div>
 
-  <!-- TAB 2 : LADDER -->
   <div class="tab" id="t-ladder">
-    <h2>원가 <b>사다리</b></h2>
-    <p>화학량론이 정한 바닥 위에 무엇이 얼마나 쌓이는지. 이것이 TEA의 전부입니다.</p>
+    <h2>Cost ladder</h2>
     <svg id="ladder" viewBox="0 0 760 430" role="img" aria-label="Cost of ethylene waterfall"></svg>
     <div class="cap" id="ladderCap"></div>
   </div>
 
-  <!-- TAB 3 : CH vs JH -->
   <div class="tab" id="t-compare">
-    <h2>연소 vs <b>주울</b></h2>
-    <p>나머지를 그대로 두고 가열 방식만 바꿔 두 번 계산한 결과입니다. 효율은 주울이 높지만 전달 열 1 GJ의 가격은 전기가 훨씬 비쌉니다.</p>
+    <h2>Fired vs Joule heating</h2>
     <div class="cards">
-      <div class="card" id="cardCH"><h4>연소 가열 · CH</h4><div class="big" id="vsCH"></div><div class="d" id="vsCHd"></div></div>
-      <div class="card" id="cardJH"><h4>주울 가열 · JH</h4><div class="big" id="vsJH"></div><div class="d" id="vsJHd"></div></div>
+      <div class="card" id="cardCH"><h4>Fired</h4><div class="big" id="vsCH"></div><div class="d" id="vsCHd"></div></div>
+      <div class="card" id="cardJH"><h4>Joule</h4><div class="big" id="vsJH"></div><div class="d" id="vsJHd"></div></div>
     </div>
-    <div class="note" id="breakeven"></div>
+    <div class="cap" id="breakeven"></div>
   </div>
 
-  <!-- TAB 4 : SENSITIVITY -->
   <div class="tab" id="t-sens">
-    <h2>지금 무엇이 <b>제일 중요한가</b></h2>
-    <p>각 노브를 ±10% 흔들었을 때 COO가 움직이는 폭입니다. 유효 범위가 정의된 노브는 그 범위로 클램프했습니다. 조건이 바뀌면 순위도 바뀝니다.</p>
+    <h2>Sensitivity</h2>
     <svg id="tornado" viewBox="0 0 760 300" role="img" aria-label="Tornado sensitivity"></svg>
+    <div class="cap">Each knob perturbed &plusmn;10%, clamped to its validated window. Ranking changes with operating point.</div>
   </div>
 
-  <!-- TAB 5 : BALANCES -->
   <div class="tab" id="t-balance">
-    <h2>수지 <b>잔차</b> · 가정</h2>
-    <p>모델이 스스로 닫혀 있는지의 검사입니다. 합격 기준 0.1%. 이 값이 0이라는 것은 모델이 <em>옳다</em>는 뜻이 아니라 수지 대수가 <em>닫혀 있다</em>는 뜻입니다.</p>
-    <table><thead><tr><th>항목</th><th class="r">잔차</th><th class="r" style="width:88px">판정</th></tr></thead>
+    <h2>Balance residuals</h2>
+    <table><thead><tr><th>Balance</th><th class="r">Residual</th><th class="r" style="width:80px">Pass &lt; 0.1%</th></tr></thead>
       <tbody id="balanceBody"></tbody></table>
-    <h3 style="margin-top:24px">고정 설계 스펙 · 자유도 없음</h3>
-    <table><thead><tr><th>항목</th><th class="r">값</th><th>출처</th></tr></thead>
+    <div class="cap">Recycle is closed analytically (recycle to extinction) rather than by iteration, so residuals sit at
+      machine precision. The algebra closes. That is not the same as the model being right.</div>
+    <h3>Fixed specifications</h3>
+    <table><thead><tr><th>Item</th><th class="r">Value</th><th>Source</th></tr></thead>
       <tbody id="specBody"></tbody></table>
     <div class="foot" id="foot"></div>
   </div>
@@ -236,7 +212,7 @@ svg{display:block;width:100%;height:auto}
 "use strict";
 const $=id=>document.getElementById(id);
 function sig(x,n=4){
-  if(!Number.isFinite(x))return'—';
+  if(!Number.isFinite(x))return'-';
   if(x===0)return'0';
   const a=Math.abs(x);
   const d=Math.max(0,Math.min(6,n-1-Math.floor(Math.log10(a))));
@@ -254,12 +230,12 @@ const C2H6='C'+sub(2)+'H'+sub(6);
 const logMap=(v,lo,hi)=>lo*Math.pow(hi/lo,v/1000);
 const logInv=(x,lo,hi)=>1000*Math.log(x/lo)/Math.log(hi/lo);
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-/* ---------- 상수 ---------- */
+/* ---------- constants ---------- */
 const MW={C2H6:30.07,C2H4:28.05,CH4:16.04,H2:2.016,C3:42.08,C:12.011};
-const FLOOR_RATIO=MW.C2H6/MW.C2H4;   // 1.0719 kg C2H6 / kg C2H4 — 해석적 하한
+const FLOOR_RATIO=MW.C2H6/MW.C2H4;   // 1.0719 kg C2H6 per kg C2H4, analytic floor
 const P_DISCH=32, RECOVERY=0.995, PURITY=0.999;
-/* 에탄 열분해 1차 반응. Eₐ는 문헌(Froment), 지수앞자리는 산업 기준점
-   (코일 출구 850 °C · 체류 0.35 s → 전환율 65%)에 맞춰 보정한 값. */
+/* First-order ethane pyrolysis. Ea from Froment; the pre-exponential is
+   calibrated so that 850 C and 0.35 s give 65% conversion. */
 const EA=272800, A_PRE=1.470e13;
 const H_RXN=145, CP_C2H6=3.0, CP_STEAM=2.3, T_PREHEAT=150;
 const LHV={CH4:50,H2:120};
@@ -268,35 +244,36 @@ const REF={cap:610,tbmc:126.8};
 const SPLIT={furnace:.30,compression:.25,coldbox:.25,fractionation:.20};
 const kJ2GJ=1e-3;                    // kJ/kg → GJ/t
 const GJ_per_kWh=0.0036;
-/* 산업 운전 범위 — 이 밖은 외삽 */
+/* Industrial operating window. Outside this the model extrapolates. */
 const VALID={cap:[300,1200],eff:[55,96],sel:[78,88],
              cot:[800,900],tau:[0.15,0.60],dilution:[0.25,0.50]};
-/* 공표 앵커 (Mittal, Kwak et al., Chem. Eng. J. 523 (2025) 168251, 재래식 벤치마크) */
+/* Published anchor: Mittal, Kwak et al., Chem. Eng. J. 523 (2025) 168251, conventional case */
 const PUB={coo:680,ethane:1.19,netEnergy:14.7};
 
-/* ---------- 상태 ---------- */
+/* ---------- state ---------- */
 const S={tab:'plant',mode:'CH',cap:610,eff:60,selMode:'calc',sel:84,tle:true,
          cot:850,tau:0.35,dilution:0.35,
          ethane:200,elec:0.07,gas:4,steam:9.8,lpg:550,ccf:0.10,labor:5};
 
-/* ---------- 모델 ---------- */
+/* ---------- model ---------- */
 function model(p){
-  /* 0. 반응기 속도론 — 1차 반응, 전환율은 온도와 체류시간에서 나온다 */
+  /* 0. Kinetics. Conversion follows from temperature and residence time. */
   const kRate=A_PRE*Math.exp(-EA/(8.314*(p.cot+273.15)));
   const X=Math.min(0.97,Math.max(0.03,1-Math.exp(-kRate*p.tau)));
 
-  /* 0b. 선택도 — 전환율이 오르면 2차 반응으로 떨어진다.
-     같은 전환율이면 짧은 체류시간·높은 온도가 유리하다 (short contact time).
-     희석은 분압을 낮춰 이분자 2차 반응을 억제한다. */
+  /* 0b. Selectivity falls as conversion climbs. At equal conversion, shorter
+     residence time at higher temperature wins: secondary reactions get less
+     time. Dilution lowers partial pressure and suppresses bimolecular paths. */
   let SmolCalc=1.0244-0.0778*X-0.2222*X*X
               +0.06*(p.dilution-0.35)
               +0.04*Math.log(0.35/p.tau);
   SmolCalc=Math.min(0.985,Math.max(0.55,SmolCalc));
 
-  /* 1. 탄소·수소 수지를 닫는다
-     부반응 배분은 가혹도 의존. 선택도가 나빠지는 것은 조건이 가혹해졌다는 뜻이고,
-     가혹해지면 잃은 탄소는 CH4와 코크로 가지 C3+로 가지 않는다.
-     고정 비율로 두면 저선택도가 LPG 크레딧을 벌어 에탄 손실을 상쇄하는 비물리적 결과가 나온다. */
+  /* 1. Close the carbon and hydrogen balances.
+     The byproduct split depends on severity. Losing selectivity means running
+     harder, and harder running sends the lost carbon to methane and coke, not
+     to C3+. A fixed split lets poor selectivity earn LPG credit that cancels
+     the feedstock loss, which is not physical. */
   const Smol=p.selMode==='calc'?SmolCalc:(p.sel/100)*MW.C2H6/MW.C2H4;
   const Smass=Smol*MW.C2H4/MW.C2H6;
   const loss=1-Smol;                           // 몰 기준 손실률
@@ -305,7 +282,7 @@ function model(p){
   const fC3=Math.max(0.02,1-fCH4-fCoke);
   const rest=2*loss;                           // 잔여 탄소, mol C / mol C2H6 전환
   const nCH4=fCH4*rest, nC3=fC3*rest/3, nCoke=fCoke*rest;
-  /* H 수지에서 유도: 4·Smol + 4m + 6p + 2h = 6 */
+  /* From the hydrogen balance: 4*Smol + 4m + 6p + 2h = 6 */
   const nH2=3-2*Smol-rest*(2*fCH4+fC3);
   const n=1000/(Smol*MW.C2H4);                 // mol C2H6 전환 / kg C2H4
   const kg=m=>n*m/1000;
@@ -313,26 +290,26 @@ function model(p){
            c3:kg(nC3*MW.C3),coke:kg(nCoke*MW.C)};
   const coil=y.ethane/X, recycle=coil-y.ethane, dilSteam=coil*p.dilution;
 
-  /* 2. 반응기 열부하 */
+  /* 2. Reactor duty */
   const qRxn=n*H_RXN;
   const qSens=(coil*CP_C2H6+dilSteam*CP_STEAM)*(p.cot-T_PREHEAT);
   const qDemand=qRxn+qSens, qDeliver=qDemand/(p.eff/100);
   const tleSteam=p.tle?TLE_REC*qSens:0;
 
-  /* 3. 자체 연료가스 — 노는 이걸 먼저 태운다 */
+  /* 3. Tail gas. The furnace burns this before buying anything. */
   const fuelGas=y.ch4*LHV.CH4*1000+y.h2*LHV.H2*1000;   // kJ/kg C2H4
   let gasBuy=0,gasSell=0,elecHeat=0;
   if(p.mode==='CH'){ if(fuelGas>=qDeliver) gasSell=fuelGas-qDeliver; else gasBuy=qDeliver-fuelGas; }
   else { elecHeat=qDeliver; gasSell=fuelGas; }
 
-  /* 4. 압축기 — 스펙 고정 */
+  /* 4. Compressor. Specification fixed. */
   const mol={c2h4:1000/MW.C2H4,c2h6:recycle*1000/MW.C2H6,ch4:y.ch4*1000/MW.CH4,
              h2:y.h2*1000/MW.H2,c3:y.c3*1000/MW.C3};
   const nGas=mol.c2h4+mol.c2h6+mol.ch4+mol.h2+mol.c3;
   const gam=1.32,st=4,rSt=Math.pow(P_DISCH/1.5,1/st);
   const wComp=st*(gam/(gam-1))*8.314*313*(Math.pow(rSt,(gam-1)/gam)-1)/0.75*nGas/1000;
 
-  /* 5. 콜드박스 — 회수율 스펙이 필요 온도를 정한다 */
+  /* 5. Cold box. The recovery specification sets the temperature required. */
   const lightFrac=(mol.ch4+mol.h2)/nGas;
   const tCold=-100-40*Math.log10(0.01/(1-RECOVERY))-160*(lightFrac-0.40);
   const mCold=coil-y.coke;
@@ -341,7 +318,7 @@ function model(p){
   let wRef=0; for(const[T,fr]of lv){const Tk=T+273.15;
     wRef+=qCold*fr/Math.max(.05,ETA2*Tk/(T_AMB-Tk));}
 
-  /* 6. C2 스플리터 — FUG. 순도를 걸면 환류비가 결과로 나온다 */
+  /* 6. C2 splitter, FUG. Fix the purity and reflux comes out as a result. */
   const alpha=1.85-0.018*P_DISCH;
   const nMin=Math.log((PURITY/(1-PURITY))*(0.99/0.01))/Math.log(alpha);
   const nAct=Math.round(2.1*nMin);
@@ -351,19 +328,19 @@ function model(p){
   const rRatio=Math.max(rMin*1.15,(rMin+(1-Math.sqrt(gx))*0.9)*1.05);
   const wSplit=(rRatio+1)*280/Math.max(.05,ETA2*243/(T_AMB-243));
 
-  /* 7. 코킹 → 가동률 */
+  /* 7. Coking sets run length, run length sets on-stream factor. */
   const runDays=60*Math.exp(-0.025*(p.cot-850))*Math.pow(p.dilution/0.35,0.6)
                   *Math.pow(0.35/p.tau,0.3);
   const osf=runDays/(runDays+1.5);
 
-  /* 8. 자본비 — 610 kt/y TBMC $126.8M 앵커, 구역별 6/10 보간 */
+  /* 8. Capital. Anchored on TBMC $126.8 M at 610 kt/y, scaled by section. */
   const sc=(x,r,e)=>Math.pow(x/r,e);
   const tbmc=REF.tbmc*sc(p.cap,REF.cap,0.65)*(
       SPLIT.furnace*sc(coil,1.809,0.65)+SPLIT.compression*sc(wComp,1134,0.70)
     + SPLIT.coldbox*sc(wRef,2098,0.70)+SPLIT.fractionation*sc(rRatio*nAct,195,0.60));
   const toc=tbmc*2.5, prod=p.cap*1000*osf;
 
-  /* 9. 사다리 — 전부 $/t C2H4 */
+  /* 9. Cost ladder, all in USD per tonne C2H4 */
   const eGJ=p.elec/GJ_per_kWh;
   const L={};
   L.floor    = FLOOR_RATIO*p.ethane;
@@ -377,7 +354,7 @@ function model(p){
   L.om       = (toc*1e6*0.075+p.labor*1e6)/prod;
   const coo=Object.values(L).reduce((a,b)=>a+b,0);
 
-  /* 10. 수지 잔차 */
+  /* 10. Balance residuals */
   const cIn=2, cOut=2*Smol+nCH4+3*nC3+nCoke;
   const hIn=6, hOut=4*Smol+4*nCH4+6*nC3+2*nH2;
   const mIn=y.ethane, mOut=1+y.ch4+y.h2+y.c3+y.coke;
@@ -395,7 +372,7 @@ function model(p){
 
 /* ---------- 렌더 ---------- */
 
-/* 손익분기 전기 가격 — 이분법 */
+/* Break-even power price, bisection */
 function breakeven(){
   let lo=1e-4,hi=0.5;
   for(let i=0;i<50;i++){
@@ -406,23 +383,24 @@ function breakeven(){
 }
 
 
-/* ---------- 공장 흐름도 ---------- */
+
+/* ---------- process flow diagram ---------- */
 function drawPFD(r){
-  const W=760,H=330, BW=124, BH=78, BY=130;
+  const BW=124, BH=78, BY=130;
   const xs=[70,210,350,490,630];
   const eGJ=S.elec/GJ_per_kWh;
   const B=[
-    {n:'반응기 · TLE',a:sig(S.cot,4)+' °C · '+sig(S.tau,3)+' s',
-     b:'전환 '+pctS(r.X*100)+' · 선택도 '+pctS(r.Smass*100),c:r.L.heat,
-     t:'열 요구 '+sig(r.qDemand*kJ2GJ,3)+' GJ/t. 온도·체류시간·희석비가 여기서만 자유롭다.'},
-    {n:'T1 TEG 건조',a:'수분 '+sig(r.dilSteam,3)+' kg/kg',b:'규격 고정',c:0,
-     t:'희석 스팀을 물로 빼낸다. 압축기 앞이므로 스팀은 압축기를 지나지 않는다.'},
-    {n:'C1 압축',a:sig(P_DISCH,3)+' bar · 4단',b:sig(r.nGas,4)+' mol/kg 통과',
-     c:r.wComp*kJ2GJ*eGJ,t:'동력 '+sig(r.wComp*kJ2GJ,3)+' GJ/t. 재순환이 많을수록 커진다.'},
-    {n:'T2 콜드박스',a:sig(r.tCold,4)+' °C',b:'경질분 '+pctS(r.lightFrac*100),
-     c:r.wRef*kJ2GJ*eGJ,t:'회수율 '+pctS(RECOVERY*100,4)+' 스펙이 필요 온도를 정한다. CH4가 많을수록 차가워진다.'},
-    {n:'T3 · T4 분리',a:'단수 '+r.nAct,b:'환류비 '+sig(r.rRatio,3)+' (결과)',
-     c:r.wSplit*kJ2GJ*eGJ,t:'순도 99.9 mol%를 걸면 환류비가 결과로 나온다. 입력이 아니다.'}
+    {n:'Reactor + TLE',a:sig(S.cot,4)+' C, '+sig(S.tau,3)+' s',
+     b:'X '+pctS(r.X*100)+', S '+pctS(r.Smass*100),c:r.L.heat,
+     t:'Duty '+sig(r.qDemand*kJ2GJ,3)+' GJ/t. Temperature, residence time and dilution are set here and nowhere else.'},
+    {n:'T1 Drying, TEG',a:'Water '+sig(r.dilSteam,3)+' kg/kg',b:'Specification fixed',c:0,
+     t:'Dilution steam is condensed out ahead of the compressor, so it never passes through C1.'},
+    {n:'C1 Compression',a:sig(P_DISCH,3)+' bar, 4 stages',b:sig(r.nGas,4)+' mol/kg',
+     c:r.wComp*kJ2GJ*eGJ,t:'Shaft duty '+sig(r.wComp*kJ2GJ,3)+' GJ/t. Grows with recycle.'},
+    {n:'T2 Cold box',a:sig(r.tCold,4)+' C',b:'Light ends '+pctS(r.lightFrac*100),
+     c:r.wRef*kJ2GJ*eGJ,t:'Recovery of '+pctS(RECOVERY*100,4)+' sets the temperature required. More methane means colder.'},
+    {n:'T3 / T4 Fractionation',a:sig(r.nAct,3)+' stages',b:'Reflux '+sig(r.rRatio,3)+', computed',
+     c:r.wSplit*kJ2GJ*eGJ,t:'Purity of 99.9 mol% is specified; reflux follows from it.'}
   ];
   const G='#6c757d', K='#212529', A='#2f8f83';
   let s='<g font-family="Roboto,-apple-system,sans-serif">';
@@ -431,95 +409,91 @@ function drawPFD(r){
     +'<marker id="k" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto">'
     +'<path d="M0,0 L6,2.5 L0,5 z" fill="'+K+'"/></marker></defs>';
   const cy=BY+BH/2;
-  /* 원료 유입 + 재순환 합류 */
-  s+='<line x1="40" y1="'+cy+'" x2="'+(xs[0]-4)+'" y2="'+cy+'" stroke="'+K+'" marker-end="url(#k)"/>';
-  s+='<text x="4" y="'+(cy-27)+'" font-size="10" fill="'+G+'">'+C2H6+' '+sig(r.y.ethane,3)+' kg</text>';
-  s+='<text x="4" y="'+(cy-11)+'" font-size="10" fill="'+G+'">스팀 '+sig(r.dilSteam,3)+' kg</text>';
-  /* 가열 투입 */
+  /* Fresh feed enters from above and joins the recycle at x = 40. */
+  s+='<text x="4" y="97" font-size="10" fill="'+G+'">'+C2H6+' '+sig(r.y.ethane,3)+' kg</text>';
+  s+='<text x="4" y="113" font-size="10" fill="'+G+'">Steam '+sig(r.dilSteam,3)+' kg</text>';
+  s+='<line x1="40" y1="120" x2="40" y2="'+(cy-2)+'" stroke="'+K+'"/>';
+  s+='<line x1="40" y1="'+cy+'" x2="'+(xs[0]-4)+'" y2="'+cy+'" stroke="'+K+'" stroke-width="1.6" marker-end="url(#k)"/>';
+  s+='<circle cx="40" cy="'+cy+'" r="2.5" fill="'+K+'"/>';
   s+='<line x1="'+(xs[0]+26)+'" y1="96" x2="'+(xs[0]+26)+'" y2="'+(BY-4)+'" stroke="'+G+'" marker-end="url(#a)"/>';
-  s+='<text x="'+(xs[0]+20)+'" y="88" font-size="10" fill="'+G+'">'+(S.mode==='CH'?'연료':'전기')+' '+sig(r.qDeliver*kJ2GJ,3)+' GJ</text>';
-  /* H.P. 스팀 회수 */
+  s+='<text x="'+(xs[0]+20)+'" y="88" font-size="10" fill="'+G+'">'+(S.mode==='CH'?'Fuel ':'Power ')+sig(r.qDeliver*kJ2GJ,3)+' GJ</text>';
   if(r.tleSteam>0){
     s+='<line x1="'+(xs[0]+BW-24)+'" y1="'+BY+'" x2="'+(xs[0]+BW-24)+'" y2="62" stroke="'+A+'" marker-end="url(#a)"/>';
-    s+='<text x="'+(xs[0]+BW-18)+'" y="58" font-size="10" fill="'+A+'">H.P. 스팀 '+usd(-r.L.steamCr)+'/t</text>';
+    s+='<text x="'+(xs[0]+BW-18)+'" y="58" font-size="10" fill="'+A+'">HP steam '+usd(-r.L.steamCr)+'/t</text>';
   }
-  /* 블록 간 연결 — 굵기는 통과 질량 */
   for(let i=0;i<4;i++)
     s+='<line x1="'+(xs[i]+BW)+'" y1="'+cy+'" x2="'+(xs[i+1]-4)+'" y2="'+cy+'" stroke="'+K+'" stroke-width="1.6" marker-end="url(#k)"/>';
-  /* 부출 */
   const down=(x,lab,col)=>'<line x1="'+x+'" y1="'+(BY+BH)+'" x2="'+x+'" y2="228" stroke="'+col+'" marker-end="url(#a)"/>'
     +'<text x="'+x+'" y="242" font-size="10" fill="'+col+'" text-anchor="middle">'+lab+'</text>';
   const up=(x,lab,col)=>'<line x1="'+x+'" y1="'+BY+'" x2="'+x+'" y2="96" stroke="'+col+'" marker-end="url(#a)"/>'
     +'<text x="'+x+'" y="88" font-size="10" fill="'+col+'" text-anchor="middle">'+lab+'</text>';
-  s+=down(xs[1]+BW/2,'물',G);
-  s+=up(xs[3]+BW/2,r.gasSell>0?'연료가스 '+usd(-r.L.gasCr)+'/t':'연료가스 → 노로',r.gasSell>0?A:G);
-  /* 제품과 LPG는 세로로 어긋나게 — 같은 높이에 두면 라벨이 겹친다 */
+  s+=down(xs[1]+BW/2,'Water',G);
+  s+=up(xs[3]+BW/2,r.gasSell>0?'Tail gas '+usd(-r.L.gasCr)+'/t':'Tail gas to furnace',r.gasSell>0?A:G);
   s+='<line x1="'+(xs[4]+28)+'" y1="'+(BY+BH)+'" x2="'+(xs[4]+28)+'" y2="224" stroke="'+K+'" marker-end="url(#k)"/>';
   s+='<text x="'+(xs[4]+28)+'" y="238" font-size="10" fill="'+K+'" text-anchor="middle">'+C2H4+' 1.000 kg</text>';
   s+='<line x1="'+(xs[4]+92)+'" y1="'+(BY+BH)+'" x2="'+(xs[4]+92)+'" y2="250" stroke="'+A+'" marker-end="url(#a)"/>';
   s+='<text x="754" y="264" font-size="10" fill="'+A+'" text-anchor="end">LPG '+usd(-r.L.lpgCr)+'/t</text>';
-  /* 재순환 — 1/X 증폭이 보이게 */
   s+='<path d="M '+(xs[4]+8)+' '+(BY+BH)+' L '+(xs[4]+8)+' 292 L 40 292 L 40 '+(cy-8)+'" '
     +'fill="none" stroke="'+G+'" stroke-dasharray="4 3" marker-end="url(#a)"/>';
   s+='<text x="'+((xs[4]+48)/2)+'" y="286" font-size="10" fill="'+G+'" text-anchor="middle">'
-    +'재순환 '+sig(r.recycle,3)+' kg — 반응기 통과량이 신선 공급의 '+sig(1/r.X,3)+'배가 된다</text>';
-  /* 블록 */
+    +'Recycle '+sig(r.recycle,3)+' kg. Reactor throughput is '+sig(1/r.X,3)+' times fresh feed.</text>';
   B.forEach((b,i)=>{
     const x=xs[i], free=(i===0);
     s+='<rect x="'+x+'" y="'+BY+'" width="'+BW+'" height="'+BH+'" rx="6" fill="#fff" stroke="'
       +(free?A:'#e3e7ea')+'" stroke-width="'+(free?1.5:1)+'"><title>'+esc(b.t)+'</title></rect>';
-    s+='<text x="'+(x+10)+'" y="'+(BY+19)+'" font-size="11.5" fill="'+K+'" font-weight="500">'+b.n+'</text>';
+    s+='<text x="'+(x+10)+'" y="'+(BY+19)+'" font-size="11" fill="'+K+'" font-weight="500">'+b.n+'</text>';
     s+='<text x="'+(x+10)+'" y="'+(BY+34)+'" font-size="9.5" fill="'+G+'">'+b.a+'</text>';
     s+='<text x="'+(x+10)+'" y="'+(BY+46)+'" font-size="9.5" fill="'+G+'">'+b.b+'</text>';
     s+='<text x="'+(x+BW-10)+'" y="'+(BY+68)+'" font-size="11.5" fill="'+K+'" text-anchor="end" '
-      +'font-family="Roboto Mono,monospace" font-weight="500">'+(b.c===0?'—':usd(b.c)+'/t')+'</text>';
-    if(free) s+='<text x="'+(x+10)+'" y="'+(BY+68)+'" font-size="9.5" fill="'+A+'" font-weight="500">자유도</text>';
+      +'font-family="Roboto Mono,monospace" font-weight="500">'+(b.c===0?'-':usd(b.c)+'/t')+'</text>';
+    if(free) s+='<text x="'+(x+10)+'" y="'+(BY+68)+'" font-size="9.5" fill="'+A+'" font-weight="500">free</text>';
   });
   s+='</g>';
   $('pfd').innerHTML=s;
 }
 
-/* ---------- 원가 표 ---------- */
+/* ---------- cost table ---------- */
 function costTable(r){
-  const eGJ=S.elec/GJ_per_kWh;
   const rows=[
-    ['원료 · 에탄',r.L.floor+r.L.selLoss,
-      '에탄 '+sig(r.y.ethane,4)+' kg/kg · 이론 바닥 1.072'],
-    [(S.mode==='CH'?'노 연료 · 순구매':'주울 전기'),r.L.heat,
-      '열 요구 '+sig(r.qDemand*kJ2GJ,3)+' → 투입 '+sig(r.qDeliver*kJ2GJ,3)+' GJ/t'],
-    ['압축 · 냉동 전기',r.L.elecProc,
+    ['Ethane feed',r.L.floor+r.L.selLoss,sig(r.y.ethane,4)+' kg/kg against a floor of 1.072'],
+    [(S.mode==='CH'?'Furnace fuel, net':'Joule power'),r.L.heat,
+      'Duty '+sig(r.qDemand*kJ2GJ,3)+' GJ/t, input '+sig(r.qDeliver*kJ2GJ,3)+' GJ/t'],
+    ['Compression and refrigeration',r.L.elecProc,
       sig((r.wComp+r.wRef+r.wSplit)*kJ2GJ/GJ_per_kWh/1000,3)+' kWh/kg'],
-    ['H.P. 스팀 회수',r.L.steamCr,sig(r.tleSteam*kJ2GJ,3)+' GJ/t'],
-    ['연료가스 판매',r.L.gasCr,sig(r.gasSell*kJ2GJ,3)+' GJ/t'],
-    ['LPG 크레딧',r.L.lpgCr,sig(r.y.c3,3)+' kg/kg'],
-    ['자본 상각',r.L.capital,'TOC $'+sig(r.toc,4)+' M · CCF '+sig(S.ccf,2)],
-    ['O&M · 인건비',r.L.om,'가동률 '+pctS(r.osf*100)]
+    ['HP steam recovered',r.L.steamCr,sig(r.tleSteam*kJ2GJ,3)+' GJ/t'],
+    ['Tail gas sold',r.L.gasCr,sig(r.gasSell*kJ2GJ,3)+' GJ/t'],
+    ['LPG credit',r.L.lpgCr,sig(r.y.c3,3)+' kg/kg'],
+    ['Capital charge',r.L.capital,'TOC $'+sig(r.toc,4)+' M at CCF '+sig(S.ccf,2)],
+    ['O&amp;M and labour',r.L.om,'On-stream '+pctS(r.osf*100)]
   ];
   const gross=rows.filter(x=>x[1]>0).reduce((a,b)=>a+b[1],0);
   let h=rows.map(([n,v,tip])=>
     '<tr title="'+esc(tip)+'"><td>'+n+'</td><td class="r'+(v<0?' cr':'')+'">'+usd(v)+'</td>'
-    +'<td class="r">'+(v>0?pctS(v/gross*100,2):'—')+'</td></tr>').join('');
-  h+='<tr class="tot"><td>COO</td><td class="r">'+usd(r.coo)+'</td><td class="r"></td></tr>';
-  h+='<tr class="ref"><td>이론 바닥 · 화학량론</td><td class="r">'+usd(r.L.floor)
-    +'</td><td class="r">'+sig(r.coo/r.L.floor,3)+'배</td></tr>';
-  h+='<tr class="ref"><td>공표값 · CEJ 2025 벤치마크</td><td class="r">'+usd(PUB.coo)
-    +'</td><td class="r">'+((r.coo-PUB.coo)/PUB.coo*100>0?'+':'−')+sig(Math.abs((r.coo-PUB.coo)/PUB.coo*100),3)+'%</td></tr>';
+    +'<td class="r">'+(v>0?pctS(v/gross*100,2):'-')+'</td></tr>').join('');
+  h+='<tr class="tot"><td>Cost of ethylene</td><td class="r">'+usd(r.coo)+'</td><td class="r"></td></tr>';
+  h+='<tr class="ref"><td>Stoichiometric floor</td><td class="r">'+usd(r.L.floor)
+    +'</td><td class="r">'+sig(r.coo/r.L.floor,3)+'x</td></tr>';
+  const gap=(r.coo-PUB.coo)/PUB.coo*100;
+  h+='<tr class="ref"><td>Published benchmark</td><td class="r">'+usd(PUB.coo)
+    +'</td><td class="r">'+(gap>0?'+':'−')+sig(Math.abs(gap),3)+'%</td></tr>';
   $('costBody').innerHTML=h;
-  $('plantNote').innerHTML='밑의 두 줄은 비교 기준입니다. '
-    +'<b>'+usd(r.L.floor)+'</b>는 화학량론이 정한 하한이라 누구도 못 내려갑니다. '
-    +'공표값과의 차이는 경계 조건 차이입니다 — 이 모델은 TLE 스팀을 크레딧으로 잡고 '
-    +'테일가스를 노 연료로 먼저 태우지만, 공표 플로우시트는 H.P. 스팀을 <em>구매</em>합니다.';
+  $('plantNote').innerHTML='The last two rows are reference points. <b>'+usd(r.L.floor)+'</b> follows from the '
+    +'stoichiometry of '+C2H6.replace(/tspan/g,'sub').replace(/ baseline-shift="sub" font-size="0.75em"/g,'')
+    +' to '+C2H4.replace(/tspan/g,'sub').replace(/ baseline-shift="sub" font-size="0.75em"/g,'')
+    +' and cannot be undercut. The distance to the published value is a boundary difference, not a parameter one: '
+    +'this model credits TLE steam and burns tail gas in the furnace before buying fuel, while the published '
+    +'flowsheet purchases HP steam.';
 }
 
-/* ---------- 사다리 · 토네이도 ---------- */
+/* ---------- cost ladder ---------- */
 const LADDER=[
-  ['이론 바닥 · 에탄','floor','floor'],['선택도 손실','selLoss','up'],
-  ['가열 에너지','heat','up'],['압축 · 냉동 전기','elecProc','up'],
-  ['H.P. 스팀 회수','steamCr','dn'],['연료가스 판매','gasCr','dn'],
-  ['LPG 크레딧','lpgCr','dn'],['자본 상각','capital','up'],['O&M · 인건비','om','up']
+  ['Stoichiometric floor','floor','floor'],['Selectivity loss','selLoss','up'],
+  ['Heating energy','heat','up'],['Compression and refrigeration','elecProc','up'],
+  ['HP steam recovered','steamCr','dn'],['Tail gas sold','gasCr','dn'],
+  ['LPG credit','lpgCr','dn'],['Capital charge','capital','up'],['O&M and labour','om','up']
 ];
 function drawLadder(r){
-  const W=760,H=430,L=132,R=74,T=30,B=42;
+  const W=760,H=430,L=190,R=74,T=30,B=42;
   const pw=W-L-R, rows=LADDER.length+1, rh=(H-T-B)/rows;
   const vals=LADDER.map(([lbl,k,kind])=>({lbl,v:r.L[k],kind}));
   const maxX=Math.max(r.coo,r.L.floor,PUB.coo)*1.10;
@@ -542,30 +516,33 @@ function drawLadder(r){
     s+='<text x="'+(W-R+8)+'" y="'+(y0+rh*0.62)+'" font-size="12" fill="#212529" font-family="Roboto Mono,monospace" font-weight="500">'+(d.v<0?'−':'+')+sig(Math.abs(d.v),3)+'</text>';
   });
   const yT=T+LADDER.length*rh;
-  s+='<line x1="'+(L-128)+'" y1="'+(yT+2)+'" x2="'+(W-R+66)+'" y2="'+(yT+2)+'" stroke="#e3e7ea"/>';
+  s+='<line x1="'+(L-186)+'" y1="'+(yT+2)+'" x2="'+(W-R+66)+'" y2="'+(yT+2)+'" stroke="#e3e7ea"/>';
   s+='<rect x="'+L+'" y="'+(yT+rh*0.22)+'" width="'+Math.max(1.5,x(r.coo)-L)+'" height="'+(rh*0.56)+'" fill="#212529"/>';
-  s+='<text x="'+(L-9)+'" y="'+(yT+rh*0.62)+'" font-size="12.5" fill="#212529" text-anchor="end" font-weight="700">COO</text>';
+  s+='<text x="'+(L-9)+'" y="'+(yT+rh*0.62)+'" font-size="12.5" fill="#212529" text-anchor="end" font-weight="700">Cost of ethylene</text>';
   s+='<text x="'+(W-R+8)+'" y="'+(yT+rh*0.62)+'" font-size="12.5" fill="#212529" font-family="Roboto Mono,monospace" font-weight="700">'+sig(r.coo,4)+'</text>';
   const fx=x(r.L.floor);
   s+='<line x1="'+fx+'" y1="'+(T-6)+'" x2="'+fx+'" y2="'+(H-B)+'" stroke="#c53a3a" stroke-width="1.5" stroke-dasharray="4 3"/>';
-  s+='<text x="'+(fx+5)+'" y="'+(T-14)+'" font-size="10.5" fill="#c53a3a" font-weight="500">물리적 하한 · 아무도 못 감</text>';
+  s+='<text x="'+(fx+5)+'" y="'+(T-14)+'" font-size="10.5" fill="#c53a3a" font-weight="500">Stoichiometric floor</text>';
   const px=x(PUB.coo);
   s+='<line x1="'+px+'" y1="'+(T-6)+'" x2="'+px+'" y2="'+(H-B)+'" stroke="#6c757d" stroke-dasharray="1 4"/>';
-  s+='<polygon points="'+px+','+(H-B)+' '+(px-5)+','+(H-B+9)+' '+(px+5)+','+(H-B+9)+'" fill="#212529"><title>공표값 $'+PUB.coo+'/t</title></polygon>';
-  s+='<text x="'+px+'" y="'+(T-14)+'" font-size="10.5" fill="#6c757d" text-anchor="middle" font-weight="500">공표값 $'+PUB.coo+'</text>';
+  s+='<polygon points="'+px+','+(H-B)+' '+(px-5)+','+(H-B+9)+' '+(px+5)+','+(H-B+9)+'" fill="#212529"><title>Published $'+PUB.coo+'/t</title></polygon>';
+  s+='<text x="'+px+'" y="'+(T-14)+'" font-size="10.5" fill="#6c757d" text-anchor="middle" font-weight="500">Published $'+PUB.coo+'</text>';
   s+='</g>';
   $('ladder').innerHTML=s;
 }
+
+/* ---------- tornado ---------- */
 function drawTornado(r){
-  const knobs=[['규모','cap'],['가열 효율','eff'],['코일 출구온도','cot'],['체류시간','tau'],
-               ['희석 스팀','dilution'],['에탄 가격','ethane'],['전기 가격','elec'],['가스 가격','gas']];
+  const knobs=[['Capacity','cap'],['Heating efficiency','eff'],['Coil outlet temperature','cot'],
+               ['Residence time','tau'],['Steam dilution','dilution'],['Ethane price','ethane'],
+               ['Power price','elec'],['Gas price','gas']];
   const clamp=(k,v)=>VALID[k]?Math.min(VALID[k][1],Math.max(VALID[k][0],v)):v;
   const data=knobs.map(([lbl,k])=>{
     const dn=model({...S,[k]:clamp(k,S[k]*0.9)}).coo-r.coo;
     const up=model({...S,[k]:clamp(k,S[k]*1.1)}).coo-r.coo;
     return {lbl,dn,up,amp:Math.abs(dn)+Math.abs(up)};
   }).sort((a,b)=>b.amp-a.amp);
-  const W=760,H=300,L=112,R=64,T=10,B=36;
+  const W=760,H=300,L=190,R=64,T=10,B=36;
   const pw=W-L-R, rh=(H-T-B)/data.length;
   const m=Math.max(...data.map(d=>Math.max(Math.abs(d.dn),Math.abs(d.up))))*1.15||1;
   const cx=L+pw/2, x=v=>cx+v/m*(pw/2), step=niceStep(m,2.5);
@@ -576,132 +553,136 @@ function drawTornado(r){
     s+='<text x="'+x(t)+'" y="'+(H-B+16)+'" font-size="11" fill="#6c757d" text-anchor="middle" font-family="Roboto Mono,monospace">'+(t>0?'+':'')+sig(t,2)+'</text>';
   }
   s+='<line x1="'+cx+'" y1="'+T+'" x2="'+cx+'" y2="'+(H-B)+'" stroke="#6c757d"/>';
-  s+='<text x="'+cx+'" y="'+(H-B+32)+'" font-size="11" fill="#6c757d" text-anchor="middle">COO 변화 · USD per tonne</text>';
+  s+='<text x="'+cx+'" y="'+(H-B+32)+'" font-size="11" fill="#6c757d" text-anchor="middle">Change in cost of ethylene, USD per tonne</text>';
   data.forEach((d,i)=>{
     const y0=T+i*rh;
     [d.dn,d.up].forEach(v=>{
       const x1=Math.min(cx,x(v)), w=Math.max(1.2,Math.abs(x(v)-cx));
       s+='<rect x="'+x1+'" y="'+(y0+rh*0.24)+'" width="'+w+'" height="'+(rh*0.52)+'" fill="'+(v>0?'#c53a3a':'#2f8f83')+'" opacity="0.85"><title>'+d.lbl+': '+usd(v,3)+'/t</title></rect>';
     });
-    s+='<text x="'+(L-100)+'" y="'+(y0+rh*0.64)+'" font-size="12" fill="#212529">'+d.lbl+'</text>';
+    s+='<text x="'+(L-178)+'" y="'+(y0+rh*0.64)+'" font-size="12" fill="#212529">'+d.lbl+'</text>';
     s+='<text x="'+(W-R+8)+'" y="'+(y0+rh*0.64)+'" font-size="12" fill="#212529" font-family="Roboto Mono,monospace" font-weight="500">'+sig(d.amp,3)+'</text>';
   });
   s+='</g>';
   $('tornado').innerHTML=s;
 }
+
 function band(el,min,max,lo,hi,cur){
   const p=v=>(v-min)/(max-min)*100;
   el.innerHTML='<i style="left:'+p(lo)+'%;width:'+(p(hi)-p(lo))+'%"></i><u style="left:'+p(cur)+'%"></u>';
-  el.title='검증 범위 '+sig(lo,3)+'–'+sig(hi,3)+' · 이 밖은 외삽';
+  el.title='Validated range '+sig(lo,3)+' to '+sig(hi,3)+'. Outside this the model extrapolates.';
 }
 
-/* ---------- 탭 ---------- */
-const TABS=[['plant','plant'],['ladder','cost ladder'],['compare','CH vs JH'],
+/* ---------- tabs ---------- */
+const TABS=[['plant','plant'],['ladder','cost ladder'],['compare','fired vs Joule'],
             ['sens','sensitivity'],['balance','balances']];
-$('nav').innerHTML=TABS.map(([id,lab])=>
-  '<button data-tab="'+id+'"'+(id==='compare'?' class="keep"':'')+'>'+lab+'</button>').join('');
+$('nav').innerHTML=TABS.map(([id,lab])=>'<button data-tab="'+id+'">'+lab+'</button>').join('');
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;render();});
 
-/* ---------- 렌더 ---------- */
+/* ---------- render ---------- */
 function render(){
   const r=model(S);
   const rCH=model({...S,mode:'CH',eff:60}), rJH=model({...S,mode:'JH',eff:95});
   const eCost=r.L.heat+r.L.elecProc+r.L.steamCr+r.L.gasCr;
   const be=breakeven();
 
-  document.querySelectorAll('#nav button').forEach(b=>
-    b.classList.toggle('active',b.dataset.tab===S.tab));
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===S.tab));
   TABS.forEach(([id])=>$('t-'+id).classList.toggle('on',id===S.tab));
 
   $('kpis').innerHTML=[
-    ['cost of ethylene',usd(r.coo),'바닥 '+usd(r.L.floor)+' 대비 '+sig(r.coo/r.L.floor,3)+'배','공표 벤치마크 $680/t · CEJ 2025'],
-    ['원료',usd(r.L.floor+r.L.selLoss),'선택도 손실 '+usd(r.L.selLoss)+' 포함','에탄 '+sig(r.y.ethane,4)+' kg/kg · 하한 1.072'],
-    ['에너지 · 순',usd(eCost),S.mode==='CH'?'연료 − 스팀 · 가스 크레딧':'전기 − 스팀 · 가스 크레딧',
-     '순 에너지 '+sig(r.netEnergy,3)+' GJ/t · 전기 '+sig(r.elec_kWh,3)+' kWh/kg'],
-    ['자본 · 고정비',usd(r.L.capital+r.L.om),'가동률 '+pctS(r.osf*100),'TOC $'+sig(r.toc,4)+' M'],
-    ['손익분기 전기가','$'+sig(be,3),'이보다 싸야 주울이 이김','CH 60% · JH 95% 기준']
+    ['Cost of ethylene',usd(r.coo),sig(r.coo/r.L.floor,3)+'x the floor of '+usd(r.L.floor),
+     'Published benchmark $680/t, CEJ 2025'],
+    ['Feedstock',usd(r.L.floor+r.L.selLoss),'Selectivity loss '+usd(r.L.selLoss),
+     'Ethane '+sig(r.y.ethane,4)+' kg/kg, floor 1.072'],
+    ['Energy, net',usd(eCost),S.mode==='CH'?'Fuel less steam and gas credits':'Power less steam and gas credits',
+     'Net energy '+sig(r.netEnergy,3)+' GJ/t, power '+sig(r.elec_kWh,3)+' kWh/kg'],
+    ['Capital and fixed',usd(r.L.capital+r.L.om),'On-stream '+pctS(r.osf*100),
+     'TOC $'+sig(r.toc,4)+' M, TBMC $'+sig(r.tbmc,4)+' M'],
+    ['Break-even power','$'+sig(be,3),'Below this, Joule wins','Fired at 60%, Joule at 95%']
   ].map(([l,v,sb,tip])=>'<div class="kpi" title="'+esc(tip)+'"><div class="lab">'+l
     +'</div><div class="val">'+v+'</div><div class="sub">'+sb+'</div></div>').join('');
 
-  const ex=(k,v)=>(v<VALID[k][0]||v>VALID[k][1])?' <span class="badge b-warn">외삽</span>':'';
-  $('vCot').textContent=sig(S.cot,4)+' °C';
+  const ex=(k,v)=>(v<VALID[k][0]||v>VALID[k][1])?' <span class="badge b-warn">extrapolated</span>':'';
+  $('vCot').textContent=sig(S.cot,4)+' C';
   band($('bCot'),760,950,VALID.cot[0],VALID.cot[1],S.cot);
-  $('nCot').innerHTML='전환율 <b>'+pctS(r.X*100)+'</b> · 선택도 <b>'+pctS(r.Smass*100)+'</b>'+ex('cot',S.cot);
+  $('nCot').innerHTML='Conversion <b>'+pctS(r.X*100)+'</b>, selectivity <b>'+pctS(r.Smass*100)+'</b>'+ex('cot',S.cot);
   $('vTau').textContent=sig(S.tau,3)+' s';
   band($('bTau'),0.05,1.5,VALID.tau[0],VALID.tau[1],S.tau);
-  $('nTau').innerHTML='운전 <b>'+sig(r.runDays,3)+'</b>일 · 가동률 <b>'+pctS(r.osf*100)+'</b>'+ex('tau',S.tau);
-  $('vDil').textContent=sig(S.dilution,3);
+  $('nTau').innerHTML='Run length <b>'+sig(r.runDays,3)+'</b> d, on-stream <b>'+pctS(r.osf*100)+'</b>'+ex('tau',S.tau);
+  $('vDil').textContent=sig(S.dilution,3)+' kg/kg';
   band($('bDil'),0.15,0.70,VALID.dilution[0],VALID.dilution[1],S.dilution);
-  $('nDil').innerHTML='가열 <b>'+usd(r.L.heat)+'</b>/t'+ex('dilution',S.dilution);
+  $('nDil').innerHTML='Heating <b>'+usd(r.L.heat)+'</b>/t'+ex('dilution',S.dilution);
   $('vCap').textContent=sig(S.cap,4)+' kt/y';
   band($('bCap'),150,1400,VALID.cap[0],VALID.cap[1],S.cap);
-  $('nCap').innerHTML='자본 · 고정비 <b>'+usd(r.L.capital+r.L.om)+'</b>/t'+ex('cap',S.cap);
+  $('nCap').innerHTML='Capital and fixed <b>'+usd(r.L.capital+r.L.om)+'</b>/t'+ex('cap',S.cap);
   $('vEff').textContent=sig(S.eff,3)+'%';
   band($('bEff'),40,98,VALID.eff[0],VALID.eff[1],S.eff);
-  $('nEff').innerHTML='가열 에너지 <b>'+usd(r.L.heat)+'</b>/t'+ex('eff',S.eff);
+  $('nEff').innerHTML='Heating <b>'+usd(r.L.heat)+'</b>/t'+ex('eff',S.eff);
   $('selKnob').style.display=(S.selMode==='direct'?'':'none');
   $('selCalc').classList.toggle('active',S.selMode==='calc');
   $('selDirect').classList.toggle('active',S.selMode==='direct');
   $('vSel').textContent=sig(S.sel,3)+'%';
   band($('bSel'),70,96,VALID.sel[0],VALID.sel[1],S.sel);
-  $('nSel').innerHTML='원료 <b>'+usd(r.L.floor+r.L.selLoss)+'</b>/t'+ex('sel',S.sel);
+  $('nSel').innerHTML='Feedstock <b>'+usd(r.L.floor+r.L.selLoss)+'</b>/t'+ex('sel',S.sel);
   $('mCH').classList.toggle('active',S.mode==='CH');
   $('mJH').classList.toggle('active',S.mode==='JH');
-  $('vEthane').textContent='$'+sig(S.ethane,3)+' per t';
-  $('nEthane').innerHTML='원료 <b>'+usd(r.L.floor+r.L.selLoss)+'</b>/t';
-  $('vElec').textContent='$'+sig(S.elec,3)+' per kWh';
-  $('nElec').innerHTML='손익분기 <b>$'+sig(be,3)+'</b>';
-  $('vGas').textContent='$'+sig(S.gas,3)+' per GJ';
-  $('nGas').innerHTML='가열 <b>'+usd(r.L.heat)+'</b>/t';
+  $('vEthane').textContent='$'+sig(S.ethane,3)+'/t';
+  $('nEthane').innerHTML='Feedstock <b>'+usd(r.L.floor+r.L.selLoss)+'</b>/t';
+  $('vElec').textContent='$'+sig(S.elec,3)+'/kWh';
+  $('nElec').innerHTML='Break-even <b>$'+sig(be,3)+'</b>';
+  $('vGas').textContent='$'+sig(S.gas,3)+'/GJ';
+  $('nGas').innerHTML='Heating <b>'+usd(r.L.heat)+'</b>/t';
 
   drawPFD(r); costTable(r); drawLadder(r); drawTornado(r);
 
   const gap=(r.coo-PUB.coo)/PUB.coo*100;
-  $('ladderCap').innerHTML='막대 = 모델 출력 · ▲ = 공표값 $'+PUB.coo+'/t (Mittal, Kwak et al., <em>Chem. Eng. J.</em> 523 (2025) 168251, 재래식 벤치마크). '
-    +'빨간 점선은 화학량론 하한 — 시뮬레이션이 아니라 해석적으로 정해진 값입니다.<br>'
-    +'<span style="color:var(--warning)">모델이 공표값을 재현하지 못합니다 ('+(gap>0?'+':'−')+sig(Math.abs(gap),3)+'%).</span> '
-    +'원인은 파라미터가 아니라 경계 조건입니다 — 이 모델은 TLE 스팀을 크레딧('+usd(-r.L.steamCr)+'/t)으로 잡고 테일가스를 노 연료로 먼저 태우지만, '
-    +'공표 플로우시트는 H.P. 스팀을 <em>구매</em>합니다. 그림을 맞추려고 파라미터를 물리 밖으로 밀지 않았습니다.';
+  $('ladderCap').innerHTML='Bars are model output. The triangle marks the published value of $'+PUB.coo+'/t '
+    +'(Mittal, Kwak et al., <em>Chem. Eng. J.</em> 523 (2025) 168251, conventional case). The red dashed line is '
+    +'the stoichiometric floor, fixed by atom count rather than by simulation.<br>'
+    +'<span style="color:var(--warning)">The model does not reproduce the published value ('
+    +(gap>0?'+':'−')+sig(Math.abs(gap),3)+'%).</span> The difference sits in the system boundary, not in the '
+    +'parameters: this model credits TLE steam ('+usd(-r.L.steamCr)+'/t) and burns tail gas in the furnace before '
+    +'buying fuel, while the published flowsheet purchases HP steam. No parameter was moved outside its physical '
+    +'range to close the gap.';
 
   $('vsCH').textContent=usd(rCH.coo); $('vsJH').textContent=usd(rJH.coo);
-  $('vsCHd').innerHTML='효율 60% · 천연가스 $'+sig(S.gas,3)+'/GJ · 전달 열 $'+sig(S.gas/0.60,3)+'/GJ';
-  $('vsJHd').innerHTML='효율 95% · 전기 $'+sig(S.elec,3)+'/kWh · 전달 열 $'+sig(S.elec/GJ_per_kWh/0.95,3)+'/GJ';
+  $('vsCHd').innerHTML='60% efficiency, gas $'+sig(S.gas,3)+'/GJ, delivered heat $'+sig(S.gas/0.60,3)+'/GJ';
+  $('vsJHd').innerHTML='95% efficiency, power $'+sig(S.elec,3)+'/kWh, delivered heat $'+sig(S.elec/GJ_per_kWh/0.95,3)+'/GJ';
   $('cardCH').className='card'+(S.mode==='CH'?' on':'');
   $('cardJH').className='card'+(S.mode==='JH'?' on':'');
-  const win=rJH.coo<rCH.coo?'주울':'연소';
-  $('breakeven').innerHTML='효율은 주울이 <b>'+sig(95/60,3)+'배</b> 높지만, 전달 열 1 GJ의 가격은 천연가스 <b>$'+sig(S.gas/0.60,3)
-    +'</b> vs 전기 <b>$'+sig(S.elec/GJ_per_kWh/0.95,3)+'</b>입니다. 현재 전기 가격에서는 <b>'+win+'</b>가 <b>'
-    +usd(Math.abs(rJH.coo-rCH.coo))+'</b>/t 유리합니다. 손익분기 전기 가격은 <b>$'+sig(be,3)+'/kWh</b>입니다.';
+  const win=rJH.coo<rCH.coo?'Joule':'fired';
+  $('breakeven').innerHTML='Joule heating is <b>'+sig(95/60,3)+'x</b> more efficient, but delivered heat costs '
+    +'<b>$'+sig(S.gas/0.60,3)+'</b>/GJ from gas against <b>$'+sig(S.elec/GJ_per_kWh/0.95,3)+'</b>/GJ from power. '
+    +'At the current power price '+win+' heating is <b>'+usd(Math.abs(rJH.coo-rCH.coo))+'</b>/t cheaper. '
+    +'Break-even power price is <b>$'+sig(be,3)+'</b>/kWh.';
 
-  const bal=[['탄소',r.bal.carbon],['수소',r.bal.hydrogen],['질량',r.bal.mass],['에너지',r.bal.energy]];
+  const bal=[['Carbon',r.bal.carbon],['Hydrogen',r.bal.hydrogen],['Mass',r.bal.mass],['Energy',r.bal.energy]];
   $('balanceBody').innerHTML=bal.map(([n,v])=>{
     const pass=Math.abs(v)<1e-3;
-    return '<tr><td>'+n+' 수지</td><td class="r">'+(Math.abs(v)<1e-12?'&lt; 1e−12':sig(v*100,3)+'%')
+    return '<tr><td>'+n+'</td><td class="r">'+(Math.abs(v)<1e-12?'&lt; 1e−12':sig(v*100,3)+'%')
       +'</td><td class="r"><span class="badge '+(pass?'b-pass':'b-fail')+'">'+(pass?'PASS':'FAIL')+'</span></td></tr>';
-  }).join('')
-  +'<tr><td colspan="3" style="color:var(--secondary);font-size:12px;border-bottom:0;padding-top:10px">'
-  +'재순환은 반복 수렴이 아니라 해석적 폐쇄(recycle to extinction)로 풀었습니다. 따라서 잔차는 기계 정밀도이며, '
-  +'이는 대수가 닫혀 있다는 뜻이지 모델이 옳다는 뜻이 아닙니다.</td></tr>';
+  }).join('');
 
   $('specBody').innerHTML=[
-    ['활성화 에너지',sig(EA/1000,4)+' kJ/mol','문헌 · 에탄 열분해 1차 반응'],
-    ['지수앞자리',sig(A_PRE,4)+' per s','보정 · 850 °C · 0.35 s → 전환율 65%'],
-    ['압축 토출 압력',sig(P_DISCH,3)+' bar','설계 상수'],
-    ['제품 순도',pctS(PURITY*100,4)+' mol','후단 스펙 · FUG가 이걸 맞춤'],
-    ['콜드박스 회수율',pctS(RECOVERY*100,4),'후단 스펙 · 필요 온도를 결정'],
-    ['반응 엔탈피',sig(H_RXN,3)+' kJ/mol','문헌 · 반응 온도 기준'],
-    ['냉동기 2법칙 효율',pctS(ETA2*100,3),'가정 · 다단 극저온 냉동 통상값'],
-    ['TBMC 앵커','$'+sig(REF.tbmc,4)+' M at '+sig(REF.cap,3)+' kt/y','CEJ 2025 SI 역산 · TCI ≈ TOC 가정'],
-    ['TOC / TBMC',sig(2.5,2),'CEJ 2025 SI 가정 11']
+    ['Activation energy',sig(EA/1000,4)+' kJ/mol','Literature, first-order ethane pyrolysis'],
+    ['Pre-exponential','1.470e13 /s','Calibrated to 850 C, 0.35 s, 65% conversion'],
+    ['Compressor discharge',sig(P_DISCH,3)+' bar','Design constant'],
+    ['Product purity',pctS(PURITY*100,4)+' mol','Downstream specification, met by FUG'],
+    ['Cold box recovery',pctS(RECOVERY*100,4),'Downstream specification, sets required temperature'],
+    ['Reaction enthalpy',sig(H_RXN,3)+' kJ/mol','Literature, at reaction temperature'],
+    ['Refrigeration second-law efficiency',pctS(ETA2*100,3),'Assumption, multistage cryogenic'],
+    ['TBMC anchor','$'+sig(REF.tbmc,4)+' M at '+sig(REF.cap,3)+' kt/y','Back-calculated from CEJ 2025 SI, TCI taken as TOC'],
+    ['TOC / TBMC','2.50','CEJ 2025 SI, assumption 11']
   ].map(([a,b,c])=>'<tr><td>'+a+'</td><td class="r">'+b+'</td><td style="color:var(--secondary)">'+c+'</td></tr>').join('');
 
-  $('foot').innerHTML='<b>정확도 등급 AACE Class 5 · ±40%.</b> 절대값을 맞히는 물건이 아니라 바닥에서 최종가까지 '
-   +'어떻게 올라가는지를 보여주는 물건입니다. 자본비는 상관식 · 계수 기반이라 Aspen APEA의 설계 기반 물량 산출과 급이 다릅니다. '
-   +'부반응 배분은 손실률에 따라 CH₄ 45→80% · 코크 8→25% · C₃₊ 잔여로 이동하는 가정이며 실측 교정이 없습니다. '
-   +'희석 스팀의 잠열 생산비와 급냉 응축 부하는 아직 모델에 없습니다 — 그래서 희석비를 올리면 계속 좋아지기만 하고 최적점이 나타나지 않습니다.';
+  $('foot').innerHTML='Screening estimate, AACE Class 5, &plusmn;40%. Capital is correlation based and does not '
+   +'resolve differences that design based estimation would. The byproduct split moves with severity '
+   +'(CH<sub>4</sub> 45 to 80%, coke 8 to 25%, C<sub>3+</sub> the balance) and is not calibrated against measurement. '
+   +'Latent heat of dilution steam generation and quench condensation duty are absent from the model, so dilution '
+   +'carries no counterpart cost and shows no optimum.';
 }
 
-/* ---------- 배선 ---------- */
+/* ---------- wiring ---------- */
 $('mCH').onclick=()=>{S.mode='CH';S.eff=60;$('sEff').value=60;render()};
 $('mJH').onclick=()=>{S.mode='JH';S.eff=95;$('sEff').value=95;render()};
 $('selCalc').onclick=()=>{S.selMode='calc';render()};
