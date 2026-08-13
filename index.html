@@ -242,17 +242,11 @@ svg{display:block;width:100%;height:auto}
     </details>
   </div>
 
-  <div class="tab on" id="t-overview">
+  <div class="tab on" id="t-main">
     <div class="ov-head">
       <div class="ov-num"><span id="ovCoo"></span><small>USD per tonne ethylene</small></div>
       <div class="ov-ctx" id="ovCtx"></div>
     </div>
-    <svg id="ladder" viewBox="0 0 760 430" role="img" aria-label="Cost of ethylene waterfall"></svg>
-    <div class="cap" id="ladderCap"></div>
-  
-  </div>
-
-  <div class="tab" id="t-plant">
     <div class="plant">
       <div>
         <h2>Process flow</h2>
@@ -267,8 +261,15 @@ svg{display:block;width:100%;height:auto}
         <div class="cap" id="plantNote"></div>
       </div>
     </div>
-  </div>
 
+    <h2 style="margin-top:30px">Cost ladder</h2>
+    <svg id="ladder" viewBox="0 0 760 430" role="img" aria-label="Cost of ethylene waterfall"></svg>
+    <div class="cap" id="ladderCap"></div>
+
+    <h2 style="margin-top:30px">Sensitivity</h2>
+    <svg id="tornado" viewBox="0 0 760 300" role="img" aria-label="Tornado sensitivity"></svg>
+    <div class="cap">Each knob perturbed &plusmn;10%, clamped to its validated window. Ranking changes with operating point.</div>
+  </div>
 
   <div class="tab" id="t-carbon">
     <h2>Carbon intensity</h2>
@@ -345,12 +346,6 @@ svg{display:block;width:100%;height:auto}
       temperature profiles, or assign route-specific capital and element-replacement costs. The result is a
       screening value of access to the wider envelope, not a detailed reactor design estimate.</div>
     </div>
-  </div>
-
-  <div class="tab" id="t-sens">
-    <h2>Sensitivity</h2>
-    <svg id="tornado" viewBox="0 0 760 300" role="img" aria-label="Tornado sensitivity"></svg>
-    <div class="cap">Each knob perturbed &plusmn;10%, clamped to its validated window. Ranking changes with operating point.</div>
   </div>
 
   <div class="tab" id="t-balance">
@@ -477,7 +472,7 @@ const CI_REF=1200;  // kg CO2e per tonne ethylene, typical published ethane crac
 const PUB={coo:680,ethane:1.19,netEnergy:14.7};
 
 /* ---------- state ---------- */
-const S={tab:'overview',grid:0.36,ethaneUp:0.50,tailFate:'burn',alloc:'expansion',mode:'CH',cap:610,eff:60,selMode:'calc',sel:84,tle:true,
+const S={tab:'main',grid:0.36,ethaneUp:0.50,tailFate:'burn',alloc:'expansion',mode:'CH',cap:610,eff:60,selMode:'calc',sel:84,tle:true,
          cot:850,tau:0.35,dilution:0.35,
          ethane:200,elec:0.07,gas:4,steam:9.8,lpg:550,ccf:0.10,labor:5};
 
@@ -698,7 +693,7 @@ function drawPFD(r){
      c:r.wComp*kJ2GJ*eGJ,t:'Shaft duty '+sig(r.wComp*kJ2GJ,3)+' GJ/t. Grows with recycle.'},
     {n:'T2 Cold box',a:sig(r.tCold,4)+' C',b:'Light ends '+pctS(r.lightFrac*100),
      c:r.wRef*kJ2GJ*eGJ,t:'Recovery of '+pctS(RECOVERY*100,4)+' sets the temperature required. More methane means colder.'},
-    {n:'T3 / T4 Fractionation',a:sig(r.nAct,3)+' stages',b:'Reflux '+sig(r.rRatio,3)+', computed',
+    {n:'T3 / T4 Columns',a:sig(r.nAct,3)+' stages',b:'Reflux '+sig(r.rRatio,3)+', computed',
      c:r.wSplit*kJ2GJ*eGJ,t:'Purity of 99.9 mol% is specified; reflux follows from it.'}
   ];
   const G='#6c757d', K='#212529', A='#2f8f83';
@@ -706,8 +701,8 @@ function drawPFD(r){
     const p='fill="none" stroke="'+col+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
     if(kind===0) return '<g '+p+'><path d="M'+(x+4)+' '+(y+17)+' C'+(x+1)+' '+(y+11)+' '+(x+9)+' '+(y+9)+' '+(x+7)+' '+(y+3)+' C'+(x+14)+' '+(y+7)+' '+(x+17)+' '+(y+12)+' '+(x+13)+' '+(y+17)+' Z"/><path d="M'+(x+8)+' '+(y+17)+' C'+(x+6)+' '+(y+14)+' '+(x+11)+' '+(y+12)+' '+(x+10)+' '+(y+9)+'"/></g>';
     if(kind===1) return '<g '+p+'><path d="M'+(x+3)+' '+(y+4)+' H'+(x+15)+' L'+(x+13)+' '+(y+17)+' H'+(x+5)+' Z"/><path d="M'+(x+5)+' '+(y+9)+' H'+(x+13)+'"/></g>';
-    if(kind===2) return '<g '+p+'><circle cx="'+(x+9)+'" cy="'+(y+10)+'" r="7"/><path d="M'+(x+9)+' '+(y+3)+' V'+(x+17)+' M'+(x+2)+' '+(y+10)+' H'+(x+16)+' M'+(x+9)+' '+(y+10)+' L'+(x+14)+' '+(y+6)+'"/></g>';
-    if(kind===3) return '<g '+p+'><path d="M'+(x+9)+' '+(y+2)+' V'+(x+18)+' M'+(x+2)+' '+(y+10)+' H'+(x+16)+' M'+(x+4)+' '+(y+5)+' L'+(x+14)+' '+(y+15)+' M'+(x+14)+' '+(y+5)+' L'+(x+4)+' '+(y+15)+'"/></g>';
+    if(kind===2) return '<g '+p+'><circle cx="'+(x+9)+'" cy="'+(y+10)+'" r="7"/><path d="M'+(x+9)+' '+(y+3)+' V'+(y+17)+' M'+(x+2)+' '+(y+10)+' H'+(x+16)+' M'+(x+9)+' '+(y+10)+' L'+(x+14)+' '+(y+6)+'"/></g>';
+    if(kind===3) return '<g '+p+'><path d="M'+(x+9)+' '+(y+2)+' V'+(y+18)+' M'+(x+2)+' '+(y+10)+' H'+(x+16)+' M'+(x+4)+' '+(y+5)+' L'+(x+14)+' '+(y+15)+' M'+(x+14)+' '+(y+5)+' L'+(x+4)+' '+(y+15)+'"/></g>';
     return '<g '+p+'><path d="M'+(x+5)+' '+(y+2)+' H'+(x+13)+' V'+(y+16)+' Q'+(x+13)+' '+(y+18)+' '+(x+11)+' '+(y+18)+' H'+(x+7)+' Q'+(x+5)+' '+(y+18)+' '+(x+5)+' '+(y+16)+' Z"/><path d="M'+(x+5)+' '+(y+7)+' H'+(x+13)+' M'+(x+5)+' '+(y+13)+' H'+(x+13)+'"/></g>';
   };
   let s='<g font-family="Roboto,-apple-system,sans-serif">';
@@ -1237,9 +1232,8 @@ function renderExplained(r,l){
 }
 
 /* ---------- tabs ---------- */
-const TABS=[['overview','overview'],['plant','plant'],['carbon','carbon'],
-            ['compare','fired vs Joule'],['sens','sensitivity'],['balance','balances'],
-            ['explained','explained'],['cite','cite']];
+const TABS=[['main','main'],['compare','fired vs Joule'],['carbon','carbon'],
+            ['balance','balances'],['explained','explained'],['cite','cite']];
 $('nav').innerHTML=TABS.map(([id,lab])=>'<button data-tab="'+id+'">'+lab+'</button>').join('');
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;render();});
 
@@ -1259,7 +1253,7 @@ function render(){
   TABS.forEach(([id])=>$('t-'+id).classList.toggle('on',id===S.tab));
   const staticTab=(S.tab==='cite');
   /* The overview leads with one number; the KPI band there would repeat it five ways. */
-  $('kpis').style.display=(staticTab||S.tab==='overview')?'none':'';
+  $('kpis').style.display=(staticTab||S.tab==='main')?'none':'';
   document.querySelector('.strip').style.display=staticTab?'none':'';
   const gapPub=(r.coo-PUB.coo)/PUB.coo*100;
   $('ovCoo').textContent=usd(r.coo);
