@@ -87,14 +87,34 @@ td.cr{color:var(--accent)}
   border:1px solid currentColor;border-radius:4px;white-space:nowrap}
 .b-pass{color:var(--accent)} .b-warn{color:var(--warning)} .b-fail{color:var(--error)}
 
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:640px}
+.compare-shell{max-width:960px}
+.decision{display:grid;grid-template-columns:1fr 220px;gap:28px;align-items:center;
+  background:#f5f8f7;border:1px solid #dce9e6;border-radius:10px;padding:20px 22px;margin-bottom:20px}
+.decision .eyebrow,.route-card .eyebrow{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--secondary)}
+.decision .verdict{font-size:30px;font-weight:700;letter-spacing:-.035em;line-height:1.2;margin:2px 0}
+.decision .basis{font-size:12px;color:var(--secondary)}
+.be .beval{font-family:var(--mono);font-size:21px;font-weight:700}
+.be-track{height:5px;background:#dce3e1;border-radius:3px;position:relative;margin:8px 0 5px}
+.be-track i{position:absolute;top:-4px;width:2px;height:13px;background:var(--ink)}
+.be-track b{position:absolute;top:-2px;width:9px;height:9px;border-radius:50%;background:var(--accent);transform:translateX(-50%)}
+.be .legend{display:flex;justify-content:space-between;font-size:10.5px;color:var(--secondary)}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:960px}
 @media(max-width:640px){.cards{grid-template-columns:1fr}}
-.card{border:1px solid var(--hairline);border-radius:8px;padding:16px}
+.card{border:1px solid var(--hairline);border-radius:8px;padding:17px 18px}
 .card.on{border-color:var(--accent)}
 .card h4{margin:0;font-size:12px;font-weight:500;color:var(--secondary);
   text-transform:uppercase;letter-spacing:.05em}
 .card .big{font-family:var(--mono);font-size:26px;font-weight:700;letter-spacing:-.02em;margin-top:3px}
 .card .d{font-size:12px;color:var(--secondary);margin-top:5px}
+.route-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--hairline)}
+.route-metrics span{display:block;font-size:10.5px;color:var(--secondary)}
+.route-metrics b{display:block;font-family:var(--mono);font-size:13px;font-weight:500}
+.value-bridge{margin-top:22px}.value-bridge svg{max-width:760px}
+.envelope{margin-top:22px}.envelope svg{max-width:760px}
+.compare-note{max-width:920px;border-left:3px solid var(--warning);padding:8px 12px;margin:18px 0 0;
+  color:var(--secondary);font-size:12px}
+.compare-note b{color:var(--ink);font-weight:500}
+@media(max-width:640px){.decision{grid-template-columns:1fr;padding:16px}.decision .verdict{font-size:25px}.route-metrics{grid-template-columns:1fr 1fr}}
 .foot{border-top:1px solid var(--hairline);margin-top:30px;padding-top:14px;
   font-size:12px;color:var(--secondary);max-width:92ch}
 svg{display:block;width:100%;height:auto}
@@ -229,18 +249,21 @@ svg{display:block;width:100%;height:auto}
   </div>
 
   <div class="tab" id="t-compare">
+    <div class="compare-shell">
     <h2>Fired vs Joule heating</h2>
+    <section class="decision" aria-live="polite"><div><div class="eyebrow">Current decision</div><div class="verdict" id="decisionVerdict"></div><div class="basis" id="decisionBasis"></div></div><div class="be"><div class="eyebrow">Break-even power</div><div class="beval" id="decisionBE"></div><div class="be-track"><i id="beMark" title="Break-even power"></i><b id="powerMark" title="Current power price"></b></div><div class="legend"><span>line · break-even</span><span>dot · current</span></div></div></section>
+    <h3>Common feasible point — energy-source effect</h3>
     <div class="cards">
-      <div class="card" id="cardCH"><h4>Fired</h4><div class="big" id="vsCH"></div><div class="d" id="vsCHd"></div></div>
-      <div class="card" id="cardJH"><h4>Joule</h4><div class="big" id="vsJH"></div><div class="d" id="vsJHd"></div></div>
+      <div class="card route-card" id="cardCH"><div class="eyebrow">Fired route</div><div class="big" id="vsCH"></div><div class="d" id="vsCHd"></div><div class="route-metrics" id="metricsCH"></div></div>
+      <div class="card route-card" id="cardJH"><div class="eyebrow">Joule route</div><div class="big" id="vsJH"></div><div class="d" id="vsJHd"></div><div class="route-metrics" id="metricsJH"></div></div>
     </div>
-    <div class="cap" id="breakeven"></div>
-    <h3>Each at the cheapest point it can reach</h3>
-    <table style="max-width:760px"><thead><tr><th>Heating</th><th class="r">Coil outlet</th>
-      <th class="r">Residence</th><th class="r">Conversion</th><th class="r">Selectivity</th>
-      <th class="r">Run length</th><th class="r">Cost of ethylene</th></tr></thead>
-      <tbody id="envBody"></tbody></table>
-    <div class="cap" id="envCap"></div>
+    <div class="value-bridge"><h3>Value bridge — what creates the gap</h3><svg id="bridgeChart" viewBox="0 0 760 205" role="img" aria-label="Cost gap bridge between fired and Joule heating"></svg><div class="cap" id="bridgeCap"></div></div>
+    <div class="envelope"><h3>Assumed operating envelopes and lowest points found</h3><svg id="envelopeChart" viewBox="0 0 760 285" role="img" aria-label="Fired and Joule temperature and residence-time envelopes"></svg><div class="cap" id="envCap"></div></div>
+    <div class="compare-note"><b>Boundary of this comparison.</b> The model prices efficiency and the assumed
+      temperature–residence-time envelopes. It does not yet size Joule-specific electrical equipment, model
+      temperature profiles, or assign route-specific capital and element-replacement costs. The result is a
+      screening value of access to the wider envelope, not a detailed reactor design estimate.</div>
+    </div>
   </div>
 
   <div class="tab" id="t-sens">
@@ -1105,7 +1128,13 @@ document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{S.tab=b.datas
 /* ---------- render ---------- */
 function render(){
   const r=model(S);
-  const rCH=model({...S,mode:'CH',eff:60}), rJH=model({...S,mode:'JH',eff:95});
+  /* A same-point comparison must sit inside both physical envelopes. Without this clamp,
+     selecting a Joule-only temperature or residence time silently compared it with an
+     infeasible fired case. */
+  const commonCot=Math.min(MODE_LIMITS.CH.cot[1],Math.max(MODE_LIMITS.CH.cot[0],S.cot));
+  const commonTau=Math.min(MODE_LIMITS.CH.tau[1],Math.max(MODE_LIMITS.CH.tau[0],S.tau));
+  const common={...S,cot:commonCot,tau:commonTau};
+  const rCH=model({...common,mode:'CH',eff:60}), rJH=model({...common,mode:'JH',eff:95});
   const eCost=r.L.heat+r.L.elecProc+r.L.steamCr+r.L.gasCr;
   const be=breakeven();
 
@@ -1180,21 +1209,51 @@ function render(){
   $('vsCH').textContent=usd(rCH.coo); $('vsJH').textContent=usd(rJH.coo);
   $('vsCHd').innerHTML='60% efficiency, gas $'+sig(S.gas,3)+'/GJ, delivered heat $'+sig(S.gas/0.60,3)+'/GJ';
   $('vsJHd').innerHTML='95% efficiency, power $'+sig(S.elec,3)+'/kWh, delivered heat $'+sig(S.elec/GJ_per_kWh/0.95,3)+'/GJ';
-  $('cardCH').className='card'+(S.mode==='CH'?' on':'');
-  $('cardJH').className='card'+(S.mode==='JH'?' on':'');
-  const win=rJH.coo<rCH.coo?'Joule':'fired';
-  $('breakeven').innerHTML='Joule heating is <b>'+sig(95/60,3)+'x</b> more efficient, but delivered heat costs '
-    +'<b>$'+sig(S.gas/0.60,3)+'</b>/GJ from gas against <b>$'+sig(S.elec/GJ_per_kWh/0.95,3)+'</b>/GJ from power. '
-    +'At the current power price '+win+' heating is <b>'+usd(Math.abs(rJH.coo-rCH.coo))+'</b>/t cheaper. '
-    +'Break-even power price is <b>$'+sig(be,3)+'</b>/kWh.';
+  $('cardCH').className='card route-card'+(S.mode==='CH'?' on':'');
+  $('cardJH').className='card route-card'+(S.mode==='JH'?' on':'');
 
   if(S.tab==='compare'){
     const bCH=bestPoint('CH'), bJH=bestPoint('JH');
-    $('envBody').innerHTML=[['Fired',bCH,MODE_LIMITS.CH],['Joule',bJH,MODE_LIMITS.JH]].map(([n,d,W])=>
-      '<tr><td>'+n+'</td><td class="r">'+sig(d.cot,4)+' C</td><td class="r">'+sig(d.tau,3)+' s</td>'
-      +'<td class="r">'+pctS(d.X*100)+'</td><td class="r">'+pctS(d.Sm*100)+'</td>'
-      +'<td class="r">'+sig(d.run,3)+' d</td><td class="r">'+usd(d.coo)+'</td></tr>').join('');
     const dEnv=bJH.coo-bCH.coo, dSame=rJH.coo-rCH.coo;
+    const saveCH=rCH.coo-bCH.coo, saveJH=rJH.coo-bJH.coo;
+    const winner=dEnv<0?'Joule':'Fired', gap=Math.abs(dEnv);
+    $('decisionVerdict').textContent=winner+' is lower by '+usd(gap)+'/t';
+    $('decisionBasis').textContent='Lowest points found at power $'+sig(S.elec,3)+'/kWh and gas $'+sig(S.gas,3)+'/GJ';
+    $('decisionBE').textContent='$'+sig(be,3)+'/kWh';
+    $('beMark').style.left=Math.min(100,be/0.15*100)+'%';
+    $('powerMark').style.left=Math.min(100,S.elec/0.15*100)+'%';
+    const metrics=(m,source)=>'<div><span>Efficiency</span><b>'+sig(m===rCH?60:95,2)+'%</b></div>'
+      +'<div><span>Purchased heat</span><b>'+sig(m.qDeliver*kJ2GJ,3)+' GJ/t</b></div>'
+      +'<div><span>Exposure</span><b>'+source+'</b></div>';
+    $('metricsCH').innerHTML=metrics(rCH,'natural gas'); $('metricsJH').innerHTML=metrics(rJH,'power');
+
+    const bridge=[['Energy-source effect',dSame],['Operating-envelope effect',dEnv-dSame],['Net Joule − fired',dEnv]];
+    const maxGap=Math.max(1,...bridge.map(x=>Math.abs(x[1]))), zero=380, span=245;
+    let bs='<line x1="'+zero+'" y1="18" x2="'+zero+'" y2="186" stroke="#adb5bd"/>';
+    bridge.forEach(([label,v],i)=>{const y=35+i*58,w=Math.abs(v)/maxGap*span,x=v<0?zero-w:zero;
+      const fill=i===2?'#212529':(v<0?'#2f8f83':'#c06055');
+      bs+='<text x="8" y="'+(y+15)+'" font-size="13" fill="#212529">'+label+'</text>'
+        +'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="22" rx="3" fill="'+fill+'"><title>'
+        +(v>0?'Joule costs more by ':'Joule saves ')+usd(Math.abs(v))+'/t</title></rect>'
+        +'<text x="'+(v<0?x-8:zero+w+8)+'" y="'+(y+16)+'" text-anchor="'+(v<0?'end':'start')+'" font-family="monospace" font-size="13" font-weight="700" fill="'+fill+'">'
+        +(v>0?'+':'−')+usd(Math.abs(v))+'/t</text>';});
+    bs+='<text x="'+(zero-8)+'" y="200" text-anchor="end" font-size="11" fill="#6c757d">Joule advantage</text><text x="'+(zero+8)+'" y="200" font-size="11" fill="#6c757d">Fired advantage</text>';
+    $('bridgeChart').innerHTML=bs;
+    $('bridgeCap').innerHTML='The common point is '+sig(commonCot,4)+' C and '+sig(commonTau,3)+' s, which both routes can reach. '
+      +'At that point the reactor requires '+sig(rCH.qDemand*kJ2GJ,3)+' GJ/t of useful heat. Purchased energy is '
+      +sig(rCH.qDeliver*kJ2GJ,3)+' GJ/t for fired heating and '+sig(rJH.qDeliver*kJ2GJ,3)+' GJ/t for Joule heating. '
+      +'The first-row gap is therefore the energy-source effect. The second row isolates the value of moving within '
+      +'each assumed operating envelope; the final row is the resulting net gap.';
+    const range=(label,y,axisMin,axisMax,lo,hi,best,color,fmt)=>{const x0=185,x1=690,scale=v=>x0+(v-axisMin)/(axisMax-axisMin)*(x1-x0);
+      return '<text x="8" y="'+(y+5)+'" font-size="12" fill="#212529">'+label+'</text><line x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'" stroke="#e3e7ea" stroke-width="8" stroke-linecap="round"/>'
+        +'<line x1="'+scale(lo)+'" y1="'+y+'" x2="'+scale(hi)+'" y2="'+y+'" stroke="'+color+'" stroke-width="8" stroke-linecap="round"/><circle cx="'+scale(best)+'" cy="'+y+'" r="6" fill="#fff" stroke="'+color+'" stroke-width="3"/>'
+        +'<text x="'+scale(lo)+'" y="'+(y+21)+'" font-size="10.5" fill="#6c757d">'+fmt(lo)+'</text><text x="'+scale(hi)+'" y="'+(y+21)+'" text-anchor="end" font-size="10.5" fill="#6c757d">'+fmt(hi)+'</text><text x="'+scale(best)+'" y="'+(y-13)+'" text-anchor="middle" font-family="monospace" font-size="11" font-weight="700">'+fmt(best)+'</text>';};
+    let es='<text x="8" y="18" font-size="11" fill="#6c757d">COIL OUTLET TEMPERATURE</text>'
+      +range('Fired',55,760,950,760,900,bCH.cot,'#6c757d',v=>sig(v,4)+' C')+range('Joule',112,760,950,760,950,bJH.cot,'#2f8f83',v=>sig(v,4)+' C')
+      +'<text x="8" y="158" font-size="11" fill="#6c757d">RESIDENCE TIME (LOG SCALE)</text>';
+    const logRange=(label,y,lo,hi,best,color)=>range(label,y,Math.log(.05),Math.log(1.5),Math.log(lo),Math.log(hi),Math.log(best),color,v=>sig(Math.exp(v),3)+' s');
+    es+=logRange('Fired',194,.20,1.5,bCH.tau,'#6c757d')+logRange('Joule',250,.05,1.5,bJH.tau,'#2f8f83');
+    $('envelopeChart').innerHTML=es;
     $('envCap').innerHTML='A fired furnace passes heat through the tube wall, so the metal runs hotter '
       +'than the gas. Alloy limits cap the coil outlet near '+MODE_LIMITS.CH.cot[1]+' C and the achievable '
       +'radiant flux sets a floor on residence time near '+sig(MODE_LIMITS.CH.tau[0],2)+' s. Joule heating '
