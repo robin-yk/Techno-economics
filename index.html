@@ -235,6 +235,12 @@ svg{display:block;width:100%;height:auto}
       <div class="card" id="cardJH"><h4>Joule</h4><div class="big" id="vsJH"></div><div class="d" id="vsJHd"></div></div>
     </div>
     <div class="cap" id="breakeven"></div>
+    <h3>Each at the cheapest point it can reach</h3>
+    <table style="max-width:760px"><thead><tr><th>Heating</th><th class="r">Coil outlet</th>
+      <th class="r">Residence</th><th class="r">Conversion</th><th class="r">Selectivity</th>
+      <th class="r">Run length</th><th class="r">Cost of ethylene</th></tr></thead>
+      <tbody id="envBody"></tbody></table>
+    <div class="cap" id="envCap"></div>
   </div>
 
   <div class="tab" id="t-sens">
@@ -342,6 +348,15 @@ const GJ_per_kWh=0.0036;
    knob put it there. */
 const VALID={cap:[300,1200],eff:[55,96],sel:[78,88],X:[0.45,0.85],
              cot:[820,880],tau:[0.15,0.60],dilution:[0.25,0.50]};
+/* What each heating method can physically reach.
+   A fired furnace passes heat through the tube wall, so the metal runs hotter than the gas.
+   Alloy limits cap the coil outlet near 900 C and the achievable radiant flux sets a floor
+   on residence time. Joule heating releases heat inside the reacting volume, so there is no
+   wall-to-gas penalty and a hotter, shorter coil becomes reachable. Only the reachable
+   envelope is modelled here; the steeper axial ramp and the flatter radial profile that
+   internal heating also gives are not, so the Joule case below is conservative. */
+const MODE_LIMITS={CH:{cot:[760,900],tau:[0.20,1.50]},JH:{cot:[760,950],tau:[0.05,1.50]}};
+
 /* Emission factors. Combustion factors are stoichiometric; the rest are defaults the user can move. */
 const EF={
   ng:56.1,          // kg CO2 per GJ natural gas, IPCC default, net calorific value
@@ -1173,6 +1188,30 @@ function render(){
     +'At the current power price '+win+' heating is <b>'+usd(Math.abs(rJH.coo-rCH.coo))+'</b>/t cheaper. '
     +'Break-even power price is <b>$'+sig(be,3)+'</b>/kWh.';
 
+  if(S.tab==='compare'){
+    const bCH=bestPoint('CH'), bJH=bestPoint('JH');
+    $('envBody').innerHTML=[['Fired',bCH,MODE_LIMITS.CH],['Joule',bJH,MODE_LIMITS.JH]].map(([n,d,W])=>
+      '<tr><td>'+n+'</td><td class="r">'+sig(d.cot,4)+' C</td><td class="r">'+sig(d.tau,3)+' s</td>'
+      +'<td class="r">'+pctS(d.X*100)+'</td><td class="r">'+pctS(d.Sm*100)+'</td>'
+      +'<td class="r">'+sig(d.run,3)+' d</td><td class="r">'+usd(d.coo)+'</td></tr>').join('');
+    const dEnv=bJH.coo-bCH.coo, dSame=rJH.coo-rCH.coo;
+    $('envCap').innerHTML='A fired furnace passes heat through the tube wall, so the metal runs hotter '
+      +'than the gas. Alloy limits cap the coil outlet near '+MODE_LIMITS.CH.cot[1]+' C and the achievable '
+      +'radiant flux sets a floor on residence time near '+sig(MODE_LIMITS.CH.tau[0],2)+' s. Joule heating '
+      +'releases heat inside the reacting volume, so it reaches '+MODE_LIMITS.JH.cot[1]+' C and '
+      +sig(MODE_LIMITS.JH.tau[0],2)+' s. Running hotter and shorter raises selectivity, because the ethylene '
+      +'already made has less time to break down further.<br>'
+      +'Held at the same operating point, Joule is '+usd(Math.abs(dSame))+'/t '+(dSame>0?'more':'less')
+      +' expensive. Each at its own cheapest reachable point, the gap is '+usd(Math.abs(dEnv))+'/t '
+      +(dEnv>0?'in favour of fired':'in favour of Joule')+'. The wider envelope is therefore worth '
+      +usd(Math.abs(dSame)-Math.abs(dEnv))+'/t, against an energy price gap of '+usd(Math.abs(dSame))
+      +'/t. Letting Joule run hotter and shorter is a real gain and it is roughly an order of magnitude '
+      +'too small to close the gap at this power price. Selectivity rises from '+pctS(bCH.Sm*100)+' to '
+      +pctS(bJH.Sm*100)+', while run length falls from '+sig(bCH.run,3)+' to '+sig(bJH.run,3)+' days.<br>'
+      +'Only the reachable envelope is modelled. The steeper temperature ramp and flatter radial profile that '
+      +'internal heating also gives are not, so the Joule figure here is conservative.';
+  }
+
   const bal=[['Carbon',r.bal.carbon],['Hydrogen',r.bal.hydrogen],['Mass',r.bal.mass],['Energy',r.bal.energy]];
   $('balanceBody').innerHTML=bal.map(([n,v])=>{
     const pass=Math.abs(v)<1e-3;
@@ -1183,6 +1222,10 @@ function render(){
   $('specBody').innerHTML=[
     ['Activation energy',sig(EA/1000,4)+' kJ/mol','Literature, first-order ethane pyrolysis'],
     ['Pre-exponential','1.470e13 /s','Calibrated to 850 C, 0.35 s, 65% conversion'],
+    ['Fired envelope',MODE_LIMITS.CH.cot[0]+' to '+MODE_LIMITS.CH.cot[1]+' C, '
+      +sig(MODE_LIMITS.CH.tau[0],2)+' s and longer','Assumption: tube wall alloy limit and radiant flux'],
+    ['Joule envelope',MODE_LIMITS.JH.cot[0]+' to '+MODE_LIMITS.JH.cot[1]+' C, '
+      +sig(MODE_LIMITS.JH.tau[0],2)+' s and longer','Assumption: heat released inside the reacting volume'],
     ['Selectivity correlation range',sig(VALID.X[0]*100,2)+' to '+sig(VALID.X[1]*100,2)+'% conversion',
      'Anchored to industrial ethane cracking. Outside this the curve is extrapolated'],
     ['Compressor discharge',sig(P_DISCH,3)+' bar','Design constant'],
@@ -1201,9 +1244,54 @@ function render(){
    +'carries no counterpart cost and shows no optimum.';
 }
 
+/* Slider travel follows the active heating method, so the handle cannot be dragged into
+   a region that method cannot reach. */
+function applyModeLimits(){
+  const W=MODE_LIMITS[S.mode];
+  $('sCot').min=W.cot[0]; $('sCot').max=W.cot[1];
+  S.cot=Math.min(W.cot[1],Math.max(W.cot[0],S.cot)); $('sCot').value=S.cot;
+  $('sTau').min=Math.round(logInv(W.tau[0],0.05,1.5));
+  S.tau=Math.min(W.tau[1],Math.max(W.tau[0],S.tau)); $('sTau').value=logInv(S.tau,0.05,1.5);
+}
+
+/* Cheapest reachable point for a heating method. Grid scan; only run on the compare tab. */
+let _bpKey='', _bpVal={};
+function bestPoint(mode){
+  const key=[S.cap,S.dilution,S.tle,S.ethane,S.elec,S.gas,S.steam,S.lpg,S.ccf,S.labor,S.selMode,S.sel].join('|');
+  if(key!==_bpKey){_bpKey=key;_bpVal={};}
+  if(_bpVal[mode]) return _bpVal[mode];
+  const W=MODE_LIMITS[mode], eff=(mode==='CH'?60:95);
+  const evalAt=(c,t)=>{
+    const m=model({...S,mode,eff,cot:c,tau:t});
+    return {coo:m.coo,cot:c,tau:t,X:m.X,Sm:m.Smass,run:m.runDays};
+  };
+  /* Coarse pass over the whole envelope, then a local refinement around the winner.
+     A single fine grid cost about 3900 model calls per render, which was visible while
+     dragging a price. This is roughly 400 for the same answer. */
+  const scan=(c0,c1,cStep,t0,t1,n)=>{
+    let b=null;
+    for(let c=c0;c<=c1+1e-9;c+=cStep){
+      for(let i=0;i<=n;i++){
+        const t=t0*Math.pow(t1/t0,i/n);
+        const v=evalAt(c,t);
+        if(!b||v.coo<b.coo) b=v;
+      }
+    }
+    return b;
+  };
+  const coarse=scan(W.cot[0],W.cot[1],10,W.tau[0],W.tau[1],9);
+  const cLo=Math.max(W.cot[0],coarse.cot-10), cHi=Math.min(W.cot[1],coarse.cot+10);
+  const ratio=Math.pow(W.tau[1]/W.tau[0],1/9);
+  const tLo=Math.max(W.tau[0],coarse.tau/ratio), tHi=Math.min(W.tau[1],coarse.tau*ratio);
+  const fine=scan(cLo,cHi,2.5,tLo,tHi,8);
+  const best=(fine.coo<=coarse.coo?fine:coarse);
+  _bpVal[mode]=best;
+  return best;
+}
+
 /* ---------- wiring ---------- */
-$('mCH').onclick=()=>{S.mode='CH';S.eff=60;$('sEff').value=60;render()};
-$('mJH').onclick=()=>{S.mode='JH';S.eff=95;$('sEff').value=95;render()};
+$('mCH').onclick=()=>{S.mode='CH';S.eff=60;$('sEff').value=60;applyModeLimits();render()};
+$('mJH').onclick=()=>{S.mode='JH';S.eff=95;$('sEff').value=95;applyModeLimits();render()};
 $('selCalc').onclick=()=>{S.selMode='calc';render()};
 $('selDirect').onclick=()=>{S.sel=model(S).Smass*100;$('sSel').value=S.sel;S.selMode='direct';render()};
 $('tTle').onchange=e=>{S.tle=e.target.checked;render()};
@@ -1230,6 +1318,7 @@ $('sEthane').value=logInv(S.ethane,50,900);
 $('sElec').value=logInv(S.elec,0.008,0.30);
 $('sGas').value=logInv(S.gas,1,30);
 
+applyModeLimits();
 render();
 </script>
 </body>
