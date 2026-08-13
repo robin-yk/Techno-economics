@@ -337,8 +337,11 @@ const SPLIT={furnace:.30,compression:.25,coldbox:.25,fractionation:.20};
 const kJ2GJ=1e-3;                    // kJ/kg → GJ/t
 const GJ_per_kWh=0.0036;
 /* Industrial operating window. Outside this the model extrapolates. */
-const VALID={cap:[300,1200],eff:[55,96],sel:[78,88],
-             cot:[800,900],tau:[0.15,0.60],dilution:[0.25,0.50]};
+/* The selectivity correlation is anchored to industrial ethane cracking between roughly
+   45 and 85% single-pass conversion. Outside that it is being extrapolated, whichever
+   knob put it there. */
+const VALID={cap:[300,1200],eff:[55,96],sel:[78,88],X:[0.45,0.85],
+             cot:[820,880],tau:[0.15,0.60],dilution:[0.25,0.50]};
 /* Emission factors. Combustion factors are stoichiometric; the rest are defaults the user can move. */
 const EF={
   ng:56.1,          // kg CO2 per GJ natural gas, IPCC default, net calorific value
@@ -363,7 +366,10 @@ const S={tab:'plant',grid:0.36,ethaneUp:0.50,tailFate:'burn',alloc:'expansion',m
 function model(p){
   /* 0. Kinetics. Conversion follows from temperature and residence time. */
   const kRate=A_PRE*Math.exp(-EA/(8.314*(p.cot+273.15)));
-  const X=Math.min(0.97,Math.max(0.03,1-Math.exp(-kRate*p.tau)));
+  /* No ceiling here. The exponential approaches 1 on its own; clamping it made the
+     whole model freeze once the clamp bound, with the slider still moving. The lower
+     guard only protects the division that follows. */
+  const X=Math.max(1e-4,1-Math.exp(-kRate*p.tau));
 
   /* 0b. Selectivity falls as conversion climbs. At equal conversion, shorter
      residence time at higher temperature wins: secondary reactions get less
@@ -371,7 +377,9 @@ function model(p){
   let SmolCalc=1.0244-0.0778*X-0.2222*X*X
               +0.06*(p.dilution-0.35)
               +0.04*Math.log(0.35/p.tau);
+  const SmolRaw=SmolCalc;
   SmolCalc=Math.min(0.985,Math.max(0.55,SmolCalc));
+  const selClipped=(SmolCalc!==SmolRaw);
 
   /* 1. Close the carbon and hydrogen balances.
      The byproduct split depends on severity. Losing selectivity means running
@@ -426,7 +434,11 @@ function model(p){
   const alpha=1.85-0.018*P_DISCH;
   const nMin=Math.log((PURITY/(1-PURITY))*(0.99/0.01))/Math.log(alpha);
   const nAct=Math.round(2.1*nMin);
-  const zF=mol.c2h4/(mol.c2h4+mol.c2h6);
+  /* Underwood diverges as the feed approaches pure light key. With conversion near 1 the
+     recycle vanishes and zF runs to 1, which collapsed the reflux onto its floor and put a
+     step in the cost. Capping zF keeps the shortcut degrading smoothly; at normal
+     conversion zF is near 0.62 so the cap never binds. */
+  const zF=Math.min(0.995,mol.c2h4/(mol.c2h4+mol.c2h6));
   const rMin=Math.max(0.5,(1/(alpha-1))*(PURITY/zF-alpha*(1-PURITY)/(1-zF)));
   const gx=(nAct-nMin)/(nAct+1);
   const rRatio=Math.max(rMin*1.15,(rMin+(1-Math.sqrt(gx))*0.9)*1.05);
@@ -469,7 +481,14 @@ function model(p){
   const netEnergy=(qDeliver-tleSteam+wComp+wRef+wSplit)*kJ2GJ;
   const elec_kWh=(wComp+wRef+wSplit+elecHeat)*kJ2GJ/GJ_per_kWh/1000;
 
-  return {y,coil,recycle,dilSteam,qRxn,qSens,qDemand,qDeliver,tleSteam,fuelGas,gasBuy,gasSell,
+  const flags=[];
+  if(X<VALID.X[0]||X>VALID.X[1])
+    flags.push('conversion '+sig(X*100,3)+'% is outside the fitted range of '
+      +sig(VALID.X[0]*100,2)+' to '+sig(VALID.X[1]*100,2)+'%');
+  if(selClipped)
+    flags.push('selectivity correlation held at its bound of '+sig(SmolRaw>0.985?98.5:55,3)+'% molar');
+
+  return {flags,selClipped,y,coil,recycle,dilSteam,qRxn,qSens,qDemand,qDeliver,tleSteam,fuelGas,gasBuy,gasSell,
     elecHeat,wComp,wRef,wSplit,tCold,qCold,lightFrac,nGas,alpha,nMin,nAct,rRatio,
     runDays,osf,tbmc,toc,prod,L,coo,bal,netEnergy,elec_kWh,Smol,Smass,X,SmolCalc};
 }
@@ -1094,28 +1113,33 @@ function render(){
   ].map(([l,v,sb,tip])=>'<div class="kpi" title="'+esc(tip)+'"><div class="lab">'+l
     +'</div><div class="val">'+v+'</div><div class="sub">'+sb+'</div></div>').join('');
 
-  const ex=(k,v)=>(v<VALID[k][0]||v>VALID[k][1])?' <span class="badge b-warn">extrapolated</span>':'';
+  const ex=(k,v,what)=>(v<VALID[k][0]||v>VALID[k][1])
+    ? ' <span class="badge b-warn" title="Validated between '+sig(VALID[k][0],3)+' and '
+      +sig(VALID[k][1],3)+'">outside '+(what||'range')+'</span>' : '';
+  const flagBadges=r.flags.map(f=>'<span class="badge b-warn" title="'+esc(f)+'">'
+    +esc(f.split(' is ')[0].split(' held ')[0])+'</span>').join(' ');
   $('vCot').textContent=sig(S.cot,4)+' C';
   band($('bCot'),760,950,VALID.cot[0],VALID.cot[1],S.cot);
-  $('nCot').innerHTML='Conversion <b>'+pctS(r.X*100)+'</b>, selectivity <b>'+pctS(r.Smass*100)+'</b>'+ex('cot',S.cot);
+  $('nCot').innerHTML='Conversion <b>'+pctS(r.X*100)+'</b>, selectivity <b>'+pctS(r.Smass*100)+'</b>'
+    +ex('cot',S.cot,'820 to 880 C')+(flagBadges?' '+flagBadges:'');
   $('vTau').textContent=sig(S.tau,3)+' s';
   band($('bTau'),0.05,1.5,VALID.tau[0],VALID.tau[1],S.tau);
-  $('nTau').innerHTML='Run length <b>'+sig(r.runDays,3)+'</b> d, on-stream <b>'+pctS(r.osf*100)+'</b>'+ex('tau',S.tau);
+  $('nTau').innerHTML='Run length <b>'+sig(r.runDays,3)+'</b> d, on-stream <b>'+pctS(r.osf*100)+'</b>'+ex('tau',S.tau,'0.15 to 0.60 s');
   $('vDil').textContent=sig(S.dilution,3)+' kg/kg';
   band($('bDil'),0.15,0.70,VALID.dilution[0],VALID.dilution[1],S.dilution);
-  $('nDil').innerHTML='Heating <b>'+usd(r.L.heat)+'</b>/t'+ex('dilution',S.dilution);
+  $('nDil').innerHTML='Heating <b>'+usd(r.L.heat)+'</b>/t'+ex('dilution',S.dilution,'0.25 to 0.50 kg/kg');
   $('vCap').textContent=sig(S.cap,4)+' kt/y';
   band($('bCap'),150,1400,VALID.cap[0],VALID.cap[1],S.cap);
-  $('nCap').innerHTML='Capital and fixed <b>'+usd(r.L.capital+r.L.om)+'</b>/t'+ex('cap',S.cap);
+  $('nCap').innerHTML='Capital and fixed <b>'+usd(r.L.capital+r.L.om)+'</b>/t'+ex('cap',S.cap,'300 to 1200 kt/y');
   $('vEff').textContent=sig(S.eff,3)+'%';
   band($('bEff'),40,98,VALID.eff[0],VALID.eff[1],S.eff);
-  $('nEff').innerHTML='Heating <b>'+usd(r.L.heat)+'</b>/t'+ex('eff',S.eff);
+  $('nEff').innerHTML='Heating <b>'+usd(r.L.heat)+'</b>/t'+ex('eff',S.eff,'55 to 96%');
   $('selKnob').style.display=(S.selMode==='direct'?'':'none');
   $('selCalc').classList.toggle('active',S.selMode==='calc');
   $('selDirect').classList.toggle('active',S.selMode==='direct');
   $('vSel').textContent=sig(S.sel,3)+'%';
   band($('bSel'),70,96,VALID.sel[0],VALID.sel[1],S.sel);
-  $('nSel').innerHTML='Feedstock <b>'+usd(r.L.floor+r.L.selLoss)+'</b>/t'+ex('sel',S.sel);
+  $('nSel').innerHTML='Feedstock <b>'+usd(r.L.floor+r.L.selLoss)+'</b>/t'+ex('sel',S.sel,'78 to 88%');
   $('mCH').classList.toggle('active',S.mode==='CH');
   $('mJH').classList.toggle('active',S.mode==='JH');
   $('vEthane').textContent='$'+sig(S.ethane,3)+'/t';
@@ -1159,6 +1183,8 @@ function render(){
   $('specBody').innerHTML=[
     ['Activation energy',sig(EA/1000,4)+' kJ/mol','Literature, first-order ethane pyrolysis'],
     ['Pre-exponential','1.470e13 /s','Calibrated to 850 C, 0.35 s, 65% conversion'],
+    ['Selectivity correlation range',sig(VALID.X[0]*100,2)+' to '+sig(VALID.X[1]*100,2)+'% conversion',
+     'Anchored to industrial ethane cracking. Outside this the curve is extrapolated'],
     ['Compressor discharge',sig(P_DISCH,3)+' bar','Design constant'],
     ['Product purity',pctS(PURITY*100,4)+' mol','Downstream specification, met by FUG'],
     ['Cold box recovery',pctS(RECOVERY*100,4),'Downstream specification, sets required temperature'],
