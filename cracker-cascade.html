@@ -185,9 +185,37 @@ svg{display:block;width:100%;height:auto}
       </div>
 
       <div class="ctrl">
-        <div class="ctrl-head"><label>에틸렌 선택도</label><span class="v" id="vSel"></span></div>
-        <input type="range" id="sSel" min="70" max="96" step="0.5" value="84">
-        <div class="band" id="bSel"></div>
+        <div class="ctrl-head"><label>코일 출구 온도</label><span class="v" id="vCot"></span></div>
+        <input type="range" id="sCot" min="760" max="950" step="2" value="850">
+        <div class="band" id="bCot"></div>
+        <div class="ctrl-sub" id="nCot"></div>
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><label>체류시간</label><span class="v" id="vTau"></span></div>
+        <input type="range" id="sTau" min="0" max="1000" step="1" value="500">
+        <div class="band" id="bTau"></div>
+        <div class="ctrl-sub" id="nTau"></div>
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><label>희석 스팀</label><span class="v" id="vDil"></span></div>
+        <input type="range" id="sDil" min="0.15" max="0.70" step="0.01" value="0.35">
+        <div class="band" id="bDil"></div>
+        <div class="ctrl-sub" id="nDil"></div>
+      </div>
+
+      <div class="grp" style="margin-bottom:16px">
+        <h3>에틸렌 선택도</h3>
+        <div class="mode" style="margin-bottom:14px">
+          <button id="selCalc" class="active">T · τ 에서 계산</button>
+          <button id="selDirect">직접 지정</button>
+        </div>
+        <div class="ctrl" id="selBox" style="display:none">
+          <div class="ctrl-head"><label>선택도 · 질량</label><span class="v" id="vSel"></span></div>
+          <input type="range" id="sSel" min="70" max="96" step="0.5" value="84">
+          <div class="band" id="bSel"></div>
+        </div>
         <div class="ctrl-sub" id="nSel"></div>
       </div>
 
@@ -248,7 +276,7 @@ svg{display:block;width:100%;height:auto}
   <section id="sensitivity">
     <h2>지금 무엇이 <b>제일 중요한가</b></h2>
     <p>현재 지점에서 각 노브를 ±10% 흔들었을 때 COO가 움직이는 폭입니다. 조건이 바뀌면 순위도 바뀝니다 — 무엇이 중요한지에 고정된 답은 없습니다.</p>
-    <svg id="tornado" viewBox="0 0 760 240" role="img" aria-label="Tornado sensitivity"></svg>
+    <svg id="tornado" viewBox="0 0 760 300" role="img" aria-label="Tornado sensitivity"></svg>
   </section>
 
   <section id="balance">
@@ -297,8 +325,10 @@ const logInv=(x,lo,hi)=>1000*Math.log(x/lo)/Math.log(hi/lo);
 /* ---------- 상수 ---------- */
 const MW={C2H6:30.07,C2H4:28.05,CH4:16.04,H2:2.016,C3:42.08,C:12.011};
 const FLOOR_RATIO=MW.C2H6/MW.C2H4;   // 1.0719 kg C2H6 / kg C2H4 — 해석적 하한
-const X_PASS=0.65, DILUTION=0.35, COT=850, P_DISCH=32;
-const RECOVERY=0.995, PURITY=0.999;
+const P_DISCH=32, RECOVERY=0.995, PURITY=0.999;
+/* 에탄 열분해 1차 반응. Eₐ는 문헌(Froment), 지수앞자리는 산업 기준점
+   (코일 출구 850 °C · 체류 0.35 s → 전환율 65%)에 맞춰 보정한 값. */
+const EA=272800, A_PRE=1.470e13;
 const H_RXN=145, CP_C2H6=3.0, CP_STEAM=2.3, T_PREHEAT=150;
 const LHV={CH4:50,H2:120};
 const ETA2=0.35, T_AMB=303, TLE_REC=0.70;
@@ -307,21 +337,36 @@ const SPLIT={furnace:.30,compression:.25,coldbox:.25,fractionation:.20};
 const kJ2GJ=1e-3;                    // kJ/kg → GJ/t
 const GJ_per_kWh=0.0036;
 /* 산업 운전 범위 — 이 밖은 외삽 */
-const VALID={cap:[300,1200],eff:[55,96],sel:[78,88]};
+const VALID={cap:[300,1200],eff:[55,96],sel:[78,88],
+             cot:[800,900],tau:[0.15,0.60],dilution:[0.25,0.50]};
 /* 공표 앵커 (Mittal, Kwak et al., Chem. Eng. J. 523 (2025) 168251, 재래식 벤치마크) */
 const PUB={coo:680,ethane:1.19,netEnergy:14.7};
 
 /* ---------- 상태 ---------- */
-const S={mode:'CH',cap:610,eff:60,sel:84,tle:true,
+const S={mode:'CH',cap:610,eff:60,selMode:'calc',sel:84,tle:true,
+         cot:850,tau:0.35,dilution:0.35,
          ethane:200,elec:0.07,gas:4,steam:9.8,lpg:550,ccf:0.10,labor:5};
 
 /* ---------- 모델 ---------- */
 function model(p){
-  /* 1. 반응기 — 선택도에서 탄소·수소 수지를 닫는다
+  /* 0. 반응기 속도론 — 1차 반응, 전환율은 온도와 체류시간에서 나온다 */
+  const kRate=A_PRE*Math.exp(-EA/(8.314*(p.cot+273.15)));
+  const X=Math.min(0.97,Math.max(0.03,1-Math.exp(-kRate*p.tau)));
+
+  /* 0b. 선택도 — 전환율이 오르면 2차 반응으로 떨어진다.
+     같은 전환율이면 짧은 체류시간·높은 온도가 유리하다 (short contact time).
+     희석은 분압을 낮춰 이분자 2차 반응을 억제한다. */
+  let SmolCalc=1.0244-0.0778*X-0.2222*X*X
+              +0.06*(p.dilution-0.35)
+              +0.04*Math.log(0.35/p.tau);
+  SmolCalc=Math.min(0.985,Math.max(0.55,SmolCalc));
+
+  /* 1. 탄소·수소 수지를 닫는다
      부반응 배분은 가혹도 의존. 선택도가 나빠지는 것은 조건이 가혹해졌다는 뜻이고,
      가혹해지면 잃은 탄소는 CH4와 코크로 가지 C3+로 가지 않는다.
      고정 비율로 두면 저선택도가 LPG 크레딧을 벌어 에탄 손실을 상쇄하는 비물리적 결과가 나온다. */
-  const Smass=p.sel/100, Smol=Smass*MW.C2H6/MW.C2H4;
+  const Smol=p.selMode==='calc'?SmolCalc:(p.sel/100)*MW.C2H6/MW.C2H4;
+  const Smass=Smol*MW.C2H4/MW.C2H6;
   const loss=1-Smol;                           // 몰 기준 손실률
   const fCH4=Math.min(0.80,0.45+0.35*(loss/0.30));
   const fCoke=Math.min(0.25,0.08+0.15*(loss/0.30));
@@ -334,11 +379,11 @@ function model(p){
   const kg=m=>n*m/1000;
   const y={ethane:kg(MW.C2H6),ch4:kg(nCH4*MW.CH4),h2:kg(nH2*MW.H2),
            c3:kg(nC3*MW.C3),coke:kg(nCoke*MW.C)};
-  const coil=y.ethane/X_PASS, recycle=coil-y.ethane, dilSteam=coil*DILUTION;
+  const coil=y.ethane/X, recycle=coil-y.ethane, dilSteam=coil*p.dilution;
 
   /* 2. 반응기 열부하 */
   const qRxn=n*H_RXN;
-  const qSens=(coil*CP_C2H6+dilSteam*CP_STEAM)*(COT-T_PREHEAT);
+  const qSens=(coil*CP_C2H6+dilSteam*CP_STEAM)*(p.cot-T_PREHEAT);
   const qDemand=qRxn+qSens, qDeliver=qDemand/(p.eff/100);
   const tleSteam=p.tle?TLE_REC*qSens:0;
 
@@ -375,7 +420,9 @@ function model(p){
   const wSplit=(rRatio+1)*280/Math.max(.05,ETA2*243/(T_AMB-243));
 
   /* 7. 코킹 → 가동률 */
-  const runDays=60*Math.exp(-0.025*(COT-850)), osf=runDays/(runDays+1.5);
+  const runDays=60*Math.exp(-0.025*(p.cot-850))*Math.pow(p.dilution/0.35,0.6)
+                  *Math.pow(0.35/p.tau,0.3);
+  const osf=runDays/(runDays+1.5);
 
   /* 8. 자본비 — 610 kt/y TBMC $126.8M 앵커, 구역별 6/10 보간 */
   const sc=(x,r,e)=>Math.pow(x/r,e);
@@ -411,7 +458,7 @@ function model(p){
 
   return {y,coil,recycle,dilSteam,qRxn,qSens,qDemand,qDeliver,tleSteam,fuelGas,gasBuy,gasSell,
     elecHeat,wComp,wRef,wSplit,tCold,qCold,lightFrac,nGas,alpha,nMin,nAct,rRatio,
-    runDays,osf,tbmc,toc,prod,L,coo,bal,netEnergy,elec_kWh,Smol};
+    runDays,osf,tbmc,toc,prod,L,coo,bal,netEnergy,elec_kWh,Smol,Smass,X,SmolCalc};
 }
 
 /* ---------- 렌더 ---------- */
@@ -479,14 +526,18 @@ function drawLadder(r){
 }
 
 function drawTornado(r){
-  const knobs=[['규모','cap'],['가열 효율','eff'],['선택도','sel'],
+  const knobs=[['규모','cap'],['가열 효율','eff'],['코일 출구 온도','cot'],
+               ['체류시간','tau'],['희석 스팀','dilution'],
                ['에탄 가격','ethane'],['전기 가격','elec'],['가스 가격','gas']];
+  /* ±10%. 유효 범위가 정의된 노브는 그 범위로 클램프한다 —
+     온도 ±10%는 ±85 °C로 모델 검증 구간을 벗어나기 때문. */
+  const clamp=(k,v)=>VALID[k]?Math.min(VALID[k][1],Math.max(VALID[k][0],v)):v;
   const data=knobs.map(([lbl,k])=>{
-    const dn=model({...S,[k]:S[k]*0.9}).coo-r.coo;
-    const up=model({...S,[k]:S[k]*1.1}).coo-r.coo;
+    const dn=model({...S,[k]:clamp(k,S[k]*0.9)}).coo-r.coo;
+    const up=model({...S,[k]:clamp(k,S[k]*1.1)}).coo-r.coo;
     return {lbl,dn,up,amp:Math.abs(dn)+Math.abs(up)};
   }).sort((a,b)=>b.amp-a.amp);
-  const W=760,H=240,L=112,R=64,T=10,B=36;
+  const W=760,H=300,L=112,R=64,T=10,B=36;
   const pw=W-L-R, rh=(H-T-B)/data.length;
   const m=Math.max(...data.map(d=>Math.max(Math.abs(d.dn),Math.abs(d.up))))*1.15||1;
   const cx=L+pw/2, x=v=>cx+v/m*(pw/2);
@@ -551,10 +602,25 @@ function render(){
   band($('bEff'),40,98,VALID.eff[0],VALID.eff[1],S.eff);
   $('nEff').innerHTML=`가열 에너지 <b>${usd(r.L.heat)}</b>/t`
     +(S.eff<VALID.eff[0]||S.eff>VALID.eff[1]?' <span class="badge b-warn">외삽</span>':'');
+  const extra=(k,v)=>(v<VALID[k][0]||v>VALID[k][1])?' <span class="badge b-warn">외삽</span>':'';
+  $('vCot').textContent=sig(S.cot,4)+' °C';
+  band($('bCot'),760,950,VALID.cot[0],VALID.cot[1],S.cot);
+  $('nCot').innerHTML=`전환율 <b>${pctS(r.X*100)}</b> · 선택도 <b>${pctS(r.Smass*100)}</b>`+extra('cot',S.cot);
+  $('vTau').textContent=sig(S.tau,3)+' s';
+  band($('bTau'),0.05,1.5,VALID.tau[0],VALID.tau[1],S.tau);
+  $('nTau').innerHTML=`가동률 <b>${pctS(r.osf*100)}</b> · 운전 <b>${sig(r.runDays,3)}</b>일`+extra('tau',S.tau);
+  $('vDil').textContent=sig(S.dilution,3)+' kg per kg';
+  band($('bDil'),0.15,0.70,VALID.dilution[0],VALID.dilution[1],S.dilution);
+  $('nDil').innerHTML=`가열 에너지 <b>${usd(r.L.heat)}</b>/t`+extra('dilution',S.dilution);
+  $('selBox').style.display=(S.selMode==='direct'?'':'none');
+  $('selCalc').classList.toggle('active',S.selMode==='calc');
+  $('selDirect').classList.toggle('active',S.selMode==='direct');
   $('vSel').textContent=sig(S.sel,3)+'%';
   band($('bSel'),70,96,VALID.sel[0],VALID.sel[1],S.sel);
-  $('nSel').innerHTML=`원료 <b>${usd(r.L.floor+r.L.selLoss)}</b>/t · 냉동 <b>${usd(r.wRef*kJ2GJ*S.elec/GJ_per_kWh)}</b>/t`
-    +(S.sel<VALID.sel[0]||S.sel>VALID.sel[1]?' <span class="badge b-warn">외삽</span>':'');
+  $('nSel').innerHTML=(S.selMode==='calc'
+      ? `속도론 결과 <b>${pctS(r.Smass*100)}</b> · 에탄 <b>${sig(r.y.ethane,4)}</b> kg/kg`
+      : `지정값 <b>${pctS(S.sel)}</b>` + extra('sel',S.sel))
+    +`<br>원료 <b>${usd(r.L.floor+r.L.selLoss)}</b>/t · 냉동 <b>${usd(r.wRef*kJ2GJ*S.elec/GJ_per_kWh)}</b>/t`;
   $('vEthane').textContent='$'+sig(S.ethane,3)+' per t';
   $('nEthane').innerHTML=`원료 <b>${usd(r.L.floor+r.L.selLoss)}</b>/t · COO의 ${pctS((r.L.floor+r.L.selLoss)/r.coo*100)}`;
   $('vElec').textContent='$'+sig(S.elec,3)+' per kWh';
@@ -574,8 +640,8 @@ function render(){
   const eu=v=>usd(v);
   const rows=[
     ['반응기 · 크래킹 노','free',
-      `선택도 ${pctS(S.sel)} · 1패스 전환율 ${pctS(X_PASS*100)} · 코일 통과 에탄 ${sig(r.coil,4)} kg/kg · 재순환 ${sig(r.recycle,3)} kg/kg · 열 요구 ${sig(r.qDemand*kJ2GJ,3)} GJ/t · 가동률 ${pctS(r.osf*100)}`,
-      '선택도가 떨어지면 에탄이 더 들고, 동시에 CH₄·H₂가 늘어 후단 냉동이 무거워집니다. 벌금을 두 번 냅니다.',
+      `${sig(S.cot,4)} °C · ${sig(S.tau,3)} s · 희석 ${sig(S.dilution,3)} → 전환율 ${pctS(r.X*100)} · 선택도 ${pctS(r.Smass*100)} · 코일 통과 에탄 ${sig(r.coil,4)} kg/kg · 재순환 ${sig(r.recycle,3)} kg/kg · 열 요구 ${sig(r.qDemand*kJ2GJ,3)} GJ/t · 가동률 ${pctS(r.osf*100)}`,
+      '전환율은 온도와 체류시간에서 나오고, 선택도는 전환율이 오를수록 떨어집니다. 같은 전환율이면 짧은 체류시간·높은 온도가 유리합니다 — 2차 반응이 일어날 시간을 안 주기 때문입니다. 선택도가 떨어지면 에탄이 더 들고 동시에 CH₄·H₂가 늘어 후단 냉동이 무거워집니다. 벌금을 두 번 냅니다.',
       r.L.heat],
     ['급냉 · TLE','fixed',
       `출구 현열 ${sig(r.qSens*kJ2GJ,3)} GJ/t · 회수 스팀 ${sig(r.tleSteam*kJ2GJ,3)} GJ/t`,
@@ -639,9 +705,8 @@ function render(){
      따라서 잔차는 기계 정밀도이며, 이는 대수가 닫혀 있다는 뜻이지 모델이 옳다는 뜻이 아닙니다.</td></tr>`;
 
   $('specBody').innerHTML=[
-    ['1패스 전환율',pctS(X_PASS*100),'설계 상수 · 산업 재래식 크래커 통상값'],
-    ['코일 출구 온도',sig(COT,3)+' °C','설계 상수'],
-    ['희석 스팀',sig(DILUTION,3)+' kg per kg 에탄','설계 상수'],
+    ['활성화 에너지',sig(EA/1000,4)+' kJ/mol','문헌 · 에탄 열분해 1차 반응'],
+    ['지수앞자리',sig(A_PRE,4)+' per s','보정 · 850 °C · 0.35 s → 전환율 65%'],
     ['압축 토출 압력',sig(P_DISCH,3)+' bar','설계 상수'],
     [`${'C2H4'} 제품 순도`,pctS(PURITY*100,4)+' mol','후단 스펙 · FUG가 이걸 맞춤'],
     ['콜드박스 회수율',pctS(RECOVERY*100,4),'후단 스펙 · 필요 온도를 결정'],
@@ -680,6 +745,12 @@ $('mJH').onclick=()=>setMode('JH');
 $('sCap').oninput=e=>{S.cap=+e.target.value;render()};
 $('sEff').oninput=e=>{S.eff=+e.target.value;render()};
 $('sSel').oninput=e=>{S.sel=+e.target.value;render()};
+$('sCot').oninput=e=>{S.cot=+e.target.value;render()};
+$('sTau').oninput=e=>{S.tau=logMap(+e.target.value,0.05,1.5);render()};
+$('sDil').oninput=e=>{S.dilution=+e.target.value;render()};
+$('sTau').value=logInv(S.tau,0.05,1.5);
+$('selCalc').onclick=()=>{S.selMode='calc';render()};
+$('selDirect').onclick=()=>{S.sel=model(S).Smass*100;$('sSel').value=S.sel;S.selMode='direct';render()};
 $('tTle').onchange=e=>{S.tle=e.target.checked;render()};
 /* 자릿수를 넘는 범위는 로그 매핑 */
 $('sEthane').oninput=e=>{S.ethane=logMap(+e.target.value,50,900);render()};
