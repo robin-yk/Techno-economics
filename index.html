@@ -35,6 +35,39 @@ nav button.active{color:var(--accent);font-weight:500;border-bottom-color:var(--
 .kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary)}
 .kpi .val{font-family:var(--mono);font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
 .kpi .sub{font-size:11.5px;color:var(--secondary)}
+.plant-hero{padding:24px 0 20px;border-bottom:1px solid var(--hairline)}
+.hero-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:14px}
+.hero-head h2{font-size:25px;line-height:1.1;letter-spacing:-.035em;margin:0;font-weight:650}
+.hero-head .hint{font-size:11px;color:var(--secondary);white-space:nowrap}
+.route-visual{display:grid;grid-template-columns:1fr 72px 1fr;min-height:265px;border:1px solid var(--hairline);
+  border-radius:16px;overflow:visible;background:#fafbfb;position:relative}
+.route-scene{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;cursor:pointer;
+  transition:background .2s ease,transform .2s ease;outline:none}
+.route-scene:first-child{border-radius:15px 0 0 15px}.route-scene:last-child{border-radius:0 15px 15px 0}
+.route-scene:hover,.route-scene:focus-visible{background:#fff}.route-scene:hover .scene-art,.route-scene:focus-visible .scene-art{transform:translateY(-3px)}
+.scene-art{width:100%;height:220px;transition:transform .2s ease}.scene-art text{font-family:Roboto,-apple-system,sans-serif}
+.route-name{position:absolute;left:18px;top:15px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.route-cost{position:absolute;left:18px;bottom:14px;font:700 23px/1.1 var(--mono);letter-spacing:-.03em}
+.route-cost small{display:block;font:400 10px/1.4 Roboto,sans-serif;color:var(--secondary);letter-spacing:.03em;text-transform:uppercase}
+.route-scene.joule{color:var(--accent)}.route-scene.fired{color:#9d5d32}
+.molecule{display:flex;align-items:center;justify-content:center;position:relative;background:#fff;border-left:1px solid var(--hairline);border-right:1px solid var(--hairline)}
+.molecule:before,.molecule:after{content:"";position:absolute;width:22px;height:1px;background:var(--btn-border)}
+.molecule:before{left:-22px}.molecule:after{right:-22px}
+.mol-mark{width:44px;height:44px;border:1px solid var(--ink);border-radius:50%;display:grid;place-items:center;background:#fff;font:700 12px var(--mono);z-index:1}
+.route-pop{position:absolute;z-index:8;left:50%;bottom:52px;width:min(310px,calc(100% - 28px));padding:14px 15px;
+  border:1px solid var(--hairline);border-radius:10px;background:#fff;color:var(--ink);box-shadow:0 12px 35px rgba(28,39,43,.14);
+  opacity:0;transform:translate(-50%,8px);pointer-events:none;transition:opacity .16s,transform .16s}
+.route-scene:hover .route-pop,.route-scene:focus-visible .route-pop{opacity:1;transform:translate(-50%,0)}
+.route-pop b{font-size:13px}.route-pop p{font-size:11.5px;line-height:1.45;color:var(--secondary);margin:4px 0 10px}
+.pop-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;border-top:1px solid var(--hairline);padding-top:9px}
+.pop-metrics span{font-size:9px;color:var(--secondary);text-transform:uppercase;letter-spacing:.04em}.pop-metrics strong{display:block;font:600 11px var(--mono);color:var(--ink)}
+.hero-foot{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-top:10px;color:var(--secondary);font-size:11.5px}
+.hero-verdict b{color:var(--ink)}
+.hero-link{background:none;border:0;padding:0;color:var(--accent);font:inherit;font-weight:650;cursor:pointer;white-space:nowrap}.hero-link:hover{text-decoration:underline}
+.pfd-wrap{position:relative}.pfd-tip{position:fixed;z-index:50;max-width:280px;padding:10px 12px;border:1px solid var(--hairline);border-radius:8px;
+  background:#fff;box-shadow:0 9px 28px rgba(28,39,43,.16);font-size:11.5px;line-height:1.45;color:var(--secondary);pointer-events:none;opacity:0;transition:opacity .12s}
+.pfd-tip.on{opacity:1}.pfd-tip b{display:block;color:var(--ink);font-size:12px;margin-bottom:2px}.pfd-unit{cursor:help}.pfd-unit>rect:first-child{transition:fill .15s,stroke .15s}.pfd-unit:hover>rect:first-child,.pfd-unit:focus>rect:first-child{fill:#f5faf9;stroke:var(--accent)}
+@media(max-width:760px){.hero-head{align-items:start}.hero-head h2{font-size:22px}.hero-head .hint{display:none}.route-visual{grid-template-columns:1fr;min-height:0}.molecule{height:52px;border:0;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline)}.molecule:before,.molecule:after{display:none}.route-scene{min-height:230px}.route-scene:first-child,.route-scene:last-child{border-radius:15px}.route-pop{bottom:50px}.hero-foot{align-items:flex-start;flex-direction:column;gap:5px}}
 
 .strip{border-bottom:1px solid var(--hairline);padding:12px 0 14px}
 .striprow{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
@@ -87,14 +120,34 @@ td.cr{color:var(--accent)}
   border:1px solid currentColor;border-radius:4px;white-space:nowrap}
 .b-pass{color:var(--accent)} .b-warn{color:var(--warning)} .b-fail{color:var(--error)}
 
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:640px}
+.compare-shell{max-width:960px}
+.decision{display:grid;grid-template-columns:1fr 220px;gap:28px;align-items:center;
+  background:#f5f8f7;border:1px solid #dce9e6;border-radius:10px;padding:20px 22px;margin-bottom:20px}
+.decision .eyebrow,.route-card .eyebrow{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--secondary)}
+.decision .verdict{font-size:30px;font-weight:700;letter-spacing:-.035em;line-height:1.2;margin:2px 0}
+.decision .basis{font-size:12px;color:var(--secondary)}
+.be .beval{font-family:var(--mono);font-size:21px;font-weight:700}
+.be-track{height:5px;background:#dce3e1;border-radius:3px;position:relative;margin:8px 0 5px}
+.be-track i{position:absolute;top:-4px;width:2px;height:13px;background:var(--ink)}
+.be-track b{position:absolute;top:-2px;width:9px;height:9px;border-radius:50%;background:var(--accent);transform:translateX(-50%)}
+.be .legend{display:flex;justify-content:space-between;font-size:10.5px;color:var(--secondary)}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:960px}
 @media(max-width:640px){.cards{grid-template-columns:1fr}}
-.card{border:1px solid var(--hairline);border-radius:8px;padding:16px}
+.card{border:1px solid var(--hairline);border-radius:8px;padding:17px 18px}
 .card.on{border-color:var(--accent)}
 .card h4{margin:0;font-size:12px;font-weight:500;color:var(--secondary);
   text-transform:uppercase;letter-spacing:.05em}
 .card .big{font-family:var(--mono);font-size:26px;font-weight:700;letter-spacing:-.02em;margin-top:3px}
 .card .d{font-size:12px;color:var(--secondary);margin-top:5px}
+.route-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--hairline)}
+.route-metrics span{display:block;font-size:10.5px;color:var(--secondary)}
+.route-metrics b{display:block;font-family:var(--mono);font-size:13px;font-weight:500}
+.value-bridge{margin-top:22px}.value-bridge svg{max-width:760px}
+.envelope{margin-top:22px}.envelope svg{max-width:760px}
+.compare-note{max-width:920px;border-left:3px solid var(--warning);padding:8px 12px;margin:18px 0 0;
+  color:var(--secondary);font-size:12px}
+.compare-note b{color:var(--ink);font-weight:500}
+@media(max-width:640px){.decision{grid-template-columns:1fr;padding:16px}.decision .verdict{font-size:25px}.route-metrics{grid-template-columns:1fr 1fr}}
 .foot{border-top:1px solid var(--hairline);margin-top:30px;padding-top:14px;
   font-size:12px;color:var(--secondary);max-width:92ch}
 svg{display:block;width:100%;height:auto}
@@ -135,6 +188,39 @@ svg{display:block;width:100%;height:auto}
 </header>
 
 <div class="wrap">
+  <section class="plant-hero" id="plantHero">
+    <div class="hero-head"><h2>Two ways to crack ethane.</h2><span class="hint">Hover a route to see what changes</span></div>
+    <div class="route-visual" aria-label="Visual comparison of fired and Joule ethane cracking">
+      <div class="route-scene fired" tabindex="0">
+        <span class="route-name">Fired</span>
+        <svg class="scene-art" viewBox="0 0 430 220" aria-hidden="true">
+          <defs><linearGradient id="hotWall" x1="0" x2="1"><stop stop-color="#f1d6c2"/><stop offset="1" stop-color="#9d5d32"/></linearGradient></defs>
+          <path d="M40 176H390" stroke="#dfe3e5"/><path d="M84 176V70Q84 48 106 48H304Q326 48 326 70V176" fill="none" stroke="#586168" stroke-width="4"/>
+          <path d="M119 155c-13-22 13-32 5-54 25 17 23 35 11 54M180 155c-14-26 16-37 7-64 29 20 26 43 12 64M250 155c-13-22 13-32 5-54 25 17 23 35 11 54" fill="url(#hotWall)"/>
+          <path d="M112 83H297" stroke="#9d5d32" stroke-width="13" opacity=".18"/><path d="M112 83H297" stroke="#9d5d32" stroke-width="3"/>
+          <path d="M51 83H109M300 83H365" stroke="#212529" stroke-width="2"/><path d="m358 77 10 6-10 6" fill="none" stroke="#212529" stroke-width="2"/>
+          <text x="205" y="27" text-anchor="middle" font-size="11" fill="#6c757d">FLAME → TUBE WALL → GAS</text>
+        </svg>
+        <div class="route-cost"><span id="heroCHCost"></span><small>per tonne ethylene</small></div>
+        <div class="route-pop"><b>Heat crosses the tube wall</b><p>Cheap fuel, but wall temperature and radiant heat flux constrain how hot and short the reactor can run.</p><div class="pop-metrics"><span>Efficiency<strong>60%</strong></span><span>Envelope<strong>≤ 900 °C</strong></span><span>Exposure<strong>Gas price</strong></span></div></div>
+      </div>
+      <div class="molecule"><div class="mol-mark">C₂H₄</div></div>
+      <div class="route-scene joule" tabindex="0">
+        <span class="route-name">Joule</span>
+        <svg class="scene-art" viewBox="0 0 430 220" aria-hidden="true">
+          <path d="M40 176H390" stroke="#dfe3e5"/><rect x="94" y="60" width="224" height="48" rx="24" fill="#e8f4f1" stroke="#2f8f83" stroke-width="2"/>
+          <path d="M50 84H92M320 84H374" stroke="#212529" stroke-width="2"/><path d="m367 78 10 6-10 6" fill="none" stroke="#212529" stroke-width="2"/>
+          <path d="m130 84 20-11 20 22 20-22 20 22 20-22 20 22 20-11" fill="none" stroke="#2f8f83" stroke-width="3"/>
+          <path d="M207 39V55M197 47h20" stroke="#2f8f83" stroke-width="2"/><circle cx="207" cy="31" r="8" fill="none" stroke="#2f8f83" stroke-width="2"/>
+          <path d="M132 129v31M159 122v38M186 133v27M228 128v32M255 120v40M282 132v28" stroke="#2f8f83" stroke-width="2" opacity=".35"/>
+          <text x="207" y="27" text-anchor="middle" font-size="11" fill="#6c757d">POWER → RESISTANCE → GAS</text>
+        </svg>
+        <div class="route-cost"><span id="heroJHCost"></span><small>per tonne ethylene</small></div>
+        <div class="route-pop"><b>Heat is generated in the reactor</b><p>Less purchased energy and a wider operating envelope, exchanged for direct exposure to electricity price.</p><div class="pop-metrics"><span>Efficiency<strong>95%</strong></span><span>Envelope<strong>≤ 950 °C</strong></span><span>Exposure<strong>Power price</strong></span></div></div>
+      </div>
+    </div>
+    <div class="hero-foot"><span class="hero-verdict" id="heroDetail"></span><button class="hero-link" id="heroCompare">Explore the full comparison →</button></div>
+  </section>
   <div class="kpis" id="kpis"></div>
 
   <div class="strip">
@@ -182,7 +268,7 @@ svg{display:block;width:100%;height:auto}
     <div class="plant">
       <div>
         <h2>Process flow</h2>
-        <svg id="pfd" viewBox="0 0 760 330" role="img" aria-label="Ethane cracker process flow"></svg>
+        <div class="pfd-wrap"><svg id="pfd" viewBox="0 0 760 330" role="img" aria-label="Ethane cracker process flow"></svg><div class="pfd-tip" id="pfdTip" role="tooltip"></div></div>
         <div class="cap">Only the reactor carries degrees of freedom. The three downstream columns hold fixed
           product specifications and re-solve, so reflux ratio is an output.</div>
       </div>
@@ -229,18 +315,21 @@ svg{display:block;width:100%;height:auto}
   </div>
 
   <div class="tab" id="t-compare">
+    <div class="compare-shell">
     <h2>Fired vs Joule heating</h2>
+    <section class="decision" aria-live="polite"><div><div class="eyebrow">Current decision</div><div class="verdict" id="decisionVerdict"></div><div class="basis" id="decisionBasis"></div></div><div class="be"><div class="eyebrow">Break-even power</div><div class="beval" id="decisionBE"></div><div class="be-track"><i id="beMark" title="Break-even power"></i><b id="powerMark" title="Current power price"></b></div><div class="legend"><span>line · break-even</span><span>dot · current</span></div></div></section>
+    <h3>Common feasible point — energy-source effect</h3>
     <div class="cards">
-      <div class="card" id="cardCH"><h4>Fired</h4><div class="big" id="vsCH"></div><div class="d" id="vsCHd"></div></div>
-      <div class="card" id="cardJH"><h4>Joule</h4><div class="big" id="vsJH"></div><div class="d" id="vsJHd"></div></div>
+      <div class="card route-card" id="cardCH"><div class="eyebrow">Fired route</div><div class="big" id="vsCH"></div><div class="d" id="vsCHd"></div><div class="route-metrics" id="metricsCH"></div></div>
+      <div class="card route-card" id="cardJH"><div class="eyebrow">Joule route</div><div class="big" id="vsJH"></div><div class="d" id="vsJHd"></div><div class="route-metrics" id="metricsJH"></div></div>
     </div>
-    <div class="cap" id="breakeven"></div>
-    <h3>Each at the cheapest point it can reach</h3>
-    <table style="max-width:760px"><thead><tr><th>Heating</th><th class="r">Coil outlet</th>
-      <th class="r">Residence</th><th class="r">Conversion</th><th class="r">Selectivity</th>
-      <th class="r">Run length</th><th class="r">Cost of ethylene</th></tr></thead>
-      <tbody id="envBody"></tbody></table>
-    <div class="cap" id="envCap"></div>
+    <div class="value-bridge"><h3>Value bridge — what creates the gap</h3><svg id="bridgeChart" viewBox="0 0 760 205" role="img" aria-label="Cost gap bridge between fired and Joule heating"></svg><div class="cap" id="bridgeCap"></div></div>
+    <div class="envelope"><h3>Assumed operating envelopes and lowest points found</h3><svg id="envelopeChart" viewBox="0 0 760 285" role="img" aria-label="Fired and Joule temperature and residence-time envelopes"></svg><div class="cap" id="envCap"></div></div>
+    <div class="compare-note"><b>Boundary of this comparison.</b> The model prices efficiency and the assumed
+      temperature–residence-time envelopes. It does not yet size Joule-specific electrical equipment, model
+      temperature profiles, or assign route-specific capital and element-replacement costs. The result is a
+      screening value of access to the wider envelope, not a detailed reactor design estimate.</div>
+    </div>
   </div>
 
   <div class="tab" id="t-sens">
@@ -591,6 +680,14 @@ function drawPFD(r){
      c:r.wSplit*kJ2GJ*eGJ,t:'Purity of 99.9 mol% is specified; reflux follows from it.'}
   ];
   const G='#6c757d', K='#212529', A='#2f8f83';
+  const icon=(kind,x,y,col)=>{
+    const p='fill="none" stroke="'+col+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
+    if(kind===0) return '<g '+p+'><path d="M'+(x+4)+' '+(y+17)+' C'+(x+1)+' '+(y+11)+' '+(x+9)+' '+(y+9)+' '+(x+7)+' '+(y+3)+' C'+(x+14)+' '+(y+7)+' '+(x+17)+' '+(y+12)+' '+(x+13)+' '+(y+17)+' Z"/><path d="M'+(x+8)+' '+(y+17)+' C'+(x+6)+' '+(y+14)+' '+(x+11)+' '+(y+12)+' '+(x+10)+' '+(y+9)+'"/></g>';
+    if(kind===1) return '<g '+p+'><path d="M'+(x+3)+' '+(y+4)+' H'+(x+15)+' L'+(x+13)+' '+(y+17)+' H'+(x+5)+' Z"/><path d="M'+(x+5)+' '+(y+9)+' H'+(x+13)+'"/></g>';
+    if(kind===2) return '<g '+p+'><circle cx="'+(x+9)+'" cy="'+(y+10)+'" r="7"/><path d="M'+(x+9)+' '+(y+3)+' V'+(x+17)+' M'+(x+2)+' '+(y+10)+' H'+(x+16)+' M'+(x+9)+' '+(y+10)+' L'+(x+14)+' '+(y+6)+'"/></g>';
+    if(kind===3) return '<g '+p+'><path d="M'+(x+9)+' '+(y+2)+' V'+(x+18)+' M'+(x+2)+' '+(y+10)+' H'+(x+16)+' M'+(x+4)+' '+(y+5)+' L'+(x+14)+' '+(y+15)+' M'+(x+14)+' '+(y+5)+' L'+(x+4)+' '+(y+15)+'"/></g>';
+    return '<g '+p+'><path d="M'+(x+5)+' '+(y+2)+' H'+(x+13)+' V'+(y+16)+' Q'+(x+13)+' '+(y+18)+' '+(x+11)+' '+(y+18)+' H'+(x+7)+' Q'+(x+5)+' '+(y+18)+' '+(x+5)+' '+(y+16)+' Z"/><path d="M'+(x+5)+' '+(y+7)+' H'+(x+13)+' M'+(x+5)+' '+(y+13)+' H'+(x+13)+'"/></g>';
+  };
   let s='<g font-family="Roboto,-apple-system,sans-serif">';
   s+='<defs><marker id="a" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto">'
     +'<path d="M0,0 L6,2.5 L0,5 z" fill="'+G+'"/></marker>'
@@ -627,17 +724,38 @@ function drawPFD(r){
     +'Recycle '+sig(r.recycle,3)+' kg. Reactor throughput is '+sig(1/r.X,3)+' times fresh feed.</text>';
   B.forEach((b,i)=>{
     const x=xs[i], free=(i===0);
+    s+='<g class="pfd-unit" tabindex="0" role="button" aria-label="'+esc(b.n)+'. '+esc(b.t)+'" data-name="'+esc(b.n)+'" data-tip="'+esc(b.t)+'">';
     s+='<rect x="'+x+'" y="'+BY+'" width="'+BW+'" height="'+BH+'" rx="6" fill="#fff" stroke="'
-      +(free?A:'#e3e7ea')+'" stroke-width="'+(free?1.5:1)+'"><title>'+esc(b.t)+'</title></rect>';
-    s+='<text x="'+(x+10)+'" y="'+(BY+19)+'" font-size="11" fill="'+K+'" font-weight="500">'+b.n+'</text>';
+      +(free?A:'#e3e7ea')+'" stroke-width="'+(free?1.5:1)+'"></rect>';
+    s+='<rect x="'+(x+8)+'" y="'+(BY+7)+'" width="24" height="24" rx="6" fill="'+(free?'#e8f4f1':'#f3f5f6')+'"/>';
+    s+=icon(i,x+11,BY+10,free?A:G);
+    s+='<text x="'+(x+38)+'" y="'+(BY+21)+'" font-size="10.5" fill="'+K+'" font-weight="600">'+b.n+'</text>';
     s+='<text x="'+(x+10)+'" y="'+(BY+34)+'" font-size="9.5" fill="'+G+'">'+b.a+'</text>';
     s+='<text x="'+(x+10)+'" y="'+(BY+46)+'" font-size="9.5" fill="'+G+'">'+b.b+'</text>';
     s+='<text x="'+(x+BW-10)+'" y="'+(BY+68)+'" font-size="11.5" fill="'+K+'" text-anchor="end" '
       +'font-family="Roboto Mono,monospace" font-weight="500">'+(b.c===0?'-':usd(b.c)+'/t')+'</text>';
     if(free) s+='<text x="'+(x+10)+'" y="'+(BY+68)+'" font-size="9.5" fill="'+A+'" font-weight="500">free</text>';
+    s+='</g>';
   });
   s+='</g>';
   $('pfd').innerHTML=s;
+  const tip=$('pfdTip');
+  const show=(unit,e)=>{
+    tip.innerHTML='<b>'+unit.dataset.name+'</b>'+unit.dataset.tip;
+    tip.classList.add('on');
+    const box=tip.getBoundingClientRect(), pad=14;
+    const cx=e&&e.clientX?e.clientX:unit.getBoundingClientRect().left+unit.getBoundingClientRect().width/2;
+    const cy=e&&e.clientY?e.clientY:unit.getBoundingClientRect().top;
+    tip.style.left=Math.max(pad,Math.min(window.innerWidth-box.width-pad,cx+14))+'px';
+    tip.style.top=Math.max(pad,cy-box.height-12)+'px';
+  };
+  document.querySelectorAll('.pfd-unit').forEach(unit=>{
+    unit.addEventListener('pointerenter',e=>show(unit,e));
+    unit.addEventListener('pointermove',e=>show(unit,e));
+    unit.addEventListener('pointerleave',()=>tip.classList.remove('on'));
+    unit.addEventListener('focus',e=>show(unit,e));
+    unit.addEventListener('blur',()=>tip.classList.remove('on'));
+  });
 }
 
 /* ---------- cost table ---------- */
@@ -1101,11 +1219,18 @@ const TABS=[['plant','plant'],['ladder','cost ladder'],['carbon','carbon'],
             ['explained','explained'],['cite','cite']];
 $('nav').innerHTML=TABS.map(([id,lab])=>'<button data-tab="'+id+'">'+lab+'</button>').join('');
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;render();});
+$('heroCompare').onclick=()=>{S.tab='compare';render();window.scrollTo({top:0,behavior:'smooth'});};
 
 /* ---------- render ---------- */
 function render(){
   const r=model(S);
-  const rCH=model({...S,mode:'CH',eff:60}), rJH=model({...S,mode:'JH',eff:95});
+  /* A same-point comparison must sit inside both physical envelopes. Without this clamp,
+     selecting a Joule-only temperature or residence time silently compared it with an
+     infeasible fired case. */
+  const commonCot=Math.min(MODE_LIMITS.CH.cot[1],Math.max(MODE_LIMITS.CH.cot[0],S.cot));
+  const commonTau=Math.min(MODE_LIMITS.CH.tau[1],Math.max(MODE_LIMITS.CH.tau[0],S.tau));
+  const common={...S,cot:commonCot,tau:commonTau};
+  const rCH=model({...common,mode:'CH',eff:60}), rJH=model({...common,mode:'JH',eff:95});
   const eCost=r.L.heat+r.L.elecProc+r.L.steamCr+r.L.gasCr;
   const be=breakeven();
 
@@ -1114,6 +1239,12 @@ function render(){
   const staticTab=(S.tab==='cite');
   $('kpis').style.display=staticTab?'none':'';
   document.querySelector('.strip').style.display=staticTab?'none':'';
+  $('plantHero').style.display=S.tab==='plant'?'':'';
+  const heroWinner=rJH.coo<rCH.coo?'Joule':'Fired';
+  $('heroCHCost').textContent=usd(rCH.coo)+'/t';
+  $('heroJHCost').textContent=usd(rJH.coo)+'/t';
+  $('heroDetail').innerHTML='<b>'+heroWinner+' is lower by '+usd(Math.abs(rJH.coo-rCH.coo))+'/t</b>'
+    +' at the common '+sig(commonCot,4)+' °C, '+sig(commonTau,3)+' s point · break-even power $'+sig(be,3)+'/kWh';
 
   $('kpis').innerHTML=[
     ['Cost of ethylene',usd(r.coo),sig(r.coo/r.L.floor,3)+'x the floor of '+usd(r.L.floor),
@@ -1180,21 +1311,51 @@ function render(){
   $('vsCH').textContent=usd(rCH.coo); $('vsJH').textContent=usd(rJH.coo);
   $('vsCHd').innerHTML='60% efficiency, gas $'+sig(S.gas,3)+'/GJ, delivered heat $'+sig(S.gas/0.60,3)+'/GJ';
   $('vsJHd').innerHTML='95% efficiency, power $'+sig(S.elec,3)+'/kWh, delivered heat $'+sig(S.elec/GJ_per_kWh/0.95,3)+'/GJ';
-  $('cardCH').className='card'+(S.mode==='CH'?' on':'');
-  $('cardJH').className='card'+(S.mode==='JH'?' on':'');
-  const win=rJH.coo<rCH.coo?'Joule':'fired';
-  $('breakeven').innerHTML='Joule heating is <b>'+sig(95/60,3)+'x</b> more efficient, but delivered heat costs '
-    +'<b>$'+sig(S.gas/0.60,3)+'</b>/GJ from gas against <b>$'+sig(S.elec/GJ_per_kWh/0.95,3)+'</b>/GJ from power. '
-    +'At the current power price '+win+' heating is <b>'+usd(Math.abs(rJH.coo-rCH.coo))+'</b>/t cheaper. '
-    +'Break-even power price is <b>$'+sig(be,3)+'</b>/kWh.';
+  $('cardCH').className='card route-card'+(S.mode==='CH'?' on':'');
+  $('cardJH').className='card route-card'+(S.mode==='JH'?' on':'');
 
   if(S.tab==='compare'){
     const bCH=bestPoint('CH'), bJH=bestPoint('JH');
-    $('envBody').innerHTML=[['Fired',bCH,MODE_LIMITS.CH],['Joule',bJH,MODE_LIMITS.JH]].map(([n,d,W])=>
-      '<tr><td>'+n+'</td><td class="r">'+sig(d.cot,4)+' C</td><td class="r">'+sig(d.tau,3)+' s</td>'
-      +'<td class="r">'+pctS(d.X*100)+'</td><td class="r">'+pctS(d.Sm*100)+'</td>'
-      +'<td class="r">'+sig(d.run,3)+' d</td><td class="r">'+usd(d.coo)+'</td></tr>').join('');
     const dEnv=bJH.coo-bCH.coo, dSame=rJH.coo-rCH.coo;
+    const saveCH=rCH.coo-bCH.coo, saveJH=rJH.coo-bJH.coo;
+    const winner=dEnv<0?'Joule':'Fired', gap=Math.abs(dEnv);
+    $('decisionVerdict').textContent=winner+' is lower by '+usd(gap)+'/t';
+    $('decisionBasis').textContent='Lowest points found at power $'+sig(S.elec,3)+'/kWh and gas $'+sig(S.gas,3)+'/GJ';
+    $('decisionBE').textContent='$'+sig(be,3)+'/kWh';
+    $('beMark').style.left=Math.min(100,be/0.15*100)+'%';
+    $('powerMark').style.left=Math.min(100,S.elec/0.15*100)+'%';
+    const metrics=(m,source)=>'<div><span>Efficiency</span><b>'+sig(m===rCH?60:95,2)+'%</b></div>'
+      +'<div><span>Purchased heat</span><b>'+sig(m.qDeliver*kJ2GJ,3)+' GJ/t</b></div>'
+      +'<div><span>Exposure</span><b>'+source+'</b></div>';
+    $('metricsCH').innerHTML=metrics(rCH,'natural gas'); $('metricsJH').innerHTML=metrics(rJH,'power');
+
+    const bridge=[['Energy-source effect',dSame],['Operating-envelope effect',dEnv-dSame],['Net Joule − fired',dEnv]];
+    const maxGap=Math.max(1,...bridge.map(x=>Math.abs(x[1]))), zero=380, span=245;
+    let bs='<line x1="'+zero+'" y1="18" x2="'+zero+'" y2="186" stroke="#adb5bd"/>';
+    bridge.forEach(([label,v],i)=>{const y=35+i*58,w=Math.abs(v)/maxGap*span,x=v<0?zero-w:zero;
+      const fill=i===2?'#212529':(v<0?'#2f8f83':'#c06055');
+      bs+='<text x="8" y="'+(y+15)+'" font-size="13" fill="#212529">'+label+'</text>'
+        +'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="22" rx="3" fill="'+fill+'"><title>'
+        +(v>0?'Joule costs more by ':'Joule saves ')+usd(Math.abs(v))+'/t</title></rect>'
+        +'<text x="'+(v<0?x-8:zero+w+8)+'" y="'+(y+16)+'" text-anchor="'+(v<0?'end':'start')+'" font-family="monospace" font-size="13" font-weight="700" fill="'+fill+'">'
+        +(v>0?'+':'−')+usd(Math.abs(v))+'/t</text>';});
+    bs+='<text x="'+(zero-8)+'" y="200" text-anchor="end" font-size="11" fill="#6c757d">Joule advantage</text><text x="'+(zero+8)+'" y="200" font-size="11" fill="#6c757d">Fired advantage</text>';
+    $('bridgeChart').innerHTML=bs;
+    $('bridgeCap').innerHTML='The common point is '+sig(commonCot,4)+' C and '+sig(commonTau,3)+' s, which both routes can reach. '
+      +'At that point the reactor requires '+sig(rCH.qDemand*kJ2GJ,3)+' GJ/t of useful heat. Purchased energy is '
+      +sig(rCH.qDeliver*kJ2GJ,3)+' GJ/t for fired heating and '+sig(rJH.qDeliver*kJ2GJ,3)+' GJ/t for Joule heating. '
+      +'The first-row gap is therefore the energy-source effect. The second row isolates the value of moving within '
+      +'each assumed operating envelope; the final row is the resulting net gap.';
+    const range=(label,y,axisMin,axisMax,lo,hi,best,color,fmt)=>{const x0=185,x1=690,scale=v=>x0+(v-axisMin)/(axisMax-axisMin)*(x1-x0);
+      return '<text x="8" y="'+(y+5)+'" font-size="12" fill="#212529">'+label+'</text><line x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'" stroke="#e3e7ea" stroke-width="8" stroke-linecap="round"/>'
+        +'<line x1="'+scale(lo)+'" y1="'+y+'" x2="'+scale(hi)+'" y2="'+y+'" stroke="'+color+'" stroke-width="8" stroke-linecap="round"/><circle cx="'+scale(best)+'" cy="'+y+'" r="6" fill="#fff" stroke="'+color+'" stroke-width="3"/>'
+        +'<text x="'+scale(lo)+'" y="'+(y+21)+'" font-size="10.5" fill="#6c757d">'+fmt(lo)+'</text><text x="'+scale(hi)+'" y="'+(y+21)+'" text-anchor="end" font-size="10.5" fill="#6c757d">'+fmt(hi)+'</text><text x="'+scale(best)+'" y="'+(y-13)+'" text-anchor="middle" font-family="monospace" font-size="11" font-weight="700">'+fmt(best)+'</text>';};
+    let es='<text x="8" y="18" font-size="11" fill="#6c757d">COIL OUTLET TEMPERATURE</text>'
+      +range('Fired',55,760,950,760,900,bCH.cot,'#6c757d',v=>sig(v,4)+' C')+range('Joule',112,760,950,760,950,bJH.cot,'#2f8f83',v=>sig(v,4)+' C')
+      +'<text x="8" y="158" font-size="11" fill="#6c757d">RESIDENCE TIME (LOG SCALE)</text>';
+    const logRange=(label,y,lo,hi,best,color)=>range(label,y,Math.log(.05),Math.log(1.5),Math.log(lo),Math.log(hi),Math.log(best),color,v=>sig(Math.exp(v),3)+' s');
+    es+=logRange('Fired',194,.20,1.5,bCH.tau,'#6c757d')+logRange('Joule',250,.05,1.5,bJH.tau,'#2f8f83');
+    $('envelopeChart').innerHTML=es;
     $('envCap').innerHTML='A fired furnace passes heat through the tube wall, so the metal runs hotter '
       +'than the gas. Alloy limits cap the coil outlet near '+MODE_LIMITS.CH.cot[1]+' C and the achievable '
       +'radiant flux sets a floor on residence time near '+sig(MODE_LIMITS.CH.tau[0],2)+' s. Joule heating '
