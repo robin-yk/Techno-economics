@@ -35,18 +35,39 @@ nav button.active{color:var(--accent);font-weight:500;border-bottom-color:var(--
 .kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary)}
 .kpi .val{font-family:var(--mono);font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
 .kpi .sub{font-size:11.5px;color:var(--secondary)}
-.plant-hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(330px,.65fr);gap:38px;
-  align-items:center;padding:30px 0 25px;border-bottom:1px solid var(--hairline)}
-.plant-hero .overline{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700}
-.plant-hero h2{font-size:34px;line-height:1.13;letter-spacing:-.035em;margin:5px 0 10px;font-weight:300;max-width:21ch}
-.plant-hero h2 b{font-weight:750}.plant-hero p{margin:0;color:var(--secondary);font-size:14px;max-width:68ch}
-.hero-result{border-left:3px solid var(--accent);padding:7px 0 7px 20px}
-.hero-result .label{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--secondary)}
-.hero-result .answer{font-family:var(--mono);font-size:25px;font-weight:700;line-height:1.25;margin:2px 0}
-.hero-result .detail{font-size:12px;color:var(--secondary)}
-.hero-link{background:none;border:0;padding:0;margin-top:12px;color:var(--accent);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
-.hero-link:hover{text-decoration:underline}
-@media(max-width:760px){.plant-hero{grid-template-columns:1fr;gap:18px;padding:22px 0}.plant-hero h2{font-size:28px}.hero-result{border-left:0;border-top:3px solid var(--accent);padding:13px 0 0}}
+.plant-hero{padding:24px 0 20px;border-bottom:1px solid var(--hairline)}
+.hero-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:14px}
+.hero-head h2{font-size:25px;line-height:1.1;letter-spacing:-.035em;margin:0;font-weight:650}
+.hero-head .hint{font-size:11px;color:var(--secondary);white-space:nowrap}
+.route-visual{display:grid;grid-template-columns:1fr 72px 1fr;min-height:265px;border:1px solid var(--hairline);
+  border-radius:16px;overflow:visible;background:#fafbfb;position:relative}
+.route-scene{position:relative;display:flex;align-items:center;justify-content:center;min-width:0;cursor:pointer;
+  transition:background .2s ease,transform .2s ease;outline:none}
+.route-scene:first-child{border-radius:15px 0 0 15px}.route-scene:last-child{border-radius:0 15px 15px 0}
+.route-scene:hover,.route-scene:focus-visible{background:#fff}.route-scene:hover .scene-art,.route-scene:focus-visible .scene-art{transform:translateY(-3px)}
+.scene-art{width:100%;height:220px;transition:transform .2s ease}.scene-art text{font-family:Roboto,-apple-system,sans-serif}
+.route-name{position:absolute;left:18px;top:15px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.route-cost{position:absolute;left:18px;bottom:14px;font:700 23px/1.1 var(--mono);letter-spacing:-.03em}
+.route-cost small{display:block;font:400 10px/1.4 Roboto,sans-serif;color:var(--secondary);letter-spacing:.03em;text-transform:uppercase}
+.route-scene.joule{color:var(--accent)}.route-scene.fired{color:#9d5d32}
+.molecule{display:flex;align-items:center;justify-content:center;position:relative;background:#fff;border-left:1px solid var(--hairline);border-right:1px solid var(--hairline)}
+.molecule:before,.molecule:after{content:"";position:absolute;width:22px;height:1px;background:var(--btn-border)}
+.molecule:before{left:-22px}.molecule:after{right:-22px}
+.mol-mark{width:44px;height:44px;border:1px solid var(--ink);border-radius:50%;display:grid;place-items:center;background:#fff;font:700 12px var(--mono);z-index:1}
+.route-pop{position:absolute;z-index:8;left:50%;bottom:52px;width:min(310px,calc(100% - 28px));padding:14px 15px;
+  border:1px solid var(--hairline);border-radius:10px;background:#fff;color:var(--ink);box-shadow:0 12px 35px rgba(28,39,43,.14);
+  opacity:0;transform:translate(-50%,8px);pointer-events:none;transition:opacity .16s,transform .16s}
+.route-scene:hover .route-pop,.route-scene:focus-visible .route-pop{opacity:1;transform:translate(-50%,0)}
+.route-pop b{font-size:13px}.route-pop p{font-size:11.5px;line-height:1.45;color:var(--secondary);margin:4px 0 10px}
+.pop-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;border-top:1px solid var(--hairline);padding-top:9px}
+.pop-metrics span{font-size:9px;color:var(--secondary);text-transform:uppercase;letter-spacing:.04em}.pop-metrics strong{display:block;font:600 11px var(--mono);color:var(--ink)}
+.hero-foot{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-top:10px;color:var(--secondary);font-size:11.5px}
+.hero-verdict b{color:var(--ink)}
+.hero-link{background:none;border:0;padding:0;color:var(--accent);font:inherit;font-weight:650;cursor:pointer;white-space:nowrap}.hero-link:hover{text-decoration:underline}
+.pfd-wrap{position:relative}.pfd-tip{position:fixed;z-index:50;max-width:280px;padding:10px 12px;border:1px solid var(--hairline);border-radius:8px;
+  background:#fff;box-shadow:0 9px 28px rgba(28,39,43,.16);font-size:11.5px;line-height:1.45;color:var(--secondary);pointer-events:none;opacity:0;transition:opacity .12s}
+.pfd-tip.on{opacity:1}.pfd-tip b{display:block;color:var(--ink);font-size:12px;margin-bottom:2px}.pfd-unit{cursor:help}.pfd-unit>rect:first-child{transition:fill .15s,stroke .15s}.pfd-unit:hover>rect:first-child,.pfd-unit:focus>rect:first-child{fill:#f5faf9;stroke:var(--accent)}
+@media(max-width:760px){.hero-head{align-items:start}.hero-head h2{font-size:22px}.hero-head .hint{display:none}.route-visual{grid-template-columns:1fr;min-height:0}.molecule{height:52px;border:0;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline)}.molecule:before,.molecule:after{display:none}.route-scene{min-height:230px}.route-scene:first-child,.route-scene:last-child{border-radius:15px}.route-pop{bottom:50px}.hero-foot{align-items:flex-start;flex-direction:column;gap:5px}}
 
 .strip{border-bottom:1px solid var(--hairline);padding:12px 0 14px}
 .striprow{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
@@ -168,8 +189,37 @@ svg{display:block;width:100%;height:auto}
 
 <div class="wrap">
   <section class="plant-hero" id="plantHero">
-    <div><div class="overline">Ethane cracking route economics</div><h2>What does internal heating have to beat?</h2><p>A reduced-order process model connects reaction severity to recycle, cryogenic separation, capital, energy and carbon. Compare a fired coil with a Joule-heated reactor on one inventory.</p></div>
-    <div class="hero-result"><div class="label">Current lowest route</div><div class="answer" id="heroAnswer"></div><div class="detail" id="heroDetail"></div><button class="hero-link" id="heroCompare">Open the full Fired vs Joule comparison →</button></div>
+    <div class="hero-head"><h2>Two ways to crack ethane.</h2><span class="hint">Hover a route to see what changes</span></div>
+    <div class="route-visual" aria-label="Visual comparison of fired and Joule ethane cracking">
+      <div class="route-scene fired" tabindex="0">
+        <span class="route-name">Fired</span>
+        <svg class="scene-art" viewBox="0 0 430 220" aria-hidden="true">
+          <defs><linearGradient id="hotWall" x1="0" x2="1"><stop stop-color="#f1d6c2"/><stop offset="1" stop-color="#9d5d32"/></linearGradient></defs>
+          <path d="M40 176H390" stroke="#dfe3e5"/><path d="M84 176V70Q84 48 106 48H304Q326 48 326 70V176" fill="none" stroke="#586168" stroke-width="4"/>
+          <path d="M119 155c-13-22 13-32 5-54 25 17 23 35 11 54M180 155c-14-26 16-37 7-64 29 20 26 43 12 64M250 155c-13-22 13-32 5-54 25 17 23 35 11 54" fill="url(#hotWall)"/>
+          <path d="M112 83H297" stroke="#9d5d32" stroke-width="13" opacity=".18"/><path d="M112 83H297" stroke="#9d5d32" stroke-width="3"/>
+          <path d="M51 83H109M300 83H365" stroke="#212529" stroke-width="2"/><path d="m358 77 10 6-10 6" fill="none" stroke="#212529" stroke-width="2"/>
+          <text x="205" y="27" text-anchor="middle" font-size="11" fill="#6c757d">FLAME → TUBE WALL → GAS</text>
+        </svg>
+        <div class="route-cost"><span id="heroCHCost"></span><small>per tonne ethylene</small></div>
+        <div class="route-pop"><b>Heat crosses the tube wall</b><p>Cheap fuel, but wall temperature and radiant heat flux constrain how hot and short the reactor can run.</p><div class="pop-metrics"><span>Efficiency<strong>60%</strong></span><span>Envelope<strong>≤ 900 °C</strong></span><span>Exposure<strong>Gas price</strong></span></div></div>
+      </div>
+      <div class="molecule"><div class="mol-mark">C₂H₄</div></div>
+      <div class="route-scene joule" tabindex="0">
+        <span class="route-name">Joule</span>
+        <svg class="scene-art" viewBox="0 0 430 220" aria-hidden="true">
+          <path d="M40 176H390" stroke="#dfe3e5"/><rect x="94" y="60" width="224" height="48" rx="24" fill="#e8f4f1" stroke="#2f8f83" stroke-width="2"/>
+          <path d="M50 84H92M320 84H374" stroke="#212529" stroke-width="2"/><path d="m367 78 10 6-10 6" fill="none" stroke="#212529" stroke-width="2"/>
+          <path d="m130 84 20-11 20 22 20-22 20 22 20-22 20 22 20-11" fill="none" stroke="#2f8f83" stroke-width="3"/>
+          <path d="M207 39V55M197 47h20" stroke="#2f8f83" stroke-width="2"/><circle cx="207" cy="31" r="8" fill="none" stroke="#2f8f83" stroke-width="2"/>
+          <path d="M132 129v31M159 122v38M186 133v27M228 128v32M255 120v40M282 132v28" stroke="#2f8f83" stroke-width="2" opacity=".35"/>
+          <text x="207" y="27" text-anchor="middle" font-size="11" fill="#6c757d">POWER → RESISTANCE → GAS</text>
+        </svg>
+        <div class="route-cost"><span id="heroJHCost"></span><small>per tonne ethylene</small></div>
+        <div class="route-pop"><b>Heat is generated in the reactor</b><p>Less purchased energy and a wider operating envelope, exchanged for direct exposure to electricity price.</p><div class="pop-metrics"><span>Efficiency<strong>95%</strong></span><span>Envelope<strong>≤ 950 °C</strong></span><span>Exposure<strong>Power price</strong></span></div></div>
+      </div>
+    </div>
+    <div class="hero-foot"><span class="hero-verdict" id="heroDetail"></span><button class="hero-link" id="heroCompare">Explore the full comparison →</button></div>
   </section>
   <div class="kpis" id="kpis"></div>
 
@@ -218,7 +268,7 @@ svg{display:block;width:100%;height:auto}
     <div class="plant">
       <div>
         <h2>Process flow</h2>
-        <svg id="pfd" viewBox="0 0 760 330" role="img" aria-label="Ethane cracker process flow"></svg>
+        <div class="pfd-wrap"><svg id="pfd" viewBox="0 0 760 330" role="img" aria-label="Ethane cracker process flow"></svg><div class="pfd-tip" id="pfdTip" role="tooltip"></div></div>
         <div class="cap">Only the reactor carries degrees of freedom. The three downstream columns hold fixed
           product specifications and re-solve, so reflux ratio is an output.</div>
       </div>
@@ -674,8 +724,9 @@ function drawPFD(r){
     +'Recycle '+sig(r.recycle,3)+' kg. Reactor throughput is '+sig(1/r.X,3)+' times fresh feed.</text>';
   B.forEach((b,i)=>{
     const x=xs[i], free=(i===0);
+    s+='<g class="pfd-unit" tabindex="0" role="button" aria-label="'+esc(b.n)+'. '+esc(b.t)+'" data-name="'+esc(b.n)+'" data-tip="'+esc(b.t)+'">';
     s+='<rect x="'+x+'" y="'+BY+'" width="'+BW+'" height="'+BH+'" rx="6" fill="#fff" stroke="'
-      +(free?A:'#e3e7ea')+'" stroke-width="'+(free?1.5:1)+'"><title>'+esc(b.t)+'</title></rect>';
+      +(free?A:'#e3e7ea')+'" stroke-width="'+(free?1.5:1)+'"></rect>';
     s+='<rect x="'+(x+8)+'" y="'+(BY+7)+'" width="24" height="24" rx="6" fill="'+(free?'#e8f4f1':'#f3f5f6')+'"/>';
     s+=icon(i,x+11,BY+10,free?A:G);
     s+='<text x="'+(x+38)+'" y="'+(BY+21)+'" font-size="10.5" fill="'+K+'" font-weight="600">'+b.n+'</text>';
@@ -684,9 +735,27 @@ function drawPFD(r){
     s+='<text x="'+(x+BW-10)+'" y="'+(BY+68)+'" font-size="11.5" fill="'+K+'" text-anchor="end" '
       +'font-family="Roboto Mono,monospace" font-weight="500">'+(b.c===0?'-':usd(b.c)+'/t')+'</text>';
     if(free) s+='<text x="'+(x+10)+'" y="'+(BY+68)+'" font-size="9.5" fill="'+A+'" font-weight="500">free</text>';
+    s+='</g>';
   });
   s+='</g>';
   $('pfd').innerHTML=s;
+  const tip=$('pfdTip');
+  const show=(unit,e)=>{
+    tip.innerHTML='<b>'+unit.dataset.name+'</b>'+unit.dataset.tip;
+    tip.classList.add('on');
+    const box=tip.getBoundingClientRect(), pad=14;
+    const cx=e&&e.clientX?e.clientX:unit.getBoundingClientRect().left+unit.getBoundingClientRect().width/2;
+    const cy=e&&e.clientY?e.clientY:unit.getBoundingClientRect().top;
+    tip.style.left=Math.max(pad,Math.min(window.innerWidth-box.width-pad,cx+14))+'px';
+    tip.style.top=Math.max(pad,cy-box.height-12)+'px';
+  };
+  document.querySelectorAll('.pfd-unit').forEach(unit=>{
+    unit.addEventListener('pointerenter',e=>show(unit,e));
+    unit.addEventListener('pointermove',e=>show(unit,e));
+    unit.addEventListener('pointerleave',()=>tip.classList.remove('on'));
+    unit.addEventListener('focus',e=>show(unit,e));
+    unit.addEventListener('blur',()=>tip.classList.remove('on'));
+  });
 }
 
 /* ---------- cost table ---------- */
@@ -1172,9 +1241,10 @@ function render(){
   document.querySelector('.strip').style.display=staticTab?'none':'';
   $('plantHero').style.display=S.tab==='plant'?'':'';
   const heroWinner=rJH.coo<rCH.coo?'Joule':'Fired';
-  $('heroAnswer').textContent=heroWinner+' · '+usd(Math.min(rCH.coo,rJH.coo))+'/t';
-  $('heroDetail').textContent='At the common '+sig(commonCot,4)+' C, '+sig(commonTau,3)+' s point, '+heroWinner
-    +' is lower by '+usd(Math.abs(rJH.coo-rCH.coo))+'/t. Break-even power is $'+sig(be,3)+'/kWh.';
+  $('heroCHCost').textContent=usd(rCH.coo)+'/t';
+  $('heroJHCost').textContent=usd(rJH.coo)+'/t';
+  $('heroDetail').innerHTML='<b>'+heroWinner+' is lower by '+usd(Math.abs(rJH.coo-rCH.coo))+'/t</b>'
+    +' at the common '+sig(commonCot,4)+' °C, '+sig(commonTau,3)+' s point · break-even power $'+sig(be,3)+'/kWh';
 
   $('kpis').innerHTML=[
     ['Cost of ethylene',usd(r.coo),sig(r.coo/r.L.floor,3)+'x the floor of '+usd(r.L.floor),
