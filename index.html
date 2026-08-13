@@ -101,6 +101,7 @@ svg{display:block;width:100%;height:auto}
 #ladder,#tornado,#ciladder{max-width:820px}
 .lcactl{border-bottom:1px solid var(--hairline);padding-bottom:14px}
 .exp{max-width:78ch}
+#t-cite .exp{max-width:90ch}
 .exp h3{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;
   color:var(--secondary);margin:30px 0 4px;border-bottom:1px solid var(--hairline);padding-bottom:6px}
 .exp h3:first-child{margin-top:0}
@@ -114,6 +115,11 @@ svg{display:block;width:100%;height:auto}
 .exp .def{font-size:13px;color:var(--secondary);border-left:2px solid var(--hairline);padding-left:12px;margin:8px 0}
 .exp .def b{color:var(--ink);font-weight:500}
 .exp table{margin-top:8px}
+.exp pre{font-family:var(--mono);font-size:12px;line-height:1.55;color:var(--ink);
+  border:1px solid var(--hairline);border-radius:8px;padding:14px 16px;overflow-x:auto;margin:8px 0 10px}
+.ghost{background:var(--background);border:1px solid var(--btn-border);border-radius:6px;
+  padding:5px 12px;font:inherit;font-size:12.5px;font-weight:500;color:var(--ink);cursor:pointer}
+.ghost:hover{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
@@ -247,6 +253,46 @@ svg{display:block;width:100%;height:auto}
     <table><thead><tr><th>Item</th><th class="r">Value</th><th>Source</th></tr></thead>
       <tbody id="specBody"></tbody></table>
     <div class="foot" id="foot"></div>
+  </div>
+
+  <div class="tab" id="t-cite">
+    <div class="exp">
+      <h3>How to cite</h3>
+      <div class="item">
+        <p>If this tool's approach is useful in your work, please cite the paper it is based on.</p>
+        <p>The tool is under active development. Its results may change and should not be taken
+           as ground truth.</p>
+      </div>
+      <div class="item">
+        <div class="t">Reference</div>
+        <p style="color:var(--ink)">Mittal, A., Kwak, Y., Zheng, W., Ierapetritou, M., &amp; Vlachos, D. G. (2025).
+          Short contact time, high temperature, internally-heated ethane crackers.
+          <em>Chemical Engineering Journal</em>, 523, 168251.</p>
+        <p><a href="https://doi.org/10.1016/j.cej.2025.168251" target="_blank" rel="noopener"
+              style="color:var(--accent)">https://doi.org/10.1016/j.cej.2025.168251</a></p>
+      </div>
+      <div class="item">
+        <div class="t">BibTeX</div>
+        <pre id="bib">@article{Mittal2025,
+  author  = {Mittal, A. and Kwak, Y. and Zheng, W. and
+             Ierapetritou, M. and Vlachos, D. G.},
+  title   = {Short contact time, high temperature, internally-heated ethane crackers},
+  journal = {Chemical Engineering Journal},
+  volume  = {523},
+  pages   = {168251},
+  year    = {2025},
+  doi     = {10.1016/j.cej.2025.168251}
+}</pre>
+        <button class="ghost" id="copyBib">Copy</button>
+      </div>
+      <div class="item">
+        <div class="t">What the tool takes from the paper</div>
+        <p>The published cost of $680 per tonne used as the benchmark marker, the total bare module
+          cost anchor of $126.8 million at 610 thousand tonnes per year, and the ratio of total
+          overnight cost to bare module cost. Everything else, including the kinetics, the separation
+          duties and the emission factors, is built here and is stated on the balances tab.</p>
+      </div>
+    </div>
   </div>
 
   <div class="tab" id="t-explained">
@@ -1018,7 +1064,7 @@ function renderExplained(r,l){
 /* ---------- tabs ---------- */
 const TABS=[['plant','plant'],['ladder','cost ladder'],['carbon','carbon'],
             ['compare','fired vs Joule'],['sens','sensitivity'],['balance','balances'],
-            ['explained','explained']];
+            ['explained','explained'],['cite','cite']];
 $('nav').innerHTML=TABS.map(([id,lab])=>'<button data-tab="'+id+'">'+lab+'</button>').join('');
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;render();});
 
@@ -1031,6 +1077,9 @@ function render(){
 
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===S.tab));
   TABS.forEach(([id])=>$('t-'+id).classList.toggle('on',id===S.tab));
+  const staticTab=(S.tab==='cite');
+  $('kpis').style.display=staticTab?'none':'';
+  document.querySelector('.strip').style.display=staticTab?'none':'';
 
   $('kpis').innerHTML=[
     ['Cost of ethylene',usd(r.coo),sig(r.coo/r.L.floor,3)+'x the floor of '+usd(r.L.floor),
@@ -1141,6 +1190,11 @@ $('sSel').oninput=e=>{S.sel=+e.target.value;render()};
 $('sEthane').oninput=e=>{S.ethane=logMap(+e.target.value,50,900);render()};
 $('sElec').oninput=e=>{S.elec=logMap(+e.target.value,0.008,0.30);render()};
 $('sGas').oninput=e=>{S.gas=logMap(+e.target.value,1,30);render()};
+$('copyBib').onclick=()=>{
+  navigator.clipboard.writeText($('bib').textContent).then(
+    ()=>{$('copyBib').textContent='Copied';setTimeout(()=>$('copyBib').textContent='Copy',1600);},
+    ()=>{$('copyBib').textContent='Select and copy';});
+};
 $('sGrid').oninput=e=>{S.grid=+e.target.value;render()};
 $('sEup').oninput=e=>{S.ethaneUp=+e.target.value;render()};
 [['fBurn','burn'],['fSell','sell'],['fVent','vent']].forEach(([id,v])=>$(id).onclick=()=>{S.tailFate=v;render()});

@@ -19,6 +19,7 @@ recovery) and re-solve, so reflux ratio is an output rather than an input.
 | sensitivity | Tornado at ±10%, clamped to validated ranges |
 | balances | Carbon, hydrogen, mass and energy residuals; fixed specifications |
 | explained | Every figure on the page written out in plain English, with each term defined at first use |
+| cite | Reference for the paper this is based on, with BibTeX |
 
 Cost and carbon come from one inventory. Prices give the cost of ethylene; emission factors
 give the carbon intensity. Two results that follow from the same mass and energy balance.
@@ -26,6 +27,15 @@ give the carbon intensity. Two results that follow from the same mass and energy
 Screening estimate, AACE Class 5, ±40%. The output to read is the accumulation, not the
 absolute figure. Known gaps are stated on the page: capital is correlation based, the
 byproduct split is uncalibrated, and dilution steam carries no counterpart cost.
+
+## Citation
+
+If the approach is useful, cite the paper it is based on. The tool is under active
+development; its results may change and should not be taken as ground truth.
+
+Mittal, A., Kwak, Y., Zheng, W., Ierapetritou, M., & Vlachos, D. G. (2025). Short contact
+time, high temperature, internally-heated ethane crackers. *Chemical Engineering Journal*,
+523, 168251. <https://doi.org/10.1016/j.cej.2025.168251>
 
 ---
 
