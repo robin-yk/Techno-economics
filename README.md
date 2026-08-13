@@ -14,9 +14,14 @@ recovery) and re-solve, so reflux ratio is an output rather than an input.
 |---|---|
 | plant | Process flow diagram and cost breakdown |
 | cost ladder | Accumulation from the stoichiometric floor to the final cost |
+| carbon | Carbon intensity from the same inventory, by scope, with grid factor, tail gas fate and co-product handling |
 | fired vs Joule | Both heating routes and the break-even power price |
 | sensitivity | Tornado at ±10%, clamped to validated ranges |
 | balances | Carbon, hydrogen, mass and energy residuals; fixed specifications |
+| explained | Every figure on the page written out in plain English, with each term defined at first use |
+
+Cost and carbon come from one inventory. Prices give the cost of ethylene; emission factors
+give the carbon intensity. Two results that follow from the same mass and energy balance.
 
 Screening estimate, AACE Class 5, ±40%. The output to read is the accumulation, not the
 absolute figure. Known gaps are stated on the page: capital is correlation based, the
