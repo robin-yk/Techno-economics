@@ -35,6 +35,18 @@ nav button.active{color:var(--accent);font-weight:500;border-bottom-color:var(--
 .kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary)}
 .kpi .val{font-family:var(--mono);font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
 .kpi .sub{font-size:11.5px;color:var(--secondary)}
+.plant-hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(330px,.65fr);gap:38px;
+  align-items:center;padding:30px 0 25px;border-bottom:1px solid var(--hairline)}
+.plant-hero .overline{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700}
+.plant-hero h2{font-size:34px;line-height:1.13;letter-spacing:-.035em;margin:5px 0 10px;font-weight:300;max-width:21ch}
+.plant-hero h2 b{font-weight:750}.plant-hero p{margin:0;color:var(--secondary);font-size:14px;max-width:68ch}
+.hero-result{border-left:3px solid var(--accent);padding:7px 0 7px 20px}
+.hero-result .label{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--secondary)}
+.hero-result .answer{font-family:var(--mono);font-size:25px;font-weight:700;line-height:1.25;margin:2px 0}
+.hero-result .detail{font-size:12px;color:var(--secondary)}
+.hero-link{background:none;border:0;padding:0;margin-top:12px;color:var(--accent);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+.hero-link:hover{text-decoration:underline}
+@media(max-width:760px){.plant-hero{grid-template-columns:1fr;gap:18px;padding:22px 0}.plant-hero h2{font-size:28px}.hero-result{border-left:0;border-top:3px solid var(--accent);padding:13px 0 0}}
 
 .strip{border-bottom:1px solid var(--hairline);padding:12px 0 14px}
 .striprow{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
@@ -155,6 +167,10 @@ svg{display:block;width:100%;height:auto}
 </header>
 
 <div class="wrap">
+  <section class="plant-hero" id="plantHero">
+    <div><div class="overline">Ethane cracking route economics</div><h2>What does internal heating have to beat?</h2><p>A reduced-order process model connects reaction severity to recycle, cryogenic separation, capital, energy and carbon. Compare a fired coil with a Joule-heated reactor on one inventory.</p></div>
+    <div class="hero-result"><div class="label">Current lowest route</div><div class="answer" id="heroAnswer"></div><div class="detail" id="heroDetail"></div><button class="hero-link" id="heroCompare">Open the full Fired vs Joule comparison →</button></div>
+  </section>
   <div class="kpis" id="kpis"></div>
 
   <div class="strip">
@@ -614,6 +630,14 @@ function drawPFD(r){
      c:r.wSplit*kJ2GJ*eGJ,t:'Purity of 99.9 mol% is specified; reflux follows from it.'}
   ];
   const G='#6c757d', K='#212529', A='#2f8f83';
+  const icon=(kind,x,y,col)=>{
+    const p='fill="none" stroke="'+col+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
+    if(kind===0) return '<g '+p+'><path d="M'+(x+4)+' '+(y+17)+' C'+(x+1)+' '+(y+11)+' '+(x+9)+' '+(y+9)+' '+(x+7)+' '+(y+3)+' C'+(x+14)+' '+(y+7)+' '+(x+17)+' '+(y+12)+' '+(x+13)+' '+(y+17)+' Z"/><path d="M'+(x+8)+' '+(y+17)+' C'+(x+6)+' '+(y+14)+' '+(x+11)+' '+(y+12)+' '+(x+10)+' '+(y+9)+'"/></g>';
+    if(kind===1) return '<g '+p+'><path d="M'+(x+3)+' '+(y+4)+' H'+(x+15)+' L'+(x+13)+' '+(y+17)+' H'+(x+5)+' Z"/><path d="M'+(x+5)+' '+(y+9)+' H'+(x+13)+'"/></g>';
+    if(kind===2) return '<g '+p+'><circle cx="'+(x+9)+'" cy="'+(y+10)+'" r="7"/><path d="M'+(x+9)+' '+(y+3)+' V'+(x+17)+' M'+(x+2)+' '+(y+10)+' H'+(x+16)+' M'+(x+9)+' '+(y+10)+' L'+(x+14)+' '+(y+6)+'"/></g>';
+    if(kind===3) return '<g '+p+'><path d="M'+(x+9)+' '+(y+2)+' V'+(x+18)+' M'+(x+2)+' '+(y+10)+' H'+(x+16)+' M'+(x+4)+' '+(y+5)+' L'+(x+14)+' '+(y+15)+' M'+(x+14)+' '+(y+5)+' L'+(x+4)+' '+(y+15)+'"/></g>';
+    return '<g '+p+'><path d="M'+(x+5)+' '+(y+2)+' H'+(x+13)+' V'+(y+16)+' Q'+(x+13)+' '+(y+18)+' '+(x+11)+' '+(y+18)+' H'+(x+7)+' Q'+(x+5)+' '+(y+18)+' '+(x+5)+' '+(y+16)+' Z"/><path d="M'+(x+5)+' '+(y+7)+' H'+(x+13)+' M'+(x+5)+' '+(y+13)+' H'+(x+13)+'"/></g>';
+  };
   let s='<g font-family="Roboto,-apple-system,sans-serif">';
   s+='<defs><marker id="a" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto">'
     +'<path d="M0,0 L6,2.5 L0,5 z" fill="'+G+'"/></marker>'
@@ -652,7 +676,9 @@ function drawPFD(r){
     const x=xs[i], free=(i===0);
     s+='<rect x="'+x+'" y="'+BY+'" width="'+BW+'" height="'+BH+'" rx="6" fill="#fff" stroke="'
       +(free?A:'#e3e7ea')+'" stroke-width="'+(free?1.5:1)+'"><title>'+esc(b.t)+'</title></rect>';
-    s+='<text x="'+(x+10)+'" y="'+(BY+19)+'" font-size="11" fill="'+K+'" font-weight="500">'+b.n+'</text>';
+    s+='<rect x="'+(x+8)+'" y="'+(BY+7)+'" width="24" height="24" rx="6" fill="'+(free?'#e8f4f1':'#f3f5f6')+'"/>';
+    s+=icon(i,x+11,BY+10,free?A:G);
+    s+='<text x="'+(x+38)+'" y="'+(BY+21)+'" font-size="10.5" fill="'+K+'" font-weight="600">'+b.n+'</text>';
     s+='<text x="'+(x+10)+'" y="'+(BY+34)+'" font-size="9.5" fill="'+G+'">'+b.a+'</text>';
     s+='<text x="'+(x+10)+'" y="'+(BY+46)+'" font-size="9.5" fill="'+G+'">'+b.b+'</text>';
     s+='<text x="'+(x+BW-10)+'" y="'+(BY+68)+'" font-size="11.5" fill="'+K+'" text-anchor="end" '
@@ -1124,6 +1150,7 @@ const TABS=[['plant','plant'],['ladder','cost ladder'],['carbon','carbon'],
             ['explained','explained'],['cite','cite']];
 $('nav').innerHTML=TABS.map(([id,lab])=>'<button data-tab="'+id+'">'+lab+'</button>').join('');
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;render();});
+$('heroCompare').onclick=()=>{S.tab='compare';render();window.scrollTo({top:0,behavior:'smooth'});};
 
 /* ---------- render ---------- */
 function render(){
@@ -1143,6 +1170,11 @@ function render(){
   const staticTab=(S.tab==='cite');
   $('kpis').style.display=staticTab?'none':'';
   document.querySelector('.strip').style.display=staticTab?'none':'';
+  $('plantHero').style.display=S.tab==='plant'?'':'';
+  const heroWinner=rJH.coo<rCH.coo?'Joule':'Fired';
+  $('heroAnswer').textContent=heroWinner+' · '+usd(Math.min(rCH.coo,rJH.coo))+'/t';
+  $('heroDetail').textContent='At the common '+sig(commonCot,4)+' C, '+sig(commonTau,3)+' s point, '+heroWinner
+    +' is lower by '+usd(Math.abs(rJH.coo-rCH.coo))+'/t. Break-even power is $'+sig(be,3)+'/kWh.';
 
   $('kpis').innerHTML=[
     ['Cost of ethylene',usd(r.coo),sig(r.coo/r.L.floor,3)+'x the floor of '+usd(r.L.floor),
