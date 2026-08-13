@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Techno-economics</title>
+<style>
+:root{
+  --background:#fff; --ink:#212529; --secondary:#6c757d; --accent:#2f8f83;
+  --hairline:#e3e7ea; --btn-border:#ced4da; --error:#c53a3a; --warning:#b46714;
+  --mono:"Roboto Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--background);color:var(--ink);
+  font-family:Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Helvetica,Arial,sans-serif;
+  font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%;
+}
+.wrap{max-width:760px;margin:0 auto;padding:56px 24px 80px}
+h1{font-size:27px;font-weight:300;margin:0 0 6px;letter-spacing:-.01em}
+h1 b{font-weight:700}
+.lede{color:var(--secondary);font-size:14.5px;margin:0 0 6px;max-width:64ch}
+.rule{border:0;border-top:1px solid var(--hairline);margin:26px 0}
+h2{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;
+   color:var(--secondary);margin:0 0 14px}
+a.card{
+  display:block;border:1px solid var(--hairline);border-radius:8px;padding:18px 20px;
+  margin-bottom:14px;text-decoration:none;color:inherit;
+}
+a.card:hover{border-color:var(--accent)}
+a.card .t{font-size:16px;font-weight:500;margin-bottom:2px}
+a.card:hover .t{color:var(--accent)}
+a.card .d{font-size:13.5px;color:var(--secondary);max-width:62ch}
+a.card .m{
+  font-family:var(--mono);font-size:11.5px;color:var(--secondary);
+  margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;
+}
+.grade{
+  font-size:11.5px;color:var(--secondary);border:1px solid var(--hairline);
+  border-radius:6px;padding:2px 8px;display:inline-block;
+}
+.note{
+  border-left:2px solid var(--hairline);padding-left:14px;font-size:13px;
+  color:var(--secondary);max-width:68ch;
+}
+.note b{color:var(--ink)}
+.foot{
+  border-top:1px solid var(--hairline);margin-top:34px;padding-top:14px;
+  font-size:12px;color:var(--secondary);
+}
+.foot a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Techno-<b>economics</b></h1>
+  <p class="lede">에틸렌 생산 공정의 기술경제성 평가 도구. 브라우저에서 바로 돌아가고, 외부 의존이 없습니다.</p>
+  <span class="grade">스크리닝 도구 · AACE Class 5 · ±40%</span>
+
+  <hr class="rule">
+
+  <h2>도구</h2>
+
+  <a class="card" href="cracker-cascade.html">
+    <div class="t">Conventional Ethane Cracker</div>
+    <div class="d">자유도를 반응기에만 둔 재래식 에탄 크래커. 온도 · 체류시간 · 희석비 · 규모 · 가열 효율을 드래그하면 후단이 순차적으로 다시 풀립니다. 후단 세 탑은 제품 규격이 고정이라 환류비는 입력이 아니라 결과로 나옵니다.</div>
+    <div class="m"><span>원가 사다리</span><span>CH vs JH</span><span>손익분기 전기가</span><span>수지 잔차</span></div>
+  </a>
+
+  <a class="card" href="ethane-cracker-tea-lab.html">
+    <div class="t">Ethane Cracker TEA Lab</div>
+    <div class="d">Mittal, Kwak et al., <em>Chem. Eng. J.</em> 523 (2025) 168251의 TEA를 재구성하고 감사하는 도구. 네 경로(재래식 · MKM 두 경우 · 실험 최적)의 공표값 대비 편차를 표시합니다.</div>
+    <div class="m"><span>Eq. S8 · S9</span><span>Table S6 인벤토리</span><span>검증 탭</span><span>용어집</span></div>
+  </a>
+
+  <hr class="rule">
+
+  <h2>읽는 법</h2>
+  <p class="note">
+    두 도구 모두 <b>절대값을 맞히는 물건이 아닙니다.</b>
+    화학량론이 정한 바닥(에틸렌 1 kg당 에탄 1.072 kg)에서 최종 원가까지
+    무엇이 얼마나 쌓이는지를 보여주는 것이 목적입니다.
+    방향과 크기 순서는 믿을 만하고, 소수점은 아닙니다.
+    자본비는 상관식 · 계수 기반이라 Aspen APEA의 설계 기반 물량 산출과 급이 다릅니다.
+  </p>
+
+  <div class="foot">
+    소스 · <a href="https://github.com/robin-yk/Techno-economics">github.com/robin-yk/Techno-economics</a>
+  </div>
+
+</div>
+</body>
+</html>
