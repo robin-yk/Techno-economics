@@ -12,8 +12,8 @@ recovery) and re-solve, so reflux ratio is an output rather than an input.
 
 | Tab | Contents |
 |---|---|
+| overview | The headline cost and the ladder from the stoichiometric floor, one number and one figure |
 | plant | Process flow diagram and cost breakdown |
-| cost ladder | Accumulation from the stoichiometric floor to the final cost |
 | carbon | Carbon intensity from the same inventory, by scope, with grid factor, tail gas fate and co-product handling |
 | fired vs Joule | Both heating routes and the break-even power price |
 | sensitivity | Tornado at ±10%, clamped to validated ranges |
