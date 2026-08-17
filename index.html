@@ -32,6 +32,38 @@ nav button.active{color:var(--accent);font-weight:500;border-bottom-color:var(--
 
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0 24px;padding:14px 0 0}
 .kpi{border-bottom:1px solid var(--hairline);padding-bottom:10px}
+
+/* Sticky readout. Cost, carbon and the price basis stay on screen while the reactor
+   knobs move, so the two results and the prices behind them are never a scroll apart. */
+.sticky{position:sticky;top:0;z-index:30;background:var(--background);
+  border-bottom:1px solid var(--hairline);padding:6px 0 5px;display:flex;align-items:baseline;
+  gap:0 22px;flex-wrap:wrap}
+.sk{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+.sk b{font-family:var(--mono);font-size:15px;font-weight:500;letter-spacing:-.01em}
+.sk span.l{font-size:10.5px;color:var(--secondary);text-transform:uppercase;letter-spacing:.06em}
+.sk-prices{font-size:11px;color:var(--secondary);font-family:var(--mono)}
+.basebar{margin-left:auto;display:flex;gap:8px;align-items:center}
+.basebar button{font-size:11px;padding:2px 9px;border:1px solid var(--btn-border);
+  background:var(--background);color:var(--ink);border-radius:3px;cursor:pointer}
+.basebar button:hover{border-color:var(--accent);color:var(--accent)}
+.basebar button[disabled]{opacity:.4;cursor:default;border-color:var(--hairline)}
+
+/* Change against the pinned baseline. Sign is always printed, so colour is never the
+   only carrier of meaning. */
+.dlt{font-family:var(--mono);font-size:11px;font-weight:500}
+.dlt.good{color:var(--accent)} .dlt.bad{color:var(--error)} .dlt.neu{color:var(--secondary)}
+.wasval{font-family:var(--mono);font-size:10.5px;color:var(--secondary)}
+
+/* Equipment inspector. Clicking a block opens it; the reactor is the only one with inputs. */
+.insp{border:1px solid var(--hairline);border-radius:4px;padding:12px 14px;margin-top:12px}
+.insp h3{margin:0 0 2px;font-size:13px;font-weight:600}
+.insp .role{font-size:10.5px;color:var(--secondary);text-transform:uppercase;letter-spacing:.06em}
+.insp table{margin-top:9px}
+.insp .warn{margin-top:9px;font-size:11px;color:var(--warning);line-height:1.5}
+.pfd-unit{cursor:pointer}
+.pfd-unit:focus{outline:none}
+.pfd-unit.sel rect:first-of-type{stroke:var(--accent);stroke-width:2}
+.pfd-unit.hot rect:first-of-type{fill:#f2f8f7}
 .kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary)}
 .kpi .val{font-family:var(--mono);font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
 .kpi .sub{font-size:11.5px;color:var(--secondary)}
@@ -98,7 +130,7 @@ details[open] summary::before{content:"\2212 "}
 
 .tab{display:none;padding-top:20px}
 .tab.on{display:block}
-h2{font-size:14px;font-weight:500;margin:0 0 12px;letter-spacing:-.005em}
+h2{font-size:14px;font-weight:500;margin:0 0 8px;letter-spacing:-.005em}
 h3{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;
    color:var(--secondary);margin:22px 0 9px}
 .cap{font-size:12px;color:var(--secondary);margin-top:8px;max-width:88ch}
@@ -153,16 +185,11 @@ td.cr{color:var(--accent)}
 svg{display:block;width:100%;height:auto}
 #ladder,#tornado,#ciladder{max-width:820px}
 .lcactl{border-bottom:1px solid var(--hairline);padding-bottom:14px}
-.ov-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;
-  padding:6px 0 14px}
-.ov-num{font-family:var(--mono);font-size:46px;font-weight:700;letter-spacing:-.03em;line-height:1}
-.ov-num small{display:block;font-family:Roboto,-apple-system,sans-serif;font-family:inherit;font-size:11px;
-  color:var(--secondary);font-weight:400;letter-spacing:.06em;text-transform:uppercase;margin-top:7px;font-family:Roboto,sans-serif}
-.ov-ctx{font-size:12.5px;color:var(--secondary);text-align:right;max-width:56ch;line-height:1.7}
+.ov-head{padding:4px 0 6px}
+.ov-ctx{font-size:12.5px;color:var(--secondary);max-width:none;line-height:1.65}
 .ov-ctx b{color:var(--ink);font-family:var(--mono);font-weight:500}
 .ov-ctx .golink{background:none;border:0;padding:0;color:var(--accent);font:inherit;font-weight:500;cursor:pointer}
 .ov-ctx .golink:hover{text-decoration:underline}
-@media(max-width:700px){.ov-ctx{text-align:left}}
 .exp{max-width:78ch}
 #t-cite .exp{max-width:90ch}
 .exp h3{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;
@@ -198,6 +225,19 @@ svg{display:block;width:100%;height:auto}
 </header>
 
 <div class="wrap">
+
+  <div class="sticky" id="sticky">
+    <div class="sk"><span class="l">Cost</span><b id="skCoo"></b><span class="dlt" id="skCooD"></span></div>
+    <div class="sk"><span class="l">Carbon</span><b id="skCi"></b><span class="dlt" id="skCiD"></span></div>
+    <div class="sk"><span class="l">Break-even power</span><b id="skBe"></b></div>
+    <div class="sk-prices" id="skPrices"></div>
+    <div class="basebar">
+      <span class="wasval" id="baseState"></span>
+      <button id="bPin">Pin baseline</button>
+      <button id="bReset" disabled>Reset</button>
+      <button id="bClear" disabled>Clear</button>
+    </div>
+  </div>
 
   <div class="kpis" id="kpis"></div>
 
@@ -244,7 +284,6 @@ svg{display:block;width:100%;height:auto}
 
   <div class="tab on" id="t-main">
     <div class="ov-head">
-      <div class="ov-num"><span id="ovCoo"></span><small>USD per tonne ethylene</small></div>
       <div class="ov-ctx" id="ovCtx"></div>
     </div>
     <div class="plant">
@@ -252,7 +291,9 @@ svg{display:block;width:100%;height:auto}
         <h2>Process flow</h2>
         <div class="pfd-wrap"><svg id="pfd" viewBox="0 0 760 330" role="img" aria-label="Ethane cracker process flow"></svg><div class="pfd-tip" id="pfdTip" role="tooltip"></div></div>
         <div class="cap">Only the reactor carries degrees of freedom. The three downstream columns hold fixed
-          product specifications and re-solve, so reflux ratio is an output.</div>
+          product specifications and re-solve, so reflux ratio is an output. Select a block for its
+          inputs, outputs and the specification it holds.</div>
+        <div class="insp" id="insp"></div>
       </div>
       <div>
         <h2>Cost breakdown</h2>
@@ -625,6 +666,12 @@ function model(p){
       +sig(VALID.X[0]*100,2)+' to '+sig(VALID.X[1]*100,2)+'%');
   if(selClipped)
     flags.push('selectivity correlation held at its bound of '+sig(SmolRaw>0.985?98.5:55,3)+'% molar');
+  /* The selectivity band was declared but only ever drawn on the manual slider. A severe
+     operating point could produce a selectivity well outside it and report the number
+     without a word. */
+  if(Smass*100<VALID.sel[0]||Smass*100>VALID.sel[1])
+    flags.push('selectivity '+sig(Smass*100,3)+'% is outside the industrial band of '
+      +sig(VALID.sel[0],2)+' to '+sig(VALID.sel[1],2)+'%');
 
   return {flags,selClipped,y,coil,recycle,dilSteam,qRxn,qSens,qDemand,qDeliver,tleSteam,fuelGas,gasBuy,gasSell,
     elecHeat,wComp,wRef,wSplit,tCold,qCold,lightFrac,nGas,alpha,nMin,nAct,rRatio,
@@ -735,9 +782,20 @@ function drawPFD(r){
     +'<marker id="k" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto">'
     +'<path d="M0,0 L6,2.5 L0,5 z" fill="'+K+'"/></marker></defs>';
   const cy=BY+BH/2;
+  /* Stream change against the pinned baseline. A flow is neither good nor bad, so it takes
+     the neutral colour and relies on the printed sign. */
+  const BR=app.baseRes;
+  const sdel=(now,was,th)=>{
+    if(!BR||was==null) return '';
+    const d=now-was;
+    if(Math.abs(d)<th) return '';
+    return ' <tspan fill="'+G+'">'+(d>0?'+':'−')+sig(Math.abs(d),2)+'</tspan>';
+  };
   /* Fresh feed enters from above and joins the recycle at x = 40. */
-  s+='<text x="4" y="97" font-size="10" fill="'+G+'">'+C2H6+' '+sig(r.y.ethane,3)+' kg</text>';
-  s+='<text x="4" y="113" font-size="10" fill="'+G+'">Steam '+sig(r.dilSteam,3)+' kg</text>';
+  s+='<text x="4" y="97" font-size="10" fill="'+G+'">'+C2H6+' '+sig(r.y.ethane,3)+' kg'
+    +sdel(r.y.ethane,BR?BR.y.ethane:null,THRESH.flow)+'</text>';
+  s+='<text x="4" y="113" font-size="10" fill="'+G+'">Steam '+sig(r.dilSteam,3)+' kg'
+    +sdel(r.dilSteam,BR?BR.dilSteam:null,THRESH.flow)+'</text>';
   s+='<line x1="40" y1="120" x2="40" y2="'+(cy-2)+'" stroke="'+K+'"/>';
   s+='<line x1="40" y1="'+cy+'" x2="'+(xs[0]-4)+'" y2="'+cy+'" stroke="'+K+'" stroke-width="1.6" marker-end="url(#k)"/>';
   s+='<circle cx="40" cy="'+cy+'" r="2.5" fill="'+K+'"/>';
@@ -762,12 +820,26 @@ function drawPFD(r){
   s+='<path d="M '+(xs[4]+8)+' '+(BY+BH)+' L '+(xs[4]+8)+' 292 L 40 292 L 40 '+(cy-8)+'" '
     +'fill="none" stroke="'+G+'" stroke-dasharray="4 3" marker-end="url(#a)"/>';
   s+='<text x="'+((xs[4]+48)/2)+'" y="286" font-size="10" fill="'+G+'" text-anchor="middle">'
-    +'Recycle '+sig(r.recycle,3)+' kg. Reactor throughput is '+sig(1/r.X,3)+' times fresh feed.</text>';
+    +'Recycle '+sig(r.recycle,3)+' kg'+sdel(r.recycle,BR?BR.recycle:null,THRESH.flow)
+    +'. Reactor throughput is '+sig(1/r.X,3)+' times fresh feed.</text>';
+  /* Cost of the same block at the pinned baseline, for the change marker. */
+  const bCost=app.baseRes?[app.baseRes.L.heat,0,
+      app.baseRes.wComp*kJ2GJ*(app.baseline.elec/GJ_per_kWh),
+      app.baseRes.wRef*kJ2GJ*(app.baseline.elec/GJ_per_kWh),
+      app.baseRes.wSplit*kJ2GJ*(app.baseline.elec/GJ_per_kWh)]:null;
   B.forEach((b,i)=>{
     const x=xs[i], free=(i===0);
-    s+='<g class="pfd-unit" tabindex="0" role="button" aria-label="'+esc(b.n)+'. '+esc(b.t)+'" data-name="'+esc(b.n)+'" data-tip="'+esc(b.t)+'">';
-    s+='<rect x="'+x+'" y="'+BY+'" width="'+BW+'" height="'+BH+'" rx="6" fill="#fff" stroke="'
-      +(free?A:'#e3e7ea')+'" stroke-width="'+(free?1.5:1)+'"></rect>';
+    const role=free?'adjustable':(i===1?'fixed':'calculated');
+    const sel=(app.unit===i);
+    /* Highlight only where the block's own cost actually moved. Colouring everything on
+       every drag would say nothing. */
+    const hot=bCost&&Math.abs(b.c-bCost[i])>=THRESH.cost;
+    s+='<g class="pfd-unit'+(sel?' sel':'')+(hot?' hot':'')+'" tabindex="0" role="button" '
+      +'aria-expanded="'+(sel?'true':'false')+'" '
+      +'aria-label="'+esc(b.n)+', '+role+'. '+esc(b.t)+'" data-unit="'+i+'" '
+      +'data-name="'+esc(b.n)+'" data-tip="'+esc(b.t)+'">';
+    s+='<rect x="'+x+'" y="'+BY+'" width="'+BW+'" height="'+BH+'" rx="6" fill="'+(hot?'#f2f8f7':'#fff')+'" stroke="'
+      +(sel?A:free?A:'#e3e7ea')+'" stroke-width="'+(sel?2:free?1.5:1)+'"></rect>';
     s+='<rect x="'+(x+8)+'" y="'+(BY+7)+'" width="24" height="24" rx="6" fill="'+(free?'#e8f4f1':'#f3f5f6')+'"/>';
     s+=icon(i,x+11,BY+10,free?A:G);
     s+='<text x="'+(x+38)+'" y="'+(BY+21)+'" font-size="10.5" fill="'+K+'" font-weight="600">'+b.n+'</text>';
@@ -775,7 +847,18 @@ function drawPFD(r){
     s+='<text x="'+(x+10)+'" y="'+(BY+46)+'" font-size="9.5" fill="'+G+'">'+b.b+'</text>';
     s+='<text x="'+(x+BW-10)+'" y="'+(BY+68)+'" font-size="11.5" fill="'+K+'" text-anchor="end" '
       +'font-family="Roboto Mono,monospace" font-weight="500">'+(b.c===0?'-':usd(b.c)+'/t')+'</text>';
-    if(free) s+='<text x="'+(x+10)+'" y="'+(BY+68)+'" font-size="9.5" fill="'+A+'" font-weight="500">free</text>';
+    /* The old label here read "free", which next to a cost figure reads as costing nothing. */
+    s+='<text x="'+(x+10)+'" y="'+(BY+68)+'" font-size="9.5" fill="'+(free?A:G)+'"'
+      +(free?' font-weight="500"':'')+'>'+role+'</text>';
+    /* The change sits above the cost, not below it. The block is 78 px tall and the cost
+       baseline is already at 68, so a line under it would print outside the box. */
+    if(bCost&&i!==1){
+      const d=b.c-bCost[i];
+      if(Math.abs(d)>=THRESH.cost)
+        s+='<text x="'+(x+BW-10)+'" y="'+(BY+57)+'" font-size="9.5" text-anchor="end" '
+          +'font-family="Roboto Mono,monospace" fill="'+(d<0?A:'#c53a3a')+'">'
+          +(d>0?'+':'−')+'$'+sig(Math.abs(d),3)+'</text>';
+    }
     s+='</g>';
   });
   s+='</g>';
@@ -796,7 +879,79 @@ function drawPFD(r){
     unit.addEventListener('pointerleave',()=>tip.classList.remove('on'));
     unit.addEventListener('focus',e=>show(unit,e));
     unit.addEventListener('blur',()=>tip.classList.remove('on'));
+    /* Selecting a block opens it in the inspector. Previously a click did nothing while
+       the element still announced itself as a button. */
+    unit.addEventListener('click',()=>{app.unit=+unit.dataset.unit;render();});
+    unit.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();app.unit=+unit.dataset.unit;render();}
+    });
   });
+  drawInspector(r);
+}
+
+/* ---------- equipment inspector ---------- */
+/* Each block reports what the user may set, what the model computed, and which
+   specification it is holding. Only the reactor has anything to set. */
+function drawInspector(r){
+  const eGJ=S.elec/GJ_per_kWh, B=app.baseRes;
+  const bGJ=B?app.baseline.elec/GJ_per_kWh:0;
+  /* Rows carry the number alongside its formatted form. Recovering it from the string
+     would lose the sign, because usd() prints U+2212 rather than a hyphen. */
+  const U=[
+    {t:'Reactor and transfer line exchanger',role:'adjustable',
+     set:'Coil outlet temperature, residence time, steam dilution, heating method and heat recovery, '
+        +'all on the controls above.',
+     out:[['Conversion',pctS(r.X*100),r.X*100,B?B.X*100:null,'pp',0.1],
+          ['Selectivity, mass',pctS(r.Smass*100),r.Smass*100,B?B.Smass*100:null,'pp',0.1],
+          ['Heating duty',sig(r.qDemand*kJ2GJ,3)+' GJ/t',r.qDemand*kJ2GJ,B?B.qDemand*kJ2GJ:null,'hide',THRESH.energy],
+          ['Heating cost',usd(r.L.heat)+'/t',r.L.heat,B?B.L.heat:null,'$',THRESH.cost,'cost'],
+          ['HP steam credit',usd(-r.L.steamCr)+'/t',-r.L.steamCr,B?-B.L.steamCr:null,'$',THRESH.cost],
+          ['Run length',sig(r.runDays,3)+' days',r.runDays,B?B.runDays:null,'hide',0.5]],
+     spec:null,
+     warn:'Steam generation and quench condensation duties are absent from the model. Raising '
+         +'dilution therefore lowers coking with no counterpart cost, and this control cannot '
+         +'locate an economic optimum.'},
+    {t:'T1 Drying, triethylene glycol',role:'fixed',
+     set:null,
+     out:[['Water condensed',sig(r.dilSteam,3)+' kg/kg',r.dilSteam,B?B.dilSteam:null,'hide',THRESH.flow]],
+     spec:'Dilution steam is removed ahead of the compressor, so it never passes through C1. '
+         +'The drying specification is held constant and carries no cost in this model.',warn:null},
+    {t:'C1 Compression, four stages',role:'calculated',
+     set:null,
+     out:[['Discharge pressure',sig(P_DISCH,3)+' bar',P_DISCH,null],
+          ['Gas to compressor',sig(r.nGas,4)+' mol/kg',r.nGas,B?B.nGas:null,'hide',0.01],
+          ['Shaft duty',sig(r.wComp*kJ2GJ,3)+' GJ/t',r.wComp*kJ2GJ,B?B.wComp*kJ2GJ:null,'hide',THRESH.energy],
+          ['Cost',usd(r.wComp*kJ2GJ*eGJ)+'/t',r.wComp*kJ2GJ*eGJ,B?B.wComp*kJ2GJ*bGJ:null,'$',THRESH.cost,'cost']],
+     spec:'Discharge pressure is fixed. Duty follows the molar flow, which grows with recycle.',warn:null},
+    {t:'T2 Cold box',role:'calculated',
+     set:null,
+     out:[['Temperature required',sig(r.tCold,4)+' C',r.tCold,B?B.tCold:null,'hide',THRESH.temp],
+          ['Light ends',pctS(r.lightFrac*100),r.lightFrac*100,B?B.lightFrac*100:null,'pp',0.1],
+          ['Refrigeration duty',sig(r.wRef*kJ2GJ,3)+' GJ/t',r.wRef*kJ2GJ,B?B.wRef*kJ2GJ:null,'hide',THRESH.energy],
+          ['Cost',usd(r.wRef*kJ2GJ*eGJ)+'/t',r.wRef*kJ2GJ*eGJ,B?B.wRef*kJ2GJ*bGJ:null,'$',THRESH.cost,'cost']],
+     spec:'Ethylene recovery of '+pctS(RECOVERY*100,4)+' is specified. The temperature is whatever '
+         +'meets it, so a larger methane fraction drives the box colder.',
+     warn:'Refrigeration work uses a Carnot bound with an assumed second-law efficiency of '
+         +pctS(ETA2*100,3)+'. No cryogenic utility price exists in the open literature to check it against.'},
+    {t:'T3 and T4 Fractionation',role:'calculated',
+     set:null,
+     out:[['Stages',sig(r.nAct,3),r.nAct,B?B.nAct:null,'hide',0.5],
+          ['Reflux ratio',sig(r.rRatio,3),r.rRatio,B?B.rRatio:null,'hide',0.02],
+          ['Minimum stages, Fenske',sig(r.nMin,3),r.nMin,null],
+          ['Cost',usd(r.wSplit*kJ2GJ*eGJ)+'/t',r.wSplit*kJ2GJ*eGJ,B?B.wSplit*kJ2GJ*bGJ:null,'$',THRESH.cost,'cost']],
+     spec:'Product purity of '+pctS(PURITY*100,4)+' is specified. Reflux ratio is an output of '
+         +'Fenske, Underwood and Gilliland, not an input.',warn:null}
+  ];
+  const u=U[app.unit]||U[0];
+  let h='<h3>'+u.t+'</h3><div class="role">'+u.role+'</div>';
+  if(u.set) h+='<div class="cap" style="margin-top:8px">'+u.set+'</div>';
+  h+='<table><tbody>'+u.out.map(([k,disp,now,was,unit,th,dir])=>
+      '<tr><td>'+k+'</td><td class="r">'+disp
+      +(was!=null?' '+dlt(now,was,unit,th,dir):'')+'</td></tr>'
+    ).join('')+'</tbody></table>';
+  if(u.spec) h+='<div class="cap" style="margin-top:9px">'+u.spec+'</div>';
+  if(u.warn) h+='<div class="warn">'+u.warn+'</div>';
+  $('insp').innerHTML=h;
 }
 
 /* ---------- cost table ---------- */
@@ -1262,6 +1417,51 @@ $('nav').innerHTML=TABS.map(([id,lab])=>'<button data-tab="'+id+'">'+lab+'</butt
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;render();});
 
 /* ---------- render ---------- */
+/* ---------- baseline and change tracking ---------- */
+/* A pinned baseline is what turns "the numbers moved" into "this is what your change did".
+   It is also the output this model is best at: a difference cancels the errors common to
+   both points, which the absolute level does not. */
+const app={baseline:null,baseRes:null,baseLca:null,unit:0};
+
+function snapshot(){
+  const r=model(S);
+  return {S:{...S},r,l:lca(r,S)};
+}
+function pinBaseline(){
+  const s=snapshot(); app.baseline=s.S; app.baseRes=s.r; app.baseLca=s.l; render();
+}
+function clearBaseline(){ app.baseline=null; app.baseRes=null; app.baseLca=null; render(); }
+function resetToBaseline(){
+  if(!app.baseline) return;
+  Object.assign(S,app.baseline);
+  $('sCot').value=S.cot; $('sTau').value=logInv(S.tau,0.05,1.5);
+  $('sDil').value=S.dilution; $('sCap').value=S.cap; $('sEff').value=S.eff; $('sSel').value=S.sel;
+  $('sEthane').value=logInv(S.ethane,50,900);
+  $('sElec').value=logInv(S.elec,0.008,0.30);
+  $('sGas').value=logInv(S.gas,1,30);
+  $('sGrid').value=S.grid; $('sEup').value=S.ethaneUp;
+  $('tTle').checked=S.tle;
+  applyModeLimits(); render();
+}
+
+/* Below these a change is rounding, not a result. Printing it would teach a precision the
+   model does not have. */
+const THRESH={flow:0.005,cost:0.10,temp:0.5,energy:0.01,ci:1,frac:0.005};
+
+/* dir tells the reader which way is better. Cost and carbon down is good; a flow is neither.
+   Units are repeated only where they would otherwise be ambiguous. A change in a percentage
+   is in percentage points, which is not the same as a percentage, so it is marked pp. Rows
+   whose value already carries a unit do not repeat it in the change. */
+function dlt(now,was,unit,thresh,dir){
+  if(was===null||was===undefined||!Number.isFinite(was)) return '';
+  const d=now-was;
+  if(Math.abs(d)<thresh) return '';
+  const cls=dir==='cost'?(d<0?'good':'bad'):'neu';
+  const mag=unit==='$'?'$'+sig(Math.abs(d),3)
+           :sig(Math.abs(d),3)+(unit==='pp'?' pp':unit&&unit!=='hide'?' '+unit:'');
+  return '<span class="dlt '+cls+'">'+(d>0?'+':'−')+mag+'</span>';
+}
+
 function render(){
   const r=model(S);
   /* A same-point comparison must sit inside both physical envelopes. Without this clamp,
@@ -1276,11 +1476,30 @@ function render(){
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===S.tab));
   TABS.forEach(([id])=>$('t-'+id).classList.toggle('on',id===S.tab));
   const staticTab=(S.tab==='cite');
+
+  /* Sticky readout. Cost and carbon come from one inventory, so they are shown together,
+     with the prices that produced them and the change against any pinned baseline. */
+  const lNow=lca(r,S), B=app.baseRes, BL=app.baseLca;
+  $('skCoo').textContent=usd(r.coo)+'/t';
+  $('skCi').textContent=sig(lNow.ci,4)+' kg/t';
+  $('skBe').textContent='$'+sig(be,3)+'/kWh';
+  $('skCooD').innerHTML=B?dlt(r.coo,B.coo,'$',THRESH.cost,'cost'):'';
+  $('skCiD').innerHTML=BL?dlt(lNow.ci,BL.ci,'kg/t',THRESH.ci,'cost'):'';
+  $('skPrices').textContent='Ethane $'+sig(S.ethane,3)+'/t · Power $'+sig(S.elec,3)
+    +'/kWh · Gas $'+sig(S.gas,3)+'/GJ · Grid '+sig(S.grid,3)+' kg CO2/kWh';
+  $('baseState').textContent=app.baseline
+    ? 'baseline '+usd(B.coo)+'/t at '+sig(app.baseline.cot,4)+' C, '+sig(app.baseline.tau,3)+' s, '
+      +(app.baseline.mode==='CH'?'fired':'Joule')
+    : '';
+  $('bReset').disabled=!app.baseline; $('bClear').disabled=!app.baseline;
+  $('bPin').textContent=app.baseline?'Re-pin here':'Pin baseline';
+  $('sticky').style.display=staticTab?'none':'';
   /* The overview leads with one number; the KPI band there would repeat it five ways. */
   $('kpis').style.display=(staticTab||S.tab==='main')?'none':'';
   document.querySelector('.strip').style.display=staticTab?'none':'';
   const gapPub=(r.coo-PUB.coo)/PUB.coo*100;
-  $('ovCoo').textContent=usd(r.coo);
+  /* The headline number lives in the sticky bar, where it stays visible while the knobs
+     move. Repeating it here in 46 px pushed the flowsheet off the first screen. */
   $('ovCtx').innerHTML=
     '<b>'+sig(r.coo/r.L.floor,3)+'x</b> the stoichiometric floor of <b>'+usd(r.L.floor)+'</b> · '
     +'published benchmark <b>'+usd(PUB.coo)+'</b> ('+(gapPub>0?'+':'−')+sig(Math.abs(gapPub),3)+'%)<br>'
@@ -1511,6 +1730,9 @@ function bestPoint(mode){
 }
 
 /* ---------- wiring ---------- */
+$('bPin').onclick=pinBaseline;
+$('bReset').onclick=resetToBaseline;
+$('bClear').onclick=clearBaseline;
 $('mCH').onclick=()=>{S.mode='CH';S.eff=60;$('sEff').value=60;applyModeLimits();render()};
 $('mJH').onclick=()=>{S.mode='JH';S.eff=95;$('sEff').value=95;applyModeLimits();render()};
 $('selCalc').onclick=()=>{S.selMode='calc';render()};
