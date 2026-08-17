@@ -431,9 +431,13 @@ const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'
 const MW={C2H6:30.07,C2H4:28.05,CH4:16.04,H2:2.016,C3:42.08,C:12.011};
 const FLOOR_RATIO=MW.C2H6/MW.C2H4;   // 1.0719 kg C2H6 per kg C2H4, analytic floor
 const P_DISCH=32, RECOVERY=0.995, PURITY=0.999;
-/* First-order ethane pyrolysis. Ea from Froment; the pre-exponential is
-   calibrated so that 850 C and 0.35 s give 65% conversion. */
-const EA=272800, A_PRE=1.470e13;
+/* First-order ethane pyrolysis. Ea from Froment. The pre-exponential is not an
+   independent measurement: it is whatever value forces the rate law through one
+   chosen operating point, so it is computed from that point rather than written
+   as a literal. Move CAL and the constant follows. */
+const EA=272800;
+const CAL={cot:850, tau:0.35, X:0.65};
+const A_PRE=(-Math.log(1-CAL.X)/CAL.tau)*Math.exp(EA/(8.314*(CAL.cot+273.15)));
 const H_RXN=145, CP_C2H6=3.0, CP_STEAM=2.3, T_PREHEAT=150;
 const LHV={CH4:50,H2:120};
 const ETA2=0.35, T_AMB=303, TLE_REC=0.70;
@@ -441,10 +445,10 @@ const REF={cap:610,tbmc:126.8};
 const SPLIT={furnace:.30,compression:.25,coldbox:.25,fractionation:.20};
 const kJ2GJ=1e-3;                    // kJ/kg → GJ/t
 const GJ_per_kWh=0.0036;
-/* Industrial operating window. Outside this the model extrapolates. */
-/* The selectivity correlation is anchored to industrial ethane cracking between roughly
-   45 and 85% single-pass conversion. Outside that it is being extrapolated, whichever
-   knob put it there. */
+/* Industrial operating window. Outside this the model extrapolates.
+   The conversion band below is the range over which the selectivity curve in SEL was
+   constructed, not a range over which it was tested. Outside it the curve is
+   extrapolating, whichever knob put it there. */
 const VALID={cap:[300,1200],eff:[55,96],sel:[78,88],X:[0.45,0.85],
              cot:[820,880],tau:[0.15,0.60],dilution:[0.25,0.50]};
 /* What each heating method can physically reach.
@@ -455,6 +459,26 @@ const VALID={cap:[300,1200],eff:[55,96],sel:[78,88],X:[0.45,0.85],
    envelope is modelled here; the steeper axial ramp and the flatter radial profile that
    internal heating also gives are not, so the Joule case below is conservative. */
 const MODE_LIMITS={CH:{cot:[760,900],tau:[0.20,1.50]},JH:{cot:[760,950],tau:[0.05,1.50]}};
+
+/* Selectivity against conversion. There is no dataset behind this curve. It is the unique
+   quadratic through three points taken as typical of reported industrial ethane cracking,
+   and it is written here as those three points rather than as fitted coefficients so that
+   the input stays visible. The anchors carry two significant figures. Any precision the
+   expanded coefficients appear to have is an artefact of the algebra, not evidence.
+   This is the most influential unsourced item in the model: it governs not only the
+   numbers but the direction of the fired against Joule conclusion. */
+const SEL_ANCHOR=[[0.50,0.93],[0.65,0.88],[0.80,0.82]];
+function selBase(X){
+  let s=0;
+  for(let i=0;i<3;i++){
+    let t=SEL_ANCHOR[i][1];
+    for(let j=0;j<3;j++) if(j!==i) t*=(X-SEL_ANCHOR[j][0])/(SEL_ANCHOR[i][0]-SEL_ANCHOR[j][0]);
+    s+=t;
+  }
+  return s;
+}
+/* Secondary corrections, one significant figure each, order of magnitude only. */
+const SEL_DIL=0.06, SEL_TAU=0.04;
 
 /* Emission factors. Combustion factors are stoichiometric; the rest are defaults the user can move. */
 const EF={
@@ -488,9 +512,9 @@ function model(p){
   /* 0b. Selectivity falls as conversion climbs. At equal conversion, shorter
      residence time at higher temperature wins: secondary reactions get less
      time. Dilution lowers partial pressure and suppresses bimolecular paths. */
-  let SmolCalc=1.0244-0.0778*X-0.2222*X*X
-              +0.06*(p.dilution-0.35)
-              +0.04*Math.log(0.35/p.tau);
+  let SmolCalc=selBase(X)
+              +SEL_DIL*(p.dilution-0.35)
+              +SEL_TAU*Math.log(0.35/p.tau);
   const SmolRaw=SmolCalc;
   SmolCalc=Math.min(0.985,Math.max(0.55,SmolCalc));
   const selClipped=(SmolCalc!==SmolRaw);
@@ -1411,13 +1435,20 @@ function render(){
 
   $('specBody').innerHTML=[
     ['Activation energy',sig(EA/1000,4)+' kJ/mol','Literature, first-order ethane pyrolysis'],
-    ['Pre-exponential','1.470e13 /s','Calibrated to 850 C, 0.35 s, 65% conversion'],
+    ['Pre-exponential',A_PRE.toExponential(2).replace('e+','e')+' /s','Not measured. Computed to force the rate law through '
+      +CAL.cot+' C, '+sig(CAL.tau,2)+' s, '+sig(CAL.X*100,2)+'% conversion'],
     ['Fired envelope',MODE_LIMITS.CH.cot[0]+' to '+MODE_LIMITS.CH.cot[1]+' C, '
       +sig(MODE_LIMITS.CH.tau[0],2)+' s and longer','Assumption: tube wall alloy limit and radiant flux'],
     ['Joule envelope',MODE_LIMITS.JH.cot[0]+' to '+MODE_LIMITS.JH.cot[1]+' C, '
       +sig(MODE_LIMITS.JH.tau[0],2)+' s and longer','Assumption: heat released inside the reacting volume'],
-    ['Selectivity correlation range',sig(VALID.X[0]*100,2)+' to '+sig(VALID.X[1]*100,2)+'% conversion',
-     'Anchored to industrial ethane cracking. Outside this the curve is extrapolated'],
+    ['Selectivity curve',SEL_ANCHOR.map(([x,s])=>sig(x*100,2)+'%&thinsp;&rarr;&thinsp;'+sig(s*100,2)+'%').join(', '),
+     'No dataset. Quadratic through three points taken as typical of reported ethane cracking. '
+     +'The largest unsourced term in the model'],
+    ['Selectivity curve range',sig(VALID.X[0]*100,2)+' to '+sig(VALID.X[1]*100,2)+'% conversion',
+     'Where the curve runs unflagged. The three points span '+sig(SEL_ANCHOR[0][0]*100,2)+' to '
+     +sig(SEL_ANCHOR[2][0]*100,2)+'%, so the edges of this band are already extrapolation'],
+    ['Dilution and residence corrections',sig(SEL_DIL,1)+' per unit steam ratio, '+sig(SEL_TAU,1)+' per ln s',
+     'Assumption, one significant figure, direction and order of magnitude only'],
     ['Compressor discharge',sig(P_DISCH,3)+' bar','Design constant'],
     ['Product purity',pctS(PURITY*100,4)+' mol','Downstream specification, met by FUG'],
     ['Cold box recovery',pctS(RECOVERY*100,4),'Downstream specification, sets required temperature'],
