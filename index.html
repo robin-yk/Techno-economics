@@ -509,15 +509,29 @@ const MODE_LIMITS={CH:{cot:[760,900],tau:[0.20,1.50]},JH:{cot:[760,950],tau:[0.0
    This is the most influential unsourced item in the model: it governs not only the
    numbers but the direction of the fired against Joule conclusion. */
 const SEL_ANCHOR=[[0.50,0.93],[0.65,0.88],[0.80,0.82]];
-function selBase(X){
+function selBase(X,A){
+  A=A||SEL_ANCHOR;
   let s=0;
   for(let i=0;i<3;i++){
-    let t=SEL_ANCHOR[i][1];
-    for(let j=0;j<3;j++) if(j!==i) t*=(X-SEL_ANCHOR[j][0])/(SEL_ANCHOR[i][0]-SEL_ANCHOR[j][0]);
+    let t=A[i][1];
+    for(let j=0;j<3;j++) if(j!==i) t*=(X-A[j][0])/(A[i][0]-A[j][0]);
     s+=t;
   }
   return s;
 }
+/* The three anchors are remembered to two significant figures, so a couple of points
+   either way is inside their uncertainty. Re-running on these variants is how the tool
+   separates a conclusion that survives the curve from a number that only exists because
+   of it. Symmetric pairs, so the set does not bias the answer in either direction. */
+const SEL_VARIANTS=[
+  [[0.50,0.93],[0.65,0.88],[0.80,0.82]],
+  [[0.50,0.93],[0.65,0.88],[0.80,0.80]],
+  [[0.50,0.93],[0.65,0.88],[0.80,0.84]],
+  [[0.50,0.93],[0.65,0.86],[0.80,0.82]],
+  [[0.50,0.93],[0.65,0.90],[0.80,0.82]],
+  [[0.50,0.91],[0.65,0.86],[0.80,0.80]],
+  [[0.50,0.95],[0.65,0.90],[0.80,0.84]]
+];
 /* Secondary corrections, one significant figure each, order of magnitude only. */
 const SEL_DIL=0.06, SEL_TAU=0.04;
 
@@ -553,7 +567,7 @@ function model(p){
   /* 0b. Selectivity falls as conversion climbs. At equal conversion, shorter
      residence time at higher temperature wins: secondary reactions get less
      time. Dilution lowers partial pressure and suppresses bimolecular paths. */
-  let SmolCalc=selBase(X)
+  let SmolCalc=selBase(X,p.selAnchor)
               +SEL_DIL*(p.dilution-0.35)
               +SEL_TAU*Math.log(0.35/p.tau);
   const SmolRaw=SmolCalc;
@@ -1617,7 +1631,18 @@ function render(){
       +'At that point the reactor requires '+sig(rCH.qDemand*kJ2GJ,3)+' GJ/t of useful heat. Purchased energy is '
       +sig(rCH.qDeliver*kJ2GJ,3)+' GJ/t for fired heating and '+sig(rJH.qDeliver*kJ2GJ,3)+' GJ/t for Joule heating. '
       +'The first row is the energy-source effect alone. The next two rows let each route move to the cheapest '
-      +'point inside its own envelope, and the rows add up exactly to the net gap.';
+      +'point inside its own envelope, and the rows add up exactly to the net gap.'
+      +(()=>{const q=robustOptimum('CH'), j=robustOptimum('JH');
+        if(!q||!j) return '<br><br><b>How firm are the two middle rows.</b> Re-running the search across the '
+          +'selectivity curve variants, one moment.';
+        return '<br><br><b>How firm are the two middle rows.</b> The best point is located by the selectivity '
+        +'curve, and that curve rests on three remembered points rather than on data. Re-running the search across '
+        +q.n+' variants of those points, each within their two significant figures, moves the fired optimum over '
+        +sig(q.cotLo,4)+' to '+sig(q.cotHi,4)+' C and its value over '+usd(q.saveLo)+' to '+usd(q.saveHi)+'/t. '
+        +'The Joule optimum moves over '+sig(j.cotLo,4)+' to '+sig(j.cotHi,4)+' C, worth '+usd(j.saveLo)+' to '
+        +usd(j.saveHi)+'/t. Every variant still produces an optimum in the same place in the argument, so the '
+        +'trade-off between conversion, selectivity and run length is a result. Where it sits, and what it is '
+        +'worth, is not.';})();
     const range=(label,y,axisMin,axisMax,lo,hi,best,color,fmt)=>{const x0=185,x1=690,scale=v=>x0+(v-axisMin)/(axisMax-axisMin)*(x1-x0);
       return '<text x="8" y="'+(y+5)+'" font-size="12" fill="#212529">'+label+'</text><line x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'" stroke="#e3e7ea" stroke-width="8" stroke-linecap="round"/>'
         +'<line x1="'+scale(lo)+'" y1="'+y+'" x2="'+scale(hi)+'" y2="'+y+'" stroke="'+color+'" stroke-width="8" stroke-linecap="round"/><circle cx="'+scale(best)+'" cy="'+y+'" r="6" fill="#fff" stroke="'+color+'" stroke-width="3"/>'
@@ -1696,6 +1721,43 @@ function applyModeLimits(){
 
 /* Cheapest reachable point for a heating method. Grid scan; only run on the compare tab. */
 let _bpKey='', _bpVal={};
+/* ---------- how firm is a reported optimum ---------- */
+/* An optimum located by this model is located by the selectivity curve, and that curve has
+   no data behind it. Re-running the search on the anchor variants shows which part of the
+   answer survives: every variant produces an optimum, so the trade-off is real, while the
+   temperature it sits at and the money it is worth move a great deal. Reported as a range,
+   because a single number here would be the more precise and the less true answer. */
+let _robKey='', _robVal={}, _robTimer=null;
+function robustScan(mode){
+  const eff=mode==='CH'?60:95, W=MODE_LIMITS[mode];
+  const ts=[], saves=[];
+  for(const A of SEL_VARIANTS){
+    let best={coo:Infinity,cot:W.cot[0]};
+    /* Coarse on purpose. The output is a range, so resolving each variant's optimum to the
+       degree would cost time and add nothing the range does not already carry. */
+    for(let t=W.cot[0];t<=W.cot[1];t+=10)
+      for(let i=0;i<=6;i++){
+        const tau=W.tau[0]*Math.pow(W.tau[1]/W.tau[0],i/6);
+        const c=model({...S,mode,eff,cot:t,tau,selAnchor:A}).coo;
+        if(c<best.coo) best={coo:c,cot:t};
+      }
+    ts.push(best.cot); saves.push(model({...S,mode,eff,selAnchor:A}).coo-best.coo);
+  }
+  return {cotLo:Math.min(...ts),cotHi:Math.max(...ts),
+          saveLo:Math.min(...saves),saveHi:Math.max(...saves),n:SEL_VARIANTS.length};
+}
+/* Returns null while the answer is stale. The scan is far too heavy to run on every input
+   event of a price drag, so a changed key schedules it and the caller renders without it
+   until it lands. mode is deliberately not in the key: both modes are stored side by side,
+   so including it would make each call evict the other and recompute both every render. */
+function robustOptimum(mode){
+  const key=[S.cap,S.dilution,S.tle,S.ethane,S.elec,S.gas,S.steam,S.lpg,S.ccf,S.labor].join('|');
+  if(key===_robKey) return _robVal[mode]||(_robVal[mode]=robustScan(mode));
+  clearTimeout(_robTimer);
+  _robTimer=setTimeout(()=>{_robKey=key;_robVal={};render();},200);
+  return null;
+}
+
 function bestPoint(mode){
   const key=[S.cap,S.dilution,S.tle,S.ethane,S.elec,S.gas,S.steam,S.lpg,S.ccf,S.labor,S.selMode,S.sel].join('|');
   if(key!==_bpKey){_bpKey=key;_bpVal={};}
