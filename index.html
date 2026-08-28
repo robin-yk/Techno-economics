@@ -344,47 +344,12 @@ svg{display:block;width:100%;height:auto}
 
   <div class="tab" id="t-compare">
     <div class="compare-shell">
-    <h2>Fired vs Joule heating</h2>
-  <section class="plant-hero" id="plantHero">
-    <div class="hero-head"><h2>Two ways to crack ethane.</h2><span class="hint">Hover a route to see what changes</span></div>
-    <div class="route-visual" aria-label="Visual comparison of fired and Joule ethane cracking">
-      <div class="route-scene fired" tabindex="0">
-        <span class="route-name">Fired</span>
-        <svg class="scene-art" viewBox="0 0 430 220" aria-hidden="true">
-          <path d="M40 176H390" stroke="#dfe3e5"/><path d="M84 176V70Q84 48 106 48H304Q326 48 326 70V176" fill="none" stroke="#586168" stroke-width="4"/>
-          <path d="M119 155c-13-22 13-32 5-54 25 17 23 35 11 54M180 155c-14-26 16-37 7-64 29 20 26 43 12 64M250 155c-13-22 13-32 5-54 25 17 23 35 11 54" fill="#d08a55"/>
-          <path d="M112 83H297" stroke="#9d5d32" stroke-width="13" opacity=".18"/><path d="M112 83H297" stroke="#9d5d32" stroke-width="3"/>
-          <path d="M51 83H109M300 83H365" stroke="#212529" stroke-width="2"/><path d="m358 77 10 6-10 6" fill="none" stroke="#212529" stroke-width="2"/>
-          <text x="205" y="27" text-anchor="middle" font-size="11" fill="#6c757d">FLAME → TUBE WALL → GAS</text>
-        </svg>
-        <div class="route-cost"><span id="heroCHCost"></span><small>per tonne ethylene</small></div>
-        <div class="route-pop"><b>Heat crosses the tube wall</b><p>Cheap fuel, but wall temperature and radiant heat flux constrain how hot and short the reactor can run.</p><div class="pop-metrics"><span>Efficiency<strong>60%</strong></span><span>Envelope<strong>≤ 900 °C</strong></span><span>Exposure<strong>Gas price</strong></span></div></div>
-      </div>
-      <div class="molecule"><div class="mol-mark">C₂H₄</div></div>
-      <div class="route-scene joule" tabindex="0">
-        <span class="route-name">Joule</span>
-        <svg class="scene-art" viewBox="0 0 430 220" aria-hidden="true">
-          <path d="M40 176H390" stroke="#dfe3e5"/><rect x="94" y="60" width="224" height="48" rx="24" fill="#e8f4f1" stroke="#2f8f83" stroke-width="2"/>
-          <path d="M50 84H92M320 84H374" stroke="#212529" stroke-width="2"/><path d="m367 78 10 6-10 6" fill="none" stroke="#212529" stroke-width="2"/>
-          <path d="m130 84 20-11 20 22 20-22 20 22 20-22 20 22 20-11" fill="none" stroke="#2f8f83" stroke-width="3"/>
-          <path d="M207 39V55M197 47h20" stroke="#2f8f83" stroke-width="2"/><circle cx="207" cy="31" r="8" fill="none" stroke="#2f8f83" stroke-width="2"/>
-          <path d="M132 129v31M159 122v38M186 133v27M228 128v32M255 120v40M282 132v28" stroke="#2f8f83" stroke-width="2" opacity=".35"/>
-          <text x="207" y="27" text-anchor="middle" font-size="11" fill="#6c757d">POWER → RESISTANCE → GAS</text>
-        </svg>
-        <div class="route-cost"><span id="heroJHCost"></span><small>per tonne ethylene</small></div>
-        <div class="route-pop"><b>Heat is generated in the reactor</b><p>Less purchased energy and a wider operating envelope, exchanged for direct exposure to electricity price.</p><div class="pop-metrics"><span>Efficiency<strong>95%</strong></span><span>Envelope<strong>≤ 950 °C</strong></span><span>Exposure<strong>Power price</strong></span></div></div>
-      </div>
-    </div>
-    <div class="hero-foot"><span class="hero-verdict" id="heroDetail"></span></div>
-  </section>
-    <section class="decision" aria-live="polite"><div><div class="eyebrow">Current decision</div><div class="verdict" id="decisionVerdict"></div><div class="basis" id="decisionBasis"></div></div><div class="be"><div class="eyebrow">Break-even power</div><div class="beval" id="decisionBE"></div><div class="be-track"><i id="beMark" title="Break-even power"></i><b id="powerMark" title="Current power price"></b></div><div class="legend"><span>line · break-even</span><span>dot · current</span></div></div></section>
-    <h3>Common feasible point: the energy-source effect</h3>
-    <div class="cards">
-      <div class="card route-card" id="cardCH"><div class="eyebrow">Fired route</div><div class="big" id="vsCH"></div><div class="d" id="vsCHd"></div><div class="route-metrics" id="metricsCH"></div></div>
-      <div class="card route-card" id="cardJH"><div class="eyebrow">Joule route</div><div class="big" id="vsJH"></div><div class="d" id="vsJHd"></div><div class="route-metrics" id="metricsJH"></div></div>
-    </div>
-    <div class="value-bridge"><h3>What creates the gap</h3><svg id="bridgeChart" viewBox="0 0 760 252" role="img" aria-label="Cost gap bridge between fired and Joule heating"></svg><div class="cap" id="bridgeCap"></div></div>
-    <div class="envelope"><h3>Assumed operating envelopes and lowest points found</h3><svg id="envelopeChart" viewBox="0 0 760 285" role="img" aria-label="Fired and Joule temperature and residence-time envelopes"></svg><div class="cap" id="envCap"></div></div>
+    <figure class="plate">
+      <svg id="fig2" viewBox="0 0 504.57 478" role="img"
+           aria-label="Figure 2. Fired against Joule heating"></svg>
+      <figcaption id="fig2cap"></figcaption>
+    </figure>
+
     <div class="compare-note"><b>Boundary of this comparison.</b> The model prices efficiency and the assumed
       temperature and residence-time envelopes. It does not yet size Joule-specific electrical equipment, model
       temperature profiles, or assign route-specific capital and element-replacement costs. The result is a
@@ -1051,9 +1016,10 @@ const FIG={
   ink:'#000000', grey:'#7a7a7a', pale:'#c8c8c8',
   teal:'#12726a', orange:'#c0561a'
 };
+/* Plain numbers on every axis. A thousands abbreviation saves three characters and costs the
+   reader a unit conversion in the middle of reading a scale. */
 const fnum=(v,n)=>{
   const a=Math.abs(v);
-  if(a>=1000) return (v/1000).toFixed(a>=10000?0:1).replace(/\.0$/,'')+'k';
   return String(+Number(v).toFixed(n===undefined?(a>=100?0:a>=10?1:2):n));
 };
 /* Draws the frame that a dashboard widget leaves out: four sides, ticks pointing in, no
@@ -1206,6 +1172,98 @@ function band(el,min,max,lo,hi,cur){
   const p=v=>(v-min)/(max-min)*100;
   el.innerHTML='<i style="left:'+p(lo)+'%;width:'+(p(hi)-p(lo))+'%"></i><u style="left:'+p(cur)+'%"></u>';
   el.title='Validated range '+sig(lo,3)+' to '+sig(hi,3)+'. Outside this the model extrapolates.';
+}
+
+/* ---------- Figure 2. Fired against Joule ---------- */
+/* Panel c is the one that earns its place. Two curves against power price cross at the
+   break-even, so the number that used to need a paragraph is a point on a plot. */
+function drawFig2(rCH,rJH,cot,tau,be){
+  const F=FIG;
+  let s='<g>';
+
+  /* a. The two routes at a point both can physically reach. */
+  const hiA=Math.max(rCH.coo,rJH.coo)*1.14;
+  const A=axes({x:132,y:22,w:318,h:52,xlim:[0,hiA],nx:5,ycat:['Fired','Joule'],
+                xlab:'Cost of ethylene (USD per tonne)'});
+  s+=panel('a',2,16)+A.s;
+  [[rCH,F.grey],[rJH,F.orange]].forEach((d,i)=>{
+    const y=22+i*26;
+    s+='<rect x="'+A.X(0)+'" y="'+(y+6)+'" width="'+(A.X(d[0].coo)-A.X(0))+'" height="14" fill="'+d[1]+'"/>'
+      +ftext(fnum(d[0].coo),A.X(d[0].coo)+3,y+16.5,{});
+  });
+  s+='<path d="M'+A.X(rCH.coo)+' 22V74" stroke="'+F.ink+'" stroke-width="'+F.ax+'" stroke-dasharray="3 2" fill="none"/>';
+
+  /* b. Where the gap comes from. The rows add to the net exactly. */
+  const dSame=rJH.coo-rCH.coo, bCH=bestPoint('CH'), bJH=bestPoint('JH');
+  const rows=[['Energy source, common point',dSame],
+              ['Fired moves to its best point',rCH.coo-bCH.coo],
+              ['Joule moves to its best point',-(rJH.coo-bJH.coo)],
+              ['Net, each at its best',bJH.coo-bCH.coo]];
+  const mB=Math.max(1,...rows.map(x=>Math.abs(x[1])))*1.25;
+  const B=axes({x:200,y:114,w:250,h:76,xlim:[-mB,mB],nx:5,ycat:rows.map(x=>x[0]),
+                xlab:'Effect on the gap (USD per tonne)',
+                xfmt:t=>(t>0?'+':t<0?'−':'')+fnum(Math.abs(t))});
+  s+=panel('b',2,108)+B.s;
+  const rhB=76/rows.length, zB=B.X(0);
+  s+='<path d="M'+zB+' 114V190" stroke="'+F.ink+'" stroke-width="'+F.ax+'" fill="none"/>';
+  rows.forEach(([,v],i)=>{
+    const y=114+i*rhB, x1=Math.min(zB,B.X(v));
+    s+='<rect x="'+x1+'" y="'+(y+rhB*0.28)+'" width="'+Math.max(0.7,Math.abs(B.X(v)-zB))+'" height="'+(rhB*0.44)
+      +'" fill="'+(i===3?F.ink:v<0?F.teal:F.grey)+'"/>'
+      +ftext((v>0?'+':'−')+fnum(Math.abs(v)),(v<0?x1-3:zB+Math.abs(B.X(v)-zB)+3),y+rhB*0.62,
+             {anchor:v<0?'end':'start',weight:i===3?'bold':null});
+  });
+
+  /* c. Cost against power price. Fired barely moves; Joule is a straight line through it. */
+  const eLo=0.01, eHi=Math.max(0.16,S.elec*1.6,be*1.6), n=64;
+  const cp={...S,cot,tau}, pts=[];
+  for(let i=0;i<=n;i++){const e=eLo+(eHi-eLo)*i/n;
+    pts.push([e,model({...cp,mode:'CH',eff:60,elec:e}).coo,model({...cp,mode:'JH',eff:95,elec:e}).coo]);}
+  const yLo=Math.min(...pts.map(p=>Math.min(p[1],p[2]))), yHi=Math.max(...pts.map(p=>Math.max(p[1],p[2])));
+  const pad=(yHi-yLo)*0.08;
+  const C=axes({x:52,y:238,w:398,h:158,xlim:[eLo,eHi],ylim:[yLo-pad,yHi+pad],nx:6,ny:5,
+                xlab:'Power price (USD per kWh)',ylab:'Cost of ethylene (USD per tonne)',ypad:30,
+                xfmt:t=>t.toFixed(2)});
+  s+=panel('c',2,232)+C.s;
+  const path=k=>'M'+pts.map(p=>C.X(p[0])+' '+C.Y(p[k])).join('L');
+  s+='<path d="'+path(1)+'" fill="none" stroke="'+F.grey+'" stroke-width="'+F.data+'" stroke-linejoin="round"/>';
+  s+='<path d="'+path(2)+'" fill="none" stroke="'+F.orange+'" stroke-width="'+F.data+'" stroke-linejoin="round"/>';
+  if(be>eLo&&be<eHi){
+    const bx=C.X(be), byv=model({...cp,mode:'CH',eff:60,elec:be}).coo;
+    s+='<path d="M'+bx+' 238V396" stroke="'+F.ink+'" stroke-width="'+F.ax+'" stroke-dasharray="3 2" fill="none"/>';
+    s+='<circle cx="'+bx+'" cy="'+C.Y(byv)+'" r="2.6" fill="#fff" stroke="'+F.ink+'" stroke-width="1.1"/>';
+    s+=ftext('break-even '+be.toFixed(4).replace(/0+$/,'')+' USD kWh',bx+3.5,246,{});
+  }
+  if(S.elec>eLo&&S.elec<eHi){
+    const px=C.X(S.elec);
+    s+='<path d="M'+px+' 238V396" stroke="'+F.grey+'" stroke-width="'+F.ax+'" stroke-dasharray="1 2" fill="none"/>'
+      +ftext('now',px+3,392,{fill:F.grey});
+  }
+  s+='<rect x="'+(452-70)+'" y="248" width="7" height="3" fill="'+F.grey+'"/>'+ftext('Fired',390,251.5,{})
+   +'<rect x="'+(452-70)+'" y="256" width="7" height="3" fill="'+F.orange+'"/>'+ftext('Joule',390,259.5,{});
+  $('fig2').innerHTML=s+'</g>';
+
+  const q=robustOptimum('CH'), j=robustOptimum('JH');
+  $('fig2cap').innerHTML='<b>Figure 2 | Fired against Joule heating.</b> '
+    +'<b>a</b>, Cost of ethylene at '+sig(cot,4)+'&thinsp;&deg;C and '+sig(tau,3)+'&thinsp;s, a point inside both '
+    +'envelopes. Broken line, the fired value. The reactor requires '+sig(rCH.qDemand*kJ2GJ,3)
+    +'&thinsp;GJ&thinsp;t<sup>&minus;1</sup> of useful heat; purchased energy is '+sig(rCH.qDeliver*kJ2GJ,3)
+    +' against '+sig(rJH.qDeliver*kJ2GJ,3)+'&thinsp;GJ&thinsp;t<sup>&minus;1</sup>. '
+    +'<b>b</b>, Decomposition of the gap. The first bar is the energy source alone; the next two let each route '
+    +'reach the cheapest point inside its own envelope, capped at '+MODE_LIMITS.CH.cot[1]+' and '
+    +MODE_LIMITS.JH.cot[1]+'&thinsp;&deg;C respectively. The three add to the net exactly. '
+    +'<b>c</b>, Cost against power price at the same point, all other prices held. The fired curve is nearly flat '
+    +'because that route buys gas; the Joule curve is a straight line through it. The crossing at '
+    +'$'+sig(be,3)+'&thinsp;kWh<sup>&minus;1</sup> is the break-even, and it is a market quantity rather than a '
+    +'property of either reactor.'
+    +(q&&j ? '<br><br>The two middle bars in <b>b</b> are located by the selectivity curve, which rests on three '
+      +'remembered points rather than on data. Re-running the search across '+q.n+' variants of those points, each '
+      +'within their two significant figures, moves the fired optimum over '+sig(q.cotLo,4)+' to '+sig(q.cotHi,4)
+      +'&thinsp;&deg;C and its value over '+usd(q.saveLo)+' to '+usd(q.saveHi)+'&thinsp;t<sup>&minus;1</sup>; the '
+      +'Joule optimum over '+sig(j.cotLo,4)+' to '+sig(j.cotHi,4)+'&thinsp;&deg;C, worth '+usd(j.saveLo)+' to '
+      +usd(j.saveHi)+'&thinsp;t<sup>&minus;1</sup>. Every variant still produces an optimum, so the trade-off '
+      +'between conversion, selectivity and run length is a result. Where it sits, and what it is worth, is not.'
+      : '<br><br>Re-running the optimum search across the selectivity curve variants, one moment.');
 }
 
 /* ---------- carbon intensity waterfall ---------- */
@@ -1646,11 +1704,6 @@ function render(){
     +'</b>/t at this power price · break-even <b>$'+sig(be,3)+'</b>/kWh '
     +'<button class="golink" data-go="compare">compare →</button>';
   document.querySelectorAll('.golink').forEach(g=>g.onclick=()=>{S.tab=g.dataset.go;render();scrollTo({top:0});});
-  const heroWinner=rJH.coo<rCH.coo?'Joule':'Fired';
-  $('heroCHCost').textContent=usd(rCH.coo)+'/t';
-  $('heroJHCost').textContent=usd(rJH.coo)+'/t';
-  $('heroDetail').innerHTML='<b>'+heroWinner+' is lower by '+usd(Math.abs(rJH.coo-rCH.coo))+'/t</b>'
-    +' at the common '+sig(commonCot,4)+' °C, '+sig(commonTau,3)+' s point · break-even power $'+sig(be,3)+'/kWh';
 
   $('kpis').innerHTML=[
     ['Cost of ethylene',usd(r.coo),sig(r.coo/r.L.floor,3)+'x the floor of '+usd(r.L.floor),
@@ -1719,86 +1772,7 @@ function render(){
   const lci=renderCarbon(r); renderExplained(r,lci);
 
 
-  $('vsCH').textContent=usd(rCH.coo); $('vsJH').textContent=usd(rJH.coo);
-  $('vsCHd').innerHTML='60% efficiency, gas $'+sig(S.gas,3)+'/GJ, delivered heat $'+sig(S.gas/0.60,3)+'/GJ';
-  $('vsJHd').innerHTML='95% efficiency, power $'+sig(S.elec,3)+'/kWh, delivered heat $'+sig(S.elec/GJ_per_kWh/0.95,3)+'/GJ';
-  $('cardCH').className='card route-card'+(S.mode==='CH'?' on':'');
-  $('cardJH').className='card route-card'+(S.mode==='JH'?' on':'');
-
-  if(S.tab==='compare'){
-    const bCH=bestPoint('CH'), bJH=bestPoint('JH');
-    const dEnv=bJH.coo-bCH.coo, dSame=rJH.coo-rCH.coo;
-    const saveCH=rCH.coo-bCH.coo, saveJH=rJH.coo-bJH.coo;
-    const winner=dEnv<0?'Joule':'Fired', gap=Math.abs(dEnv);
-    $('decisionVerdict').textContent=winner+' is lower by '+usd(gap)+'/t';
-    $('decisionBasis').textContent='Lowest points found at power $'+sig(S.elec,3)+'/kWh and gas $'+sig(S.gas,3)+'/GJ';
-    $('decisionBE').textContent='$'+sig(be,3)+'/kWh';
-    $('beMark').style.left=Math.min(100,be/0.15*100)+'%';
-    $('powerMark').style.left=Math.min(100,S.elec/0.15*100)+'%';
-    const metrics=(m,source)=>'<div><span>Efficiency</span><b>'+sig(m===rCH?60:95,2)+'%</b></div>'
-      +'<div><span>Purchased heat</span><b>'+sig(m.qDeliver*kJ2GJ,3)+' GJ/t</b></div>'
-      +'<div><span>Exposure</span><b>'+source+'</b></div>';
-    $('metricsCH').innerHTML=metrics(rCH,'natural gas'); $('metricsJH').innerHTML=metrics(rJH,'power');
-
-    /* dSame + saveCH − saveJH = dEnv exactly, so the rows add up. Lumping the two
-       re-optimisations into one "envelope effect" conflated them. */
-    const bridge=[['Energy source at the common point',dSame],
-                  ['Fired moves to its own best point',saveCH],
-                  ['Joule moves to its own best point',-saveJH],
-                  ['Net, each at its best',dEnv]];
-    const maxGap=Math.max(1,...bridge.map(x=>Math.abs(x[1]))), zero=380, span=245;
-    let bs='<line x1="'+zero+'" y1="14" x2="'+zero+'" y2="216" stroke="#adb5bd"/>';
-    bridge.forEach(([label,v],i)=>{const y=26+i*50,w=Math.abs(v)/maxGap*span,x=v<0?zero-w:zero;
-      const fill=i===3?'#212529':(v<0?'#2f8f83':'#6c757d');
-      bs+='<text x="8" y="'+(y+15)+'" font-size="13" fill="#212529">'+label+'</text>'
-        +'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="22" rx="3" fill="'+fill+'"><title>'
-        +(v>0?'Joule costs more by ':'Joule saves ')+usd(Math.abs(v))+'/t</title></rect>'
-        +'<text x="'+(v<0?x-8:zero+w+8)+'" y="'+(y+16)+'" text-anchor="'+(v<0?'end':'start')+'" font-family="monospace" font-size="13" font-weight="700" fill="'+fill+'">'
-        +(v>0?'+':'−')+usd(Math.abs(v))+'/t</text>';});
-    bs+='<text x="'+(zero-8)+'" y="240" text-anchor="end" font-size="11" fill="#6c757d">narrows the gap</text><text x="'+(zero+8)+'" y="240" font-size="11" fill="#6c757d">widens the gap</text>';
-    $('bridgeChart').innerHTML=bs;
-    $('bridgeCap').innerHTML='The common point is '+sig(commonCot,4)+' C and '+sig(commonTau,3)+' s, which both routes can reach. '
-      +'At that point the reactor requires '+sig(rCH.qDemand*kJ2GJ,3)+' GJ/t of useful heat. Purchased energy is '
-      +sig(rCH.qDeliver*kJ2GJ,3)+' GJ/t for fired heating and '+sig(rJH.qDeliver*kJ2GJ,3)+' GJ/t for Joule heating. '
-      +'The first row is the energy-source effect alone. The next two rows let each route move to the cheapest '
-      +'point inside its own envelope, and the rows add up exactly to the net gap.'
-      +(()=>{const q=robustOptimum('CH'), j=robustOptimum('JH');
-        if(!q||!j) return '<br><br><b>How firm are the two middle rows.</b> Re-running the search across the '
-          +'selectivity curve variants, one moment.';
-        return '<br><br><b>How firm are the two middle rows.</b> The best point is located by the selectivity '
-        +'curve, and that curve rests on three remembered points rather than on data. Re-running the search across '
-        +q.n+' variants of those points, each within their two significant figures, moves the fired optimum over '
-        +sig(q.cotLo,4)+' to '+sig(q.cotHi,4)+' C and its value over '+usd(q.saveLo)+' to '+usd(q.saveHi)+'/t. '
-        +'The Joule optimum moves over '+sig(j.cotLo,4)+' to '+sig(j.cotHi,4)+' C, worth '+usd(j.saveLo)+' to '
-        +usd(j.saveHi)+'/t. Every variant still produces an optimum in the same place in the argument, so the '
-        +'trade-off between conversion, selectivity and run length is a result. Where it sits, and what it is '
-        +'worth, is not.';})();
-    const range=(label,y,axisMin,axisMax,lo,hi,best,color,fmt)=>{const x0=185,x1=690,scale=v=>x0+(v-axisMin)/(axisMax-axisMin)*(x1-x0);
-      return '<text x="8" y="'+(y+5)+'" font-size="12" fill="#212529">'+label+'</text><line x1="'+x0+'" y1="'+y+'" x2="'+x1+'" y2="'+y+'" stroke="#e3e7ea" stroke-width="8" stroke-linecap="round"/>'
-        +'<line x1="'+scale(lo)+'" y1="'+y+'" x2="'+scale(hi)+'" y2="'+y+'" stroke="'+color+'" stroke-width="8" stroke-linecap="round"/><circle cx="'+scale(best)+'" cy="'+y+'" r="6" fill="#fff" stroke="'+color+'" stroke-width="3"/>'
-        +'<text x="'+scale(lo)+'" y="'+(y+21)+'" font-size="10.5" fill="#6c757d">'+fmt(lo)+'</text><text x="'+scale(hi)+'" y="'+(y+21)+'" text-anchor="end" font-size="10.5" fill="#6c757d">'+fmt(hi)+'</text><text x="'+scale(best)+'" y="'+(y-13)+'" text-anchor="middle" font-family="monospace" font-size="11" font-weight="700">'+fmt(best)+'</text>';};
-    let es='<text x="8" y="18" font-size="11" fill="#6c757d">COIL OUTLET TEMPERATURE</text>'
-      +range('Fired',55,760,950,760,900,bCH.cot,'#6c757d',v=>sig(v,4)+' C')+range('Joule',112,760,950,760,950,bJH.cot,'#2f8f83',v=>sig(v,4)+' C')
-      +'<text x="8" y="158" font-size="11" fill="#6c757d">RESIDENCE TIME (LOG SCALE)</text>';
-    const logRange=(label,y,lo,hi,best,color)=>range(label,y,Math.log(.05),Math.log(1.5),Math.log(lo),Math.log(hi),Math.log(best),color,v=>sig(Math.exp(v),3)+' s');
-    es+=logRange('Fired',194,.20,1.5,bCH.tau,'#6c757d')+logRange('Joule',250,.05,1.5,bJH.tau,'#2f8f83');
-    $('envelopeChart').innerHTML=es;
-    $('envCap').innerHTML='A fired furnace passes heat through the tube wall, so the metal runs hotter '
-      +'than the gas. Alloy limits cap the coil outlet near '+MODE_LIMITS.CH.cot[1]+' C and the achievable '
-      +'radiant flux sets a floor on residence time near '+sig(MODE_LIMITS.CH.tau[0],2)+' s. Joule heating '
-      +'releases heat inside the reacting volume, so it reaches '+MODE_LIMITS.JH.cot[1]+' C and '
-      +sig(MODE_LIMITS.JH.tau[0],2)+' s. Running hotter and shorter raises selectivity, because the ethylene '
-      +'already made has less time to break down further.<br>'
-      +'Held at the same operating point, Joule is '+usd(Math.abs(dSame))+'/t '+(dSame>0?'more':'less')
-      +' expensive. Each at its own cheapest reachable point, the gap is '+usd(Math.abs(dEnv))+'/t '
-      +(dEnv>0?'in favour of fired':'in favour of Joule')+'. The wider envelope is therefore worth '
-      +usd(Math.abs(dSame)-Math.abs(dEnv))+'/t, against an energy price gap of '+usd(Math.abs(dSame))
-      +'/t. Letting Joule run hotter and shorter is a real gain and it is roughly an order of magnitude '
-      +'too small to close the gap at this power price. Selectivity rises from '+pctS(bCH.Sm*100)+' to '
-      +pctS(bJH.Sm*100)+', while run length falls from '+sig(bCH.run,3)+' to '+sig(bJH.run,3)+' days.<br>'
-      +'Only the reachable envelope is modelled. The steeper temperature ramp and flatter radial profile that '
-      +'internal heating also gives are not, so the Joule figure here is conservative.';
-  }
+  if(S.tab==='compare') drawFig2(rCH,rJH,commonCot,commonTau,be);
 
   const bal=[['Carbon',r.bal.carbon],['Hydrogen',r.bal.hydrogen],['Mass',r.bal.mass],['Energy',r.bal.energy]];
   $('balanceBody').innerHTML=bal.map(([n,v])=>{
