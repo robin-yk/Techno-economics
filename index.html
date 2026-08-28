@@ -482,6 +482,20 @@ const A_PRE=(-Math.log(1-CAL.X)/CAL.tau)*Math.exp(EA/(8.314*(CAL.cot+273.15)));
 const H_RXN=145, CP_C2H6=3.0, CP_STEAM=2.3, T_PREHEAT=150;
 const LHV={CH4:50,H2:120};
 const ETA2=0.35, T_AMB=303, TLE_REC=0.70;
+/* Dilution steam is not free, and until now this model treated it as if it were. It is
+   raised in the dilution steam generator, condensed out again in the quench, and the
+   condensation duty is rejected to cooling water. Only the sensible heat of superheating
+   it to the coil outlet was charged, and that was largely handed back as a recovery
+   credit, so every extra kilogram of steam bought selectivity and run length for almost
+   nothing. The latent heat is the missing term.
+   The generator raises steam at roughly 5 barg, where the latent heat is about 2100 kJ/kg.
+   The heat comes from the low-grade end of the recovery train rather than from the transfer
+   line exchanger, so it is charged at a fraction of the steam price the model credits for
+   high pressure export. That fraction is an assumption, not a quotation, and it is the
+   single number that decides where the dilution optimum sits. */
+const H_VAP_DSG=2100;      // kJ/kg, latent heat at roughly 5 barg
+const STEAM_GRADE=0.45;    // low pressure heat against the high pressure export credit
+const CW_REJECT=0.40;      // $/GJ, cooling water duty for the quench condensation
 const REF={cap:610,tbmc:126.8};
 const SPLIT={furnace:.30,compression:.25,coldbox:.25,fractionation:.20};
 const kJ2GJ=1e-3;                    // kJ/kg → GJ/t
@@ -650,6 +664,7 @@ function model(p){
   const toc=tbmc*2.5, prod=p.cap*1000*osf;
 
   /* 9. Cost ladder, all in USD per tonne C2H4 */
+  const qDSG=dilSteam*H_VAP_DSG;              // raised in the generator, rejected in the quench
   const eGJ=p.elec/GJ_per_kWh;
   const L={};
   L.floor    = FLOOR_RATIO*p.ethane;
@@ -659,6 +674,7 @@ function model(p){
   L.steamCr  = -tleSteam*kJ2GJ*p.steam;
   L.gasCr    = -gasSell*kJ2GJ*p.gas;
   L.lpgCr    = -y.c3*p.lpg;
+  L.dilSteam = qDSG*kJ2GJ*(p.steam*(p.grade===undefined?STEAM_GRADE:p.grade)+CW_REJECT);
   L.capital  = toc*1e6*p.ccf/prod;
   L.om       = (toc*1e6*0.075+p.labor*1e6)/prod;
   const coo=Object.values(L).reduce((a,b)=>a+b,0);
@@ -689,7 +705,7 @@ function model(p){
 
   return {flags,selClipped,y,coil,recycle,dilSteam,qRxn,qSens,qDemand,qDeliver,tleSteam,fuelGas,gasBuy,gasSell,
     elecHeat,wComp,wRef,wSplit,tCold,qCold,lightFrac,nGas,alpha,nMin,nAct,rRatio,
-    runDays,osf,tbmc,toc,prod,L,coo,bal,netEnergy,elec_kWh,Smol,Smass,X,SmolCalc};
+    qDSG,runDays,osf,tbmc,toc,prod,L,coo,bal,netEnergy,elec_kWh,Smol,Smass,X,SmolCalc};
 }
 
 /* ---------- 렌더 ---------- */
@@ -922,9 +938,12 @@ function drawInspector(r){
           ['HP steam credit',usd(-r.L.steamCr)+'/t',-r.L.steamCr,B?-B.L.steamCr:null,'$',THRESH.cost],
           ['Run length',sig(r.runDays,3)+' days',r.runDays,B?B.runDays:null,'hide',0.5]],
      spec:null,
-     warn:'Steam generation and quench condensation duties are absent from the model. Raising '
-         +'dilution therefore lowers coking with no counterpart cost, and this control cannot '
-         +'locate an economic optimum.'},
+     warn:'The dilution steam charge below rests on one assumed number: the value of the low grade '
+         +'heat that raises the steam, taken here at '+pctS(STEAM_GRADE*100,2)+' of the high pressure '
+         +'export price. Nothing quotes that price. Take it anywhere from a fifth to four fifths of that '
+         +'price, all defensible, and the least cost dilution runs the whole travel of the control, 0.15 to '
+         +'0.70 kg/kg. Being wrong about it costs under two dollars a tonne, which is the more useful finding: '
+         +'the trade is real but nearly flat, so dilution is set by coking and hydraulics, not by the cost sheet.'},
     {t:'T1 Drying, triethylene glycol',role:'fixed',
      set:null,
      out:[['Water condensed',sig(r.dilSteam,3)+' kg/kg',r.dilSteam,B?B.dilSteam:null,'hide',THRESH.flow]],
@@ -974,6 +993,8 @@ function costTable(r){
     ['Ethane feed',r.L.floor+r.L.selLoss,sig(r.y.ethane,4)+' kg/kg against a floor of 1.072'],
     [(S.mode==='CH'?'Furnace fuel, net':'Joule power'),r.L.heat,
       'Duty '+sig(r.qDemand*kJ2GJ,3)+' GJ/t, input '+sig(r.qDeliver*kJ2GJ,3)+' GJ/t'],
+    ['Dilution steam',r.L.dilSteam,
+      sig(r.dilSteam,3)+' kg/kg raised and condensed, '+sig(r.qDSG*kJ2GJ,3)+' GJ/t'],
     ['Compression and refrigeration',r.L.elecProc,
       sig((r.wComp+r.wRef+r.wSplit)*kJ2GJ/GJ_per_kWh/1000,3)+' kWh/kg'],
     ['HP steam recovered',r.L.steamCr,sig(r.tleSteam*kJ2GJ,3)+' GJ/t'],
@@ -1004,7 +1025,8 @@ function costTable(r){
 /* ---------- cost ladder ---------- */
 const LADDER=[
   ['Stoichiometric floor','floor','floor'],['Selectivity loss','selLoss','up'],
-  ['Heating energy','heat','up'],['Compression and refrigeration','elecProc','up'],
+  ['Heating energy','heat','up'],['Dilution steam','dilSteam','up'],
+  ['Compression and refrigeration','elecProc','up'],
   ['HP steam recovered','steamCr','dn'],['Tail gas sold','gasCr','dn'],
   ['LPG credit','lpgCr','dn'],['Capital charge','capital','up'],['O&M and labour','om','up']
 ];
@@ -1218,6 +1240,7 @@ function renderCarbon(r){
 
 /* ---------- explained tab ---------- */
 function renderExplained(r,l){
+  const DS=dilScan();
   const item=(t,v,body)=>'<div class="item"><div class="t">'+t+'</div>'
     +(v!==null?'<div class="v">'+v+'</div>':'')+body+'</div>';
   const gap=(r.coo-PUB.coo)/PUB.coo*100;
@@ -1258,9 +1281,9 @@ function renderExplained(r,l){
     +'<p>Only '+pctS(r.Smass*100)+' of the ethane that reacts becomes ethylene. The rest becomes methane, hydrogen, '
     +'liquefied petroleum gas, heavier hydrocarbons and coke. That lost carbon is paid for twice: once as feed that '
     +'did not become product, and again as separation duty, because the extra methane must be removed at low temperature.</p>');
-  h+=item('Net energy cost','$'+sig(r.L.heat+r.L.elecProc+r.L.steamCr+r.L.gasCr,4)+' per tonne',
-    '<div class="eq">$'+sig(r.L.heat,4)+' + $'+sig(r.L.elecProc,4)+' − $'+sig(-r.L.steamCr,4)
-    +(r.L.gasCr<0?' − $'+sig(-r.L.gasCr,4):'')+' = $'+sig(r.L.heat+r.L.elecProc+r.L.steamCr+r.L.gasCr,4)+'</div>'
+  h+=item('Net energy cost','$'+sig(r.L.heat+r.L.dilSteam+r.L.elecProc+r.L.steamCr+r.L.gasCr,4)+' per tonne',
+    '<div class="eq">$'+sig(r.L.heat,4)+' + $'+sig(r.L.dilSteam,4)+' + $'+sig(r.L.elecProc,4)+' − $'+sig(-r.L.steamCr,4)
+    +(r.L.gasCr<0?' − $'+sig(-r.L.gasCr,4):'')+' = $'+sig(r.L.heat+r.L.dilSteam+r.L.elecProc+r.L.steamCr+r.L.gasCr,4)+'</div>'
     +'<p>Reactor heating $'+sig(r.L.heat,4)+'. Compression, refrigeration and separation $'+sig(r.L.elecProc,4)
     +'. Credit of $'+sig(-r.L.steamCr,4)+' for high pressure steam raised from recovered reactor heat'
     +(r.L.gasCr<0?', and $'+sig(-r.L.gasCr,4)+' for surplus tail gas sold':'')+'.</p>');
@@ -1311,8 +1334,16 @@ function renderExplained(r,l){
     +'drop and block heat transfer.</p>');
   h+=item('Steam dilution',sig(S.dilution,3)+' kilograms of steam per kilogram of ethane',
     '<p>Steam lowers the partial pressure of hydrocarbon in the reactor, which suppresses the bimolecular reactions '
-    +'that make coke. The plant must then cool, condense and remove that water, and must have raised the steam in '
-    +'the first place. Those two costs are not yet in this model, which is why raising dilution here only ever helps.</p>');
+    +'that make coke. Longer runs between decokes and a slightly better selectivity are what the steam buys. '
+    +'It is paid for by raising the steam in the first place and by condensing it out again in the quench, '
+    +'together '+usd(r.L.dilSteam)+' per tonne at the present setting.</p>'
+    +'<p>The two sides very nearly cancel. Across 0.20 to 0.40 kg per kg the cost of ethylene moves by '
+    +'$'+DS.span.toFixed(2)+' per tonne, against a screening band '+usd(r.coo*0.8)+' wide, with the least cost point at '
+    +sig(DS.opt,2)+' kg per kg. The lesson is not where that point is. It is that dilution is not an economic '
+    +'lever at all: a real plant sets it on coking, on furnace hydraulics and on the capacity of the quench and '
+    +'steam system, and the cost sheet has almost no opinion. Change the one assumed number underneath, the value '
+    +'of low grade heat, and the least cost point moves to '+sig(DS.gLo,2)+' or '+sig(DS.gHi,2)+' kg per kg '
+    +'without ever costing more than $'+DS.gWorth.toFixed(2)+' per tonne to be wrong about.</p>');
   h+=item('Plant capacity',sig(S.cap,4)+' thousand tonnes per year',
     '<p>Nameplate output. Actual production is '+sig(r.prod/1000,4)+' thousand tonnes after the on-stream factor. '
     +'Capital cost per tonne falls as capacity rises because equipment cost scales roughly with the 0.6 power of size.</p>');
@@ -1554,7 +1585,8 @@ function render(){
   $('nTau').innerHTML='Run length <b>'+sig(r.runDays,3)+'</b> d, on-stream <b>'+pctS(r.osf*100)+'</b>'+ex('tau',S.tau,'0.15 to 0.60 s');
   $('vDil').textContent=sig(S.dilution,3)+' kg/kg';
   band($('bDil'),0.15,0.70,VALID.dilution[0],VALID.dilution[1],S.dilution);
-  $('nDil').innerHTML='Heating <b>'+usd(r.L.heat)+'</b>/t'+ex('dilution',S.dilution,'0.25 to 0.50 kg/kg');
+  $('nDil').innerHTML='Steam <b>'+usd(r.L.dilSteam)+'</b>/t, on-stream <b>'+pctS(r.osf*100)+'</b>'
+    +ex('dilution',S.dilution,'0.25 to 0.50 kg/kg');
   $('vCap').textContent=sig(S.cap,4)+' kt/y';
   band($('bCap'),150,1400,VALID.cap[0],VALID.cap[1],S.cap);
   $('nCap').innerHTML='Capital and fixed <b>'+usd(r.L.capital+r.L.om)+'</b>/t'+ex('cap',S.cap,'300 to 1200 kt/y');
@@ -1698,6 +1730,11 @@ function render(){
     ['Cold box recovery',pctS(RECOVERY*100,4),'Downstream specification, sets required temperature'],
     ['Reaction enthalpy',sig(H_RXN,3)+' kJ/mol','Literature, at reaction temperature'],
     ['Refrigeration second-law efficiency',pctS(ETA2*100,3),'Assumption, multistage cryogenic'],
+    ['Dilution steam latent heat',sig(H_VAP_DSG,4)+' kJ/kg','Steam tables at roughly 5 barg, the usual generator pressure'],
+    ['Low grade heat value',pctS(STEAM_GRADE*100,2)+' of the steam price',
+     'Assumption. The generator draws from the cold end of the recovery train, not from the transfer line exchanger. '
+     +'This factor alone sets where the dilution optimum sits'],
+    ['Quench heat rejection','$'+sig(CW_REJECT,2)+' / GJ','Cooling water, one significant figure'],
     ['TBMC anchor','$'+sig(REF.tbmc,4)+' M at '+sig(REF.cap,3)+' kt/y','Back-calculated from CEJ 2025 SI, TCI taken as TOC'],
     ['TOC / TBMC','2.50','CEJ 2025 SI, assumption 11']
   ].map(([a,b,c])=>'<tr><td>'+a+'</td><td class="r">'+b+'</td><td style="color:var(--secondary)">'+c+'</td></tr>').join('');
@@ -1705,8 +1742,8 @@ function render(){
   $('foot').innerHTML='Screening estimate, AACE Class 5, &plusmn;40%. Capital is correlation based and does not '
    +'resolve differences that design based estimation would. The byproduct split moves with severity '
    +'(CH<sub>4</sub> 45 to 80%, coke 8 to 25%, C<sub>3+</sub> the balance) and is not calibrated against measurement. '
-   +'Latent heat of dilution steam generation and quench condensation duty are absent from the model, so dilution '
-   +'carries no counterpart cost and shows no optimum.';
+   +'The dilution steam generation and quench condensation duties are charged against an assumed value for low '
+   +'grade heat, which no market quotes; that one factor decides where the dilution optimum sits.';
 }
 
 /* Slider travel follows the active heating method, so the handle cannot be dragged into
@@ -1746,6 +1783,25 @@ function robustScan(mode){
   return {cotLo:Math.min(...ts),cotHi:Math.max(...ts),
           saveLo:Math.min(...saves),saveHi:Math.max(...saves),n:SEL_VARIANTS.length};
 }
+/* The dilution knob has one honest thing to say and it takes a sweep to say it: the curve is
+   nearly flat, and the assumed value of low grade heat, not the physics, decides where its
+   floor lies. Cheap enough to run inline, since model() is arithmetic only. */
+function dilScan(){
+  const at=d=>model({...S,dilution:d}).coo;
+  let opt=0.15,best=Infinity,lo=Infinity,hi=-Infinity;
+  for(let d=0.15;d<=0.7001;d+=0.01){
+    const c=at(d);
+    if(c<best){best=c;opt=d;}
+    if(d>=0.199&&d<=0.401){lo=Math.min(lo,c);hi=Math.max(hi,c);}
+  }
+  const gOpt=g=>{let b=Infinity,o=0.15;
+    for(let d=0.15;d<=0.7001;d+=0.01){const c=model({...S,dilution:d,grade:g}).coo; if(c<b){b=c;o=d;}}
+    return {d:o,worth:model({...S,grade:g}).coo-b};};
+  const a=gOpt(0.20), z=gOpt(0.80);
+  return {opt,span:hi-lo,gLo:Math.min(a.d,z.d),gHi:Math.max(a.d,z.d),
+          gWorth:Math.max(a.worth,z.worth)};
+}
+
 /* Returns null while the answer is stale. The scan is far too heavy to run on every input
    event of a price drag, so a changed key schedules it and the caller renders without it
    until it lands. mode is deliberately not in the key: both modes are stored side by side,
