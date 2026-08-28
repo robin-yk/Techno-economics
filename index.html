@@ -62,8 +62,8 @@ nav button.active{color:var(--accent);font-weight:500;border-bottom-color:var(--
 .insp .warn{margin-top:9px;font-size:11px;color:var(--warning);line-height:1.5}
 .pfd-unit{cursor:pointer}
 .pfd-unit:focus{outline:none}
-.pfd-unit.sel rect:first-of-type{stroke:var(--accent);stroke-width:2}
-.pfd-unit.hot rect:first-of-type{fill:#f2f8f7}
+.pfd-unit.sel rect:first-of-type{stroke:var(--accent);stroke-width:3.5}
+.pfd-unit.hot rect:first-of-type{fill:#eef5f4}
 .kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary)}
 .kpi .val{font-family:var(--mono);font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.3}
 .kpi .sub{font-size:11.5px;color:var(--secondary)}
@@ -149,6 +149,19 @@ tr.tot td{border-bottom:0;border-top:1px solid var(--ink);font-weight:700;paddin
 tr.ref td{border-bottom:0;color:var(--secondary)}
 td.cr{color:var(--accent)}
 .wor{color:var(--secondary);font-family:'Roboto Mono',monospace;font-size:10.5px;white-space:nowrap}
+/* ---------- publication plates ----------
+   The plate is the figure at its printed proportions. Nothing decorative goes on it: the
+   caption sits outside, in the caption's own type, the way it does under a printed figure. */
+figure.plate{margin:26px 0 0;max-width:740px;scroll-margin-top:96px}
+figure.plate svg{display:block;width:100%;height:auto}
+figure.plate figcaption{font-size:12.5px;line-height:1.55;color:var(--ink);
+  margin-top:11px;padding-top:9px;border-top:1px solid var(--ink);max-width:740px;text-align:justify}
+figure.plate figcaption b{font-weight:700}
+figure.plate figcaption sup{font-size:0.75em}
+.supp{margin-top:34px;max-width:940px}
+.supp h3{font-size:12.5px;font-weight:700;letter-spacing:.02em;margin:0 0 8px;
+  padding-bottom:6px;border-bottom:1px solid var(--ink)}
+.supp td.bas{color:var(--secondary);font-size:12px;line-height:1.45}
 .badge{display:inline-block;font-size:10.5px;font-weight:500;padding:1px 6px;
   border:1px solid currentColor;border-radius:4px;white-space:nowrap}
 .b-pass{color:var(--accent)} .b-warn{color:var(--warning)} .b-fail{color:var(--error)}
@@ -287,30 +300,19 @@ svg{display:block;width:100%;height:auto}
     <div class="ov-head">
       <div class="ov-ctx" id="ovCtx"></div>
     </div>
-    <div class="plant">
-      <div>
-        <h2>Process flow</h2>
-        <div class="pfd-wrap"><svg id="pfd" viewBox="0 0 760 330" role="img" aria-label="Ethane cracker process flow"></svg><div class="pfd-tip" id="pfdTip" role="tooltip"></div></div>
-        <div class="cap">Only the reactor carries degrees of freedom. The three downstream columns hold fixed
-          product specifications and re-solve, so reflux ratio is an output. Select a block for its
-          inputs, outputs and the specification it holds.</div>
-        <div class="insp" id="insp"></div>
-      </div>
-      <div>
-        <h2>Cost breakdown</h2>
-        <table><thead><tr><th>Item</th><th class="r">USD/t</th><th class="r" style="width:58px">Share</th></tr></thead>
-          <tbody id="costBody"></tbody></table>
-        <div class="cap" id="plantNote"></div>
-      </div>
+    <figure class="plate">
+      <svg id="fig1" viewBox="0 0 504.57 572" role="img"
+           aria-label="Figure 1. Process flow, cost structure and sensitivity of an ethane cracker"></svg>
+      <figcaption id="fig1cap"></figcaption>
+    </figure>
+    <div class="insp" id="insp"></div>
+
+    <div class="supp">
+      <h3>Supplementary Table 1 | Cost of ethylene by item</h3>
+      <table><thead><tr><th>Item</th><th class="r">USD/t</th><th class="r" style="width:58px">Share</th><th>Basis</th></tr></thead>
+        <tbody id="costBody"></tbody></table>
+      <div class="cap" id="plantNote"></div>
     </div>
-
-    <h2 style="margin-top:30px">Cost ladder</h2>
-    <svg id="ladder" viewBox="0 0 760 430" role="img" aria-label="Cost of ethylene waterfall"></svg>
-    <div class="cap" id="ladderCap"></div>
-
-    <h2 style="margin-top:30px">Sensitivity</h2>
-    <svg id="tornado" viewBox="0 0 760 300" role="img" aria-label="Tornado sensitivity"></svg>
-    <div class="cap">Each knob perturbed &plusmn;10%, clamped to its validated window. Ranking changes with operating point.</div>
   </div>
 
   <div class="tab" id="t-carbon">
@@ -785,33 +787,33 @@ function lca(r,p){
 }
 
 /* ---------- process flow diagram ---------- */
-function drawPFD(r){
+function panelFlow(r){
   const BW=124, BH=78, BY=130;
   const xs=[70,210,350,490,630];
   const eGJ=S.elec/GJ_per_kWh;
   const B=[
-    {n:'Reactor + TLE',a:sig(S.cot,4)+' C, '+sig(S.tau,3)+' s',
+    {n:'Reactor + TLE',a:sig(S.cot,4)+' \u00b0C, '+sig(S.tau,3)+' s',
      b:'X '+pctS(r.X*100)+', S '+pctS(r.Smass*100),c:r.L.heat,
      t:'Duty '+sig(r.qDemand*kJ2GJ,3)+' GJ/t. Temperature, residence time and dilution are set here and nowhere else.'},
     {n:'T1 Drying, TEG',a:'Water '+sig(r.dilSteam,3)+' kg/kg',b:'Specification fixed',c:0,
      t:'Dilution steam is condensed out ahead of the compressor, so it never passes through C1.'},
     {n:'C1 Compression',a:sig(P_DISCH,3)+' bar, 4 stages',b:sig(r.nGas,4)+' mol/kg',
      c:r.wComp*kJ2GJ*eGJ,t:'Shaft duty '+sig(r.wComp*kJ2GJ,3)+' GJ/t. Grows with recycle.'},
-    {n:'T2 Cold box',a:sig(r.tCold,4)+' C',b:'Light ends '+pctS(r.lightFrac*100),
+    {n:'T2 Cold box',a:fnum(r.tCold,1).replace('-','\u2212')+' \u00b0C',b:'Light ends '+pctS(r.lightFrac*100),
      c:r.wRef*kJ2GJ*eGJ,t:'Recovery of '+pctS(RECOVERY*100,4)+' sets the temperature required. More methane means colder.'},
     {n:'T3 / T4 Columns',a:sig(r.nAct,3)+' stages',b:'Reflux '+sig(r.rRatio,3)+', computed',
      c:r.wSplit*kJ2GJ*eGJ,t:'Purity of 99.9 mol% is specified; reflux follows from it.'}
   ];
-  const G='#6c757d', K='#212529', A='#2f8f83';
+  const G=FIG.grey, K=FIG.ink, A=FIG.teal;
   const icon=(kind,x,y,col)=>{
-    const p='fill="none" stroke="'+col+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
+    const p='fill="none" stroke="'+col+'" stroke-width="1.36" stroke-linecap="round" stroke-linejoin="round"';
     if(kind===0) return '<g '+p+'><path d="M'+(x+4)+' '+(y+17)+' C'+(x+1)+' '+(y+11)+' '+(x+9)+' '+(y+9)+' '+(x+7)+' '+(y+3)+' C'+(x+14)+' '+(y+7)+' '+(x+17)+' '+(y+12)+' '+(x+13)+' '+(y+17)+' Z"/><path d="M'+(x+8)+' '+(y+17)+' C'+(x+6)+' '+(y+14)+' '+(x+11)+' '+(y+12)+' '+(x+10)+' '+(y+9)+'"/></g>';
     if(kind===1) return '<g '+p+'><path d="M'+(x+3)+' '+(y+4)+' H'+(x+15)+' L'+(x+13)+' '+(y+17)+' H'+(x+5)+' Z"/><path d="M'+(x+5)+' '+(y+9)+' H'+(x+13)+'"/></g>';
     if(kind===2) return '<g '+p+'><circle cx="'+(x+9)+'" cy="'+(y+10)+'" r="7"/><path d="M'+(x+9)+' '+(y+3)+' V'+(y+17)+' M'+(x+2)+' '+(y+10)+' H'+(x+16)+' M'+(x+9)+' '+(y+10)+' L'+(x+14)+' '+(y+6)+'"/></g>';
     if(kind===3) return '<g '+p+'><path d="M'+(x+9)+' '+(y+2)+' V'+(y+18)+' M'+(x+2)+' '+(y+10)+' H'+(x+16)+' M'+(x+4)+' '+(y+5)+' L'+(x+14)+' '+(y+15)+' M'+(x+14)+' '+(y+5)+' L'+(x+4)+' '+(y+15)+'"/></g>';
     return '<g '+p+'><path d="M'+(x+5)+' '+(y+2)+' H'+(x+13)+' V'+(y+16)+' Q'+(x+13)+' '+(y+18)+' '+(x+11)+' '+(y+18)+' H'+(x+7)+' Q'+(x+5)+' '+(y+18)+' '+(x+5)+' '+(y+16)+' Z"/><path d="M'+(x+5)+' '+(y+7)+' H'+(x+13)+' M'+(x+5)+' '+(y+13)+' H'+(x+13)+'"/></g>';
   };
-  let s='<g font-family="Roboto,-apple-system,sans-serif">';
+  let s='<g font-family="'+FIG.font+'">';
   s+='<defs><marker id="a" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto">'
     +'<path d="M0,0 L6,2.5 L0,5 z" fill="'+G+'"/></marker>'
     +'<marker id="k" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto">'
@@ -827,34 +829,34 @@ function drawPFD(r){
     return ' <tspan fill="'+G+'">'+(d>0?'+':'−')+sig(Math.abs(d),2)+'</tspan>';
   };
   /* Fresh feed enters from above and joins the recycle at x = 40. */
-  s+='<text x="4" y="97" font-size="10" fill="'+G+'">'+C2H6+' '+sig(r.y.ethane,3)+' kg'
+  s+='<text x="4" y="97" font-size="10.5" fill="'+G+'">'+C2H6+' '+sig(r.y.ethane,3)+' kg'
     +sdel(r.y.ethane,BR?BR.y.ethane:null,THRESH.flow)+'</text>';
-  s+='<text x="4" y="113" font-size="10" fill="'+G+'">Steam '+sig(r.dilSteam,3)+' kg'
+  s+='<text x="4" y="113" font-size="10.5" fill="'+G+'">Steam '+sig(r.dilSteam,3)+' kg'
     +sdel(r.dilSteam,BR?BR.dilSteam:null,THRESH.flow)+'</text>';
   s+='<line x1="40" y1="120" x2="40" y2="'+(cy-2)+'" stroke="'+K+'"/>';
-  s+='<line x1="40" y1="'+cy+'" x2="'+(xs[0]-4)+'" y2="'+cy+'" stroke="'+K+'" stroke-width="1.6" marker-end="url(#k)"/>';
+  s+='<line x1="40" y1="'+cy+'" x2="'+(xs[0]-4)+'" y2="'+cy+'" stroke="'+K+'" stroke-width="2.3" marker-end="url(#k)"/>';
   s+='<circle cx="40" cy="'+cy+'" r="2.5" fill="'+K+'"/>';
   s+='<line x1="'+(xs[0]+26)+'" y1="96" x2="'+(xs[0]+26)+'" y2="'+(BY-4)+'" stroke="'+G+'" marker-end="url(#a)"/>';
-  s+='<text x="'+(xs[0]+20)+'" y="88" font-size="10" fill="'+G+'">'+(S.mode==='CH'?'Fuel ':'Power ')+sig(r.qDeliver*kJ2GJ,3)+' GJ</text>';
+  s+='<text x="'+(xs[0]+20)+'" y="88" font-size="10.5" fill="'+G+'">'+(S.mode==='CH'?'Fuel ':'Power ')+sig(r.qDeliver*kJ2GJ,3)+' GJ</text>';
   if(r.tleSteam>0){
     s+='<line x1="'+(xs[0]+BW-24)+'" y1="'+BY+'" x2="'+(xs[0]+BW-24)+'" y2="62" stroke="'+A+'" marker-end="url(#a)"/>';
-    s+='<text x="'+(xs[0]+BW-18)+'" y="58" font-size="10" fill="'+A+'">HP steam '+usd(-r.L.steamCr)+'/t</text>';
+    s+='<text x="'+(xs[0]+BW-18)+'" y="58" font-size="10.5" fill="'+A+'">HP steam '+usd(-r.L.steamCr)+'/t</text>';
   }
   for(let i=0;i<4;i++)
-    s+='<line x1="'+(xs[i]+BW)+'" y1="'+cy+'" x2="'+(xs[i+1]-4)+'" y2="'+cy+'" stroke="'+K+'" stroke-width="1.6" marker-end="url(#k)"/>';
+    s+='<line x1="'+(xs[i]+BW)+'" y1="'+cy+'" x2="'+(xs[i+1]-4)+'" y2="'+cy+'" stroke="'+K+'" stroke-width="2.3" marker-end="url(#k)"/>';
   const down=(x,lab,col)=>'<line x1="'+x+'" y1="'+(BY+BH)+'" x2="'+x+'" y2="228" stroke="'+col+'" marker-end="url(#a)"/>'
-    +'<text x="'+x+'" y="242" font-size="10" fill="'+col+'" text-anchor="middle">'+lab+'</text>';
+    +'<text x="'+x+'" y="242" font-size="10.5" fill="'+col+'" text-anchor="middle">'+lab+'</text>';
   const up=(x,lab,col)=>'<line x1="'+x+'" y1="'+BY+'" x2="'+x+'" y2="96" stroke="'+col+'" marker-end="url(#a)"/>'
-    +'<text x="'+x+'" y="88" font-size="10" fill="'+col+'" text-anchor="middle">'+lab+'</text>';
+    +'<text x="'+x+'" y="88" font-size="10.5" fill="'+col+'" text-anchor="middle">'+lab+'</text>';
   s+=down(xs[1]+BW/2,'Water',G);
   s+=up(xs[3]+BW/2,r.gasSell>0?'Tail gas '+usd(-r.L.gasCr)+'/t':'Tail gas to furnace',r.gasSell>0?A:G);
   s+='<line x1="'+(xs[4]+28)+'" y1="'+(BY+BH)+'" x2="'+(xs[4]+28)+'" y2="224" stroke="'+K+'" marker-end="url(#k)"/>';
-  s+='<text x="'+(xs[4]+28)+'" y="238" font-size="10" fill="'+K+'" text-anchor="middle">'+C2H4+' 1.000 kg</text>';
+  s+='<text x="'+(xs[4]+28)+'" y="238" font-size="10.5" fill="'+K+'" text-anchor="middle">'+C2H4+' 1.000 kg</text>';
   s+='<line x1="'+(xs[4]+92)+'" y1="'+(BY+BH)+'" x2="'+(xs[4]+92)+'" y2="250" stroke="'+A+'" marker-end="url(#a)"/>';
-  s+='<text x="754" y="264" font-size="10" fill="'+A+'" text-anchor="end">LPG '+usd(-r.L.lpgCr)+'/t</text>';
+  s+='<text x="754" y="264" font-size="10.5" fill="'+A+'" text-anchor="end">LPG '+usd(-r.L.lpgCr)+'/t</text>';
   s+='<path d="M '+(xs[4]+8)+' '+(BY+BH)+' L '+(xs[4]+8)+' 292 L 40 292 L 40 '+(cy-8)+'" '
     +'fill="none" stroke="'+G+'" stroke-dasharray="4 3" marker-end="url(#a)"/>';
-  s+='<text x="'+((xs[4]+48)/2)+'" y="286" font-size="10" fill="'+G+'" text-anchor="middle">'
+  s+='<text x="'+((xs[4]+48)/2)+'" y="286" font-size="10.5" fill="'+G+'" text-anchor="middle">'
     +'Recycle '+sig(r.recycle,3)+' kg'+sdel(r.recycle,BR?BR.recycle:null,THRESH.flow)
     +'. Reactor throughput is '+sig(1/r.X,3)+' times fresh feed.</text>';
   /* Cost of the same block at the pinned baseline, for the change marker. */
@@ -873,31 +875,34 @@ function drawPFD(r){
       +'aria-expanded="'+(sel?'true':'false')+'" '
       +'aria-label="'+esc(b.n)+', '+role+'. '+esc(b.t)+'" data-unit="'+i+'" '
       +'data-name="'+esc(b.n)+'" data-tip="'+esc(b.t)+'">';
-    s+='<rect x="'+x+'" y="'+BY+'" width="'+BW+'" height="'+BH+'" rx="6" fill="'+(hot?'#f2f8f7':'#fff')+'" stroke="'
-      +(sel?A:free?A:'#e3e7ea')+'" stroke-width="'+(sel?2:free?1.5:1)+'"></rect>';
-    s+='<rect x="'+(x+8)+'" y="'+(BY+7)+'" width="24" height="24" rx="6" fill="'+(free?'#e8f4f1':'#f3f5f6')+'"/>';
-    s+=icon(i,x+11,BY+10,free?A:G);
+    s+='<rect x="'+x+'" y="'+BY+'" width="'+BW+'" height="'+BH+'" rx="2" fill="'+(hot?'#eef5f4':'#fff')+'" stroke="'
+      +(sel||free?A:K)+'" stroke-width="'+(sel?3.5:free?2.1:1.36)+'"></rect>';
+    s+=icon(i,x+10,BY+9,free?A:K);
     s+='<text x="'+(x+38)+'" y="'+(BY+21)+'" font-size="10.5" fill="'+K+'" font-weight="600">'+b.n+'</text>';
-    s+='<text x="'+(x+10)+'" y="'+(BY+34)+'" font-size="9.5" fill="'+G+'">'+b.a+'</text>';
-    s+='<text x="'+(x+10)+'" y="'+(BY+46)+'" font-size="9.5" fill="'+G+'">'+b.b+'</text>';
-    s+='<text x="'+(x+BW-10)+'" y="'+(BY+68)+'" font-size="11.5" fill="'+K+'" text-anchor="end" '
-      +'font-family="Roboto Mono,monospace" font-weight="500">'+(b.c===0?'-':usd(b.c)+'/t')+'</text>';
+    s+='<text x="'+(x+10)+'" y="'+(BY+34)+'" font-size="10.5" fill="'+G+'">'+b.a+'</text>';
+    s+='<text x="'+(x+10)+'" y="'+(BY+46)+'" font-size="10.5" fill="'+G+'">'+b.b+'</text>';
+    s+='<text x="'+(x+BW-10)+'" y="'+(BY+68)+'" font-size="12" fill="'+K+'" text-anchor="end" '
+      +'font-weight="500">'+(b.c===0?'-':usd(b.c)+'/t')+'</text>';
     /* The old label here read "free", which next to a cost figure reads as costing nothing. */
-    s+='<text x="'+(x+10)+'" y="'+(BY+68)+'" font-size="9.5" fill="'+(free?A:G)+'"'
+    s+='<text x="'+(x+10)+'" y="'+(BY+68)+'" font-size="10.5" fill="'+(free?A:G)+'"'
       +(free?' font-weight="500"':'')+'>'+role+'</text>';
     /* The change sits above the cost, not below it. The block is 78 px tall and the cost
        baseline is already at 68, so a line under it would print outside the box. */
     if(bCost&&i!==1){
       const d=b.c-bCost[i];
       if(Math.abs(d)>=THRESH.cost)
-        s+='<text x="'+(x+BW-10)+'" y="'+(BY+57)+'" font-size="9.5" text-anchor="end" '
-          +'font-family="Roboto Mono,monospace" fill="'+(d<0?A:'#c53a3a')+'">'
+        s+='<text x="'+(x+BW-10)+'" y="'+(BY+57)+'" font-size="10.5" text-anchor="end" '
+          +'fill="'+(d<0?A:'#c53a3a')+'">'
           +(d>0?'+':'−')+'$'+sig(Math.abs(d),3)+'</text>';
     }
     s+='</g>';
   });
   s+='</g>';
-  $('pfd').innerHTML=s;
+  return s;
+}
+
+function wirePFD(r){
+
   const tip=$('pfdTip');
   const show=(unit,e)=>{
     tip.innerHTML='<b>'+unit.dataset.name+'</b>'+unit.dataset.tip;
@@ -1009,15 +1014,18 @@ function costTable(r){
     ['O&amp;M and labour',r.L.om,'On-stream '+pctS(r.osf*100)]
   ];
   const gross=rows.filter(x=>x[1]>0).reduce((a,b)=>a+b[1],0);
+  /* The basis used to be a tooltip. A figure that needs hover to be read is not a figure, and
+     the same goes for the table under it. */
   let h=rows.map(([n,v,tip])=>
-    '<tr title="'+esc(tip)+'"><td>'+n+'</td><td class="r'+(v<0?' cr':'')+'">'+usd(v)+'</td>'
-    +'<td class="r">'+(v>0?pctS(v/gross*100,2):'-')+'</td></tr>').join('');
-  h+='<tr class="tot"><td>Cost of ethylene</td><td class="r">'+usd(r.coo)+'</td><td class="r"></td></tr>';
+    '<tr><td>'+n+'</td><td class="r'+(v<0?' cr':'')+'">'+usd(v)+'</td>'
+    +'<td class="r">'+(v>0?pctS(v/gross*100,2):'-')+'</td>'
+    +'<td class="bas">'+tip+'</td></tr>').join('');
+  h+='<tr class="tot"><td>Cost of ethylene</td><td class="r">'+usd(r.coo)+'</td><td class="r"></td><td></td></tr>';
   h+='<tr class="ref"><td>Stoichiometric floor</td><td class="r">'+usd(r.L.floor)
-    +'</td><td class="r">'+sig(r.coo/r.L.floor,3)+'x</td></tr>';
+    +'</td><td class="r">'+sig(r.coo/r.L.floor,3)+'x</td><td class="bas">Atom count, '+sig(FLOOR_RATIO,4)+' kg kg<sup>−1</sup></td></tr>';
   const gap=(r.coo-PUB.coo)/PUB.coo*100;
   h+='<tr class="ref"><td>Published benchmark</td><td class="r">'+usd(PUB.coo)
-    +'</td><td class="r">'+(gap>0?'+':'−')+sig(Math.abs(gap),3)+'%</td></tr>';
+    +'</td><td class="r">'+(gap>0?'+':'−')+sig(Math.abs(gap),3)+'%</td><td class="bas">CEJ 2025, conventional case</td></tr>';
   $('costBody').innerHTML=h;
   $('plantNote').innerHTML='The last two rows are reference points. <b>'+usd(r.L.floor)+'</b> follows from the '
     +'stoichiometry of '+C2H6.replace(/tspan/g,'sub').replace(/ baseline-shift="sub" font-size="0.75em"/g,'')
@@ -1027,6 +1035,67 @@ function costTable(r){
     +'flowsheet purchases HP steam.';
 }
 
+/* ---------- publication figure kernel ----------
+   Every result panel is drawn on a plate measured in points, because a Nature column is
+   specified in millimetres and a point is the unit the rest of the specification is written
+   in. 178 mm is 504.57 pt, so a font-size of 7 in this coordinate system is literally 7 pt
+   and a stroke-width of 0.9 is literally 0.9 pt. The browser scales the plate to the width
+   of its container; export writes the same geometry at 600 dpi. One set of numbers, three
+   destinations. */
+const MM=72/25.4;                                    // points per millimetre
+const FIG={
+  w1:89*MM, w2:178*MM,                               // single and double column
+  font:'Arial,Helvetica,sans-serif',
+  fs:7, fsPanel:8,                                   // body text and panel letter
+  ax:0.9, data:2.3, tickLen:3.2, thin:0.6,
+  ink:'#000000', grey:'#7a7a7a', pale:'#c8c8c8',
+  teal:'#12726a', orange:'#c0561a'
+};
+const fnum=(v,n)=>{
+  const a=Math.abs(v);
+  if(a>=1000) return (v/1000).toFixed(a>=10000?0:1).replace(/\.0$/,'')+'k';
+  return String(+Number(v).toFixed(n===undefined?(a>=100?0:a>=10?1:2):n));
+};
+/* Draws the frame that a dashboard widget leaves out: four sides, ticks pointing in, no
+   grid. Returns the scales so a panel body is only its data. */
+function axes(o){
+  const {x,y,w,h}=o, F=FIG;
+  const xl=o.xlim||[0,1], yl=o.ylim||[0,1];
+  const X=v=>x+(v-xl[0])/(xl[1]-xl[0])*w;
+  const Y=o.ycat ? (i=>y+(i+0.5)*(h/o.ycat.length))
+                 : (v=>y+h-(v-yl[0])/(yl[1]-yl[0])*h);
+  let s='<g fill="none" stroke="'+F.ink+'" stroke-width="'+F.ax+'" shape-rendering="crispEdges">'
+       +'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'"/>';
+  const xt=o.xticks||niceTicks(xl,o.nx||5);
+  for(const t of xt){ if(t<xl[0]-1e-9||t>xl[1]+1e-9) continue; const px=X(t);
+    s+='<path d="M'+px+' '+(y+h)+'v'+(-F.tickLen)+'M'+px+' '+y+'v'+F.tickLen+'"/>'; }
+  let yt=[];
+  if(!o.ycat){ yt=o.yticks||niceTicks(yl,o.ny||5);
+    for(const t of yt){ if(t<yl[0]-1e-9||t>yl[1]+1e-9) continue; const py=Y(t);
+      s+='<path d="M'+x+' '+py+'h'+F.tickLen+'M'+(x+w)+' '+py+'h'+(-F.tickLen)+'"/>'; } }
+  s+='</g><g font-family="'+F.font+'" font-size="'+F.fs+'" fill="'+F.ink+'" stroke="none">';
+  for(const t of xt){ if(t<xl[0]-1e-9||t>xl[1]+1e-9) continue;
+    s+='<text x="'+X(t)+'" y="'+(y+h+F.fs+2.4)+'" text-anchor="middle">'+(o.xfmt?o.xfmt(t):fnum(t))+'</text>'; }
+  if(o.ycat){ o.ycat.forEach((L,i)=>{
+      s+='<text x="'+(x-4)+'" y="'+(Y(i)+F.fs*0.36)+'" text-anchor="end">'+L+'</text>'; }); }
+  else { for(const t of yt){ if(t<yl[0]-1e-9||t>yl[1]+1e-9) continue;
+      s+='<text x="'+(x-3.2)+'" y="'+(Y(t)+F.fs*0.36)+'" text-anchor="end">'+(o.yfmt?o.yfmt(t):fnum(t))+'</text>'; } }
+  if(o.xlab) s+='<text x="'+(x+w/2)+'" y="'+(y+h+F.fs*2+5)+'" text-anchor="middle">'+o.xlab+'</text>';
+  if(o.ylab) s+='<text transform="translate('+(x-(o.ypad||24))+','+(y+h/2)+') rotate(-90)" text-anchor="middle">'+o.ylab+'</text>';
+  s+='</g>';
+  return {s,X,Y,x,y,w,h};
+}
+function niceTicks(lim,n){
+  const st=niceStep(lim[1]-lim[0],n), out=[];
+  for(let t=Math.ceil(lim[0]/st)*st;t<=lim[1]+1e-9;t+=st) out.push(+t.toPrecision(12));
+  return out;
+}
+const panel=(L,x,y)=>'<text x="'+x+'" y="'+y+'" font-family="'+FIG.font+'" font-size="'+FIG.fsPanel
+  +'" font-weight="bold" fill="'+FIG.ink+'">'+L+'</text>';
+const ftext=(t,x,y,o)=>'<text x="'+x+'" y="'+y+'" font-family="'+FIG.font+'" font-size="'+((o&&o.size)||FIG.fs)
+  +'" fill="'+((o&&o.fill)||FIG.ink)+'"'+(o&&o.anchor?' text-anchor="'+o.anchor+'"':'')
+  +(o&&o.weight?' font-weight="'+o.weight+'"':'')+'>'+t+'</text>';
+
 /* ---------- cost ladder ---------- */
 const LADDER=[
   ['Stoichiometric floor','floor','floor'],['Selectivity loss','selLoss','up'],
@@ -1035,51 +1104,45 @@ const LADDER=[
   ['HP steam recovered','steamCr','dn'],['Tail gas sold','gasCr','dn'],
   ['LPG credit','lpgCr','dn'],['Capital charge','capital','up'],['O&M and labour','om','up']
 ];
-function drawLadder(r){
-  const W=760,H=430,L=190,R=74,T=30,B=42;
-  const pw=W-L-R, rows=LADDER.length+1, rh=(H-T-B)/rows;
+/* Fig. 1b. Waterfall from the stoichiometric feed to the cost of ethylene. Costs run right,
+   credits run left, and the two reference lines are drawn rather than described. */
+function panelCost(r,px,py,pw,ph){
+  const F=FIG, rows=LADDER.length+1, rh=ph/rows;
   const vals=LADDER.map(([lbl,k,kind])=>({lbl,v:r.L[k],kind}));
-  let run=0, peak=0;
-  vals.forEach(d=>{run+=d.v; if(run>peak) peak=run;});
-  const maxX=Math.max(r.coo,r.L.floor,PUB.coo,peak)*1.10;
-  const x=v=>L+v/maxX*pw, step=niceStep(maxX,5);
-  let s='<g font-family="Roboto,-apple-system,sans-serif">';
-  s+='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-R)+'" y2="'+(H-B)+'" stroke="#e3e7ea"/>';
-  for(let t=0;t<=maxX;t+=step){
-    const px=x(t);
-    s+='<line x1="'+px+'" y1="'+T+'" x2="'+px+'" y2="'+(H-B)+'" stroke="#e3e7ea" stroke-dasharray="2 3"/>';
-    s+='<text x="'+px+'" y="'+(H-B+16)+'" font-size="11" fill="#6c757d" text-anchor="middle" font-family="Roboto Mono,monospace">'+(t>=1000?(t/1000)+'k':t)+'</text>';
-  }
-  s+='<text x="'+(L+pw/2)+'" y="'+(H-B+34)+'" font-size="11" fill="#6c757d" text-anchor="middle">USD per tonne '+C2H4+'</text>';
-  let cum=0;
+  let run=0,peak=0; vals.forEach(d=>{run+=d.v; if(run>peak)peak=run;});
+  const hi=Math.max(r.coo,PUB.coo,peak)*1.08;
+  const A=axes({x:px,y:py,w:pw,h:ph,xlim:[0,hi],nx:5,
+                ycat:vals.map(d=>d.lbl).concat(['Cost of ethylene']),
+                xlab:'Cost of ethylene (USD per tonne)'});
+  let s=A.s, cum=0;
+  s+='<g>';
   vals.forEach((d,i)=>{
-    const y0=T+i*rh, st=cum, en=cum+d.v; cum=en;
-    const x1=x(Math.min(st,en)), w=Math.max(1.5,Math.abs(x(en)-x(st)));
-    const fill=d.kind==='dn'?'#2f8f83':(d.kind==='floor'?'#212529':'#6c757d');
-    s+='<rect x="'+x1+'" y="'+(y0+rh*0.22)+'" width="'+w+'" height="'+(rh*0.56)+'" fill="'+fill+'"><title>'+d.lbl+': '+usd(d.v)+'/t</title></rect>';
-    s+='<text x="'+(L-9)+'" y="'+(y0+rh*0.62)+'" font-size="12" fill="#212529" text-anchor="end">'+d.lbl+'</text>';
-    s+='<text x="'+(W-R+8)+'" y="'+(y0+rh*0.62)+'" font-size="12" fill="#212529" font-family="Roboto Mono,monospace" font-weight="500">'+(d.v<0?'−':'+')+sig(Math.abs(d.v),3)+'</text>';
+    const st=cum,en=cum+d.v; cum=en;
+    const x1=A.X(Math.min(st,en)), w=Math.max(0.7,Math.abs(A.X(en)-A.X(st)));
+    const fill=d.v<0?F.teal:(d.kind==='floor'?F.ink:F.grey);
+    s+='<rect x="'+x1+'" y="'+(py+i*rh+rh*0.22)+'" width="'+w+'" height="'+(rh*0.56)+'" fill="'+fill+'"/>';
+    s+=ftext((d.v<0?'−':'+')+fnum(Math.abs(d.v)),px+pw+4,py+i*rh+rh*0.5+F.fs*0.36,{});
   });
-  const yT=T+LADDER.length*rh;
-  s+='<line x1="'+(L-186)+'" y1="'+(yT+2)+'" x2="'+(W-R+66)+'" y2="'+(yT+2)+'" stroke="#e3e7ea"/>';
-  s+='<rect x="'+L+'" y="'+(yT+rh*0.22)+'" width="'+Math.max(1.5,x(r.coo)-L)+'" height="'+(rh*0.56)+'" fill="#212529"/>';
-  s+='<text x="'+(L-9)+'" y="'+(yT+rh*0.62)+'" font-size="12.5" fill="#212529" text-anchor="end" font-weight="700">Cost of ethylene</text>';
-  s+='<text x="'+(W-R+8)+'" y="'+(yT+rh*0.62)+'" font-size="12.5" fill="#212529" font-family="Roboto Mono,monospace" font-weight="700">'+sig(r.coo,4)+'</text>';
-  const fx=x(r.L.floor);
-  s+='<line x1="'+fx+'" y1="'+(T-6)+'" x2="'+fx+'" y2="'+(H-B)+'" stroke="#c53a3a" stroke-width="1.5" stroke-dasharray="4 3"/>';
-  s+='<text x="'+(fx+5)+'" y="'+(T-14)+'" font-size="10.5" fill="#c53a3a" font-weight="500">Stoichiometric floor</text>';
-  const px=x(PUB.coo);
-  s+='<line x1="'+px+'" y1="'+(T-6)+'" x2="'+px+'" y2="'+(H-B)+'" stroke="#6c757d" stroke-dasharray="1 4"/>';
-  s+='<polygon points="'+px+','+(H-B)+' '+(px-5)+','+(H-B+9)+' '+(px+5)+','+(H-B+9)+'" fill="#212529"><title>Published $'+PUB.coo+'/t</title></polygon>';
-  s+='<text x="'+px+'" y="'+(T-14)+'" font-size="10.5" fill="#6c757d" text-anchor="middle" font-weight="500">Published $'+PUB.coo+'</text>';
-  s+='</g>';
-  $('ladder').innerHTML=s;
+  const yT=py+vals.length*rh;
+  s+='<rect x="'+A.X(0)+'" y="'+(yT+rh*0.16)+'" width="'+Math.max(0.7,A.X(r.coo)-A.X(0))+'" height="'+(rh*0.68)+'" fill="'+F.ink+'"/>';
+  s+=ftext(fnum(r.coo),px+pw+4,yT+rh*0.5+F.fs*0.36,{weight:'bold'});
+  /* Two reference lines: what the chemistry cannot go below, and what the published case reports. */
+  const fx=A.X(r.L.floor), bx=A.X(PUB.coo);
+  s+='<path d="M'+fx+' '+py+'V'+(py+ph)+'" stroke="'+F.ink+'" stroke-width="'+F.ax+'" stroke-dasharray="3 2" fill="none"/>';
+  s+=ftext('Stoichiometric floor '+fnum(r.L.floor),fx+3,py-2.5,{size:F.fs});
+  s+='<path d="M'+bx+' '+py+'V'+(py+ph)+'" stroke="'+F.grey+'" stroke-width="'+F.ax+'" stroke-dasharray="1 2" fill="none"/>';
+  s+=ftext('Published '+fnum(PUB.coo),bx-3,py-2.5,{fill:F.grey,anchor:'end'});
+  return s+'</g>';
 }
 
 /* ---------- tornado ---------- */
-function drawTornado(r){
-  const knobs=[['Capacity','cap'],['Heating efficiency','eff'],['Coil outlet temperature','cot'],
-               ['Residence time','tau'],['Steam dilution','dilution'],['Ethane price','ethane'],
+/* Fig. 1c. Each control perturbed by a tenth, clamped to the window the model claims validity
+   over. Teal is the low side and orange the high side, so the asymmetry of a knob is visible
+   as well as its size. */
+function panelTornado(r,px,py,pw,ph){
+  const F=FIG;
+  const knobs=[['Coil outlet temperature','cot'],['Residence time','tau'],['Steam dilution','dilution'],
+               ['Capacity','cap'],['Heating efficiency','eff'],['Ethane price','ethane'],
                ['Power price','elec'],['Gas price','gas']];
   const clamp=(k,v)=>VALID[k]?Math.min(VALID[k][1],Math.max(VALID[k][0],v)):v;
   const data=knobs.map(([lbl,k])=>{
@@ -1087,29 +1150,56 @@ function drawTornado(r){
     const up=model({...S,[k]:clamp(k,S[k]*1.1)}).coo-r.coo;
     return {lbl,dn,up,amp:Math.abs(dn)+Math.abs(up)};
   }).sort((a,b)=>b.amp-a.amp);
-  const W=760,H=300,L=190,R=64,T=10,B=36;
-  const pw=W-L-R, rh=(H-T-B)/data.length;
-  const m=Math.max(...data.map(d=>Math.max(Math.abs(d.dn),Math.abs(d.up))))*1.15||1;
-  const cx=L+pw/2, x=v=>cx+v/m*(pw/2), step=niceStep(m,2.5);
-  let s='<g font-family="Roboto,-apple-system,sans-serif">';
-  for(let t=-Math.ceil(m/step)*step;t<=m;t+=step){
-    if(Math.abs(t)>m)continue;
-    s+='<line x1="'+x(t)+'" y1="'+T+'" x2="'+x(t)+'" y2="'+(H-B)+'" stroke="#e3e7ea" stroke-dasharray="2 3"/>';
-    s+='<text x="'+x(t)+'" y="'+(H-B+16)+'" font-size="11" fill="#6c757d" text-anchor="middle" font-family="Roboto Mono,monospace">'+(t>0?'+':'')+sig(t,2)+'</text>';
-  }
-  s+='<line x1="'+cx+'" y1="'+T+'" x2="'+cx+'" y2="'+(H-B)+'" stroke="#6c757d"/>';
-  s+='<text x="'+cx+'" y="'+(H-B+32)+'" font-size="11" fill="#6c757d" text-anchor="middle">Change in cost of ethylene, USD per tonne</text>';
+  const m=Math.max(...data.map(d=>Math.max(Math.abs(d.dn),Math.abs(d.up))),1)*1.15;
+  const A=axes({x:px,y:py,w:pw,h:ph,xlim:[-m,m],nx:6,ycat:data.map(d=>d.lbl),
+                xlab:'Change in cost of ethylene (USD per tonne)',
+                xfmt:t=>(t>0?'+':t<0?'−':'')+fnum(Math.abs(t))});
+  const rh=ph/data.length, z=A.X(0);
+  let s=A.s+'<g>';
+  s+='<path d="M'+z+' '+py+'V'+(py+ph)+'" stroke="'+F.ink+'" stroke-width="'+F.ax+'" fill="none"/>';
   data.forEach((d,i)=>{
-    const y0=T+i*rh;
-    [d.dn,d.up].forEach(v=>{
-      const x1=Math.min(cx,x(v)), w=Math.max(1.2,Math.abs(x(v)-cx));
-      s+='<rect x="'+x1+'" y="'+(y0+rh*0.24)+'" width="'+w+'" height="'+(rh*0.52)+'" fill="'+(v>0?'#c53a3a':'#2f8f83')+'" opacity="0.85"><title>'+d.lbl+': '+usd(v,3)+'/t</title></rect>';
+    const y0=py+i*rh;
+    [[d.dn,F.teal,0.10],[d.up,F.orange,0.52]].forEach(([v,col,off])=>{
+      const x1=Math.min(z,A.X(v));
+      s+='<rect x="'+x1+'" y="'+(y0+rh*off+rh*0.06)+'" width="'+Math.max(0.7,Math.abs(A.X(v)-z))
+        +'" height="'+(rh*0.32)+'" fill="'+col+'"/>';
     });
-    s+='<text x="'+(L-178)+'" y="'+(y0+rh*0.64)+'" font-size="12" fill="#212529">'+d.lbl+'</text>';
-    s+='<text x="'+(W-R+8)+'" y="'+(y0+rh*0.64)+'" font-size="12" fill="#212529" font-family="Roboto Mono,monospace" font-weight="500">'+sig(d.amp,3)+'</text>';
   });
-  s+='</g>';
-  $('tornado').innerHTML=s;
+  s+='<rect x="'+(px+3)+'" y="'+(py+5)+'" width="7" height="3" fill="'+F.teal+'"/>'
+    +ftext('−10%',px+12.5,py+8,{})
+    +'<rect x="'+(px+3)+'" y="'+(py+13)+'" width="7" height="3" fill="'+F.orange+'"/>'
+    +ftext('+10%',px+12.5,py+16,{});
+  return s+'</g>';
+}
+
+/* Fig. 1. Assembled on one plate so the flowsheet, the money it implies and the ranking of the
+   controls are read in one movement of the eye instead of three scrolls. */
+function drawFig1(r){
+  let s='<g>';
+  s+=panel('a',2,14);
+  s+='<g transform="translate(0,12) scale('+(504.57/760)+')">'+panelFlow(r)+'</g>';
+  s+=panel('b',2,247);
+  s+=panelCost(r,132,254,318,152);
+  s+=panel('c',2,441);
+  s+=panelTornado(r,132,448,318,100);
+  $('fig1').innerHTML=s+'</g>';
+  wirePFD(r);
+  $('fig1cap').innerHTML='<b>Figure 1 | Process flow, cost structure and sensitivity.</b> '
+    +'<b>a</b>, Flowsheet at '+sig(S.cot,4)+'&thinsp;&deg;C, '+sig(S.tau,3)+'&thinsp;s and '
+    +sig(S.dilution,3)+'&thinsp;kg&thinsp;kg<sup>&minus;1</sup> steam. Only the reactor carries degrees of '
+    +'freedom; the three downstream columns hold fixed product specifications and re-solve, so reflux ratio is '
+    +'an output. Streams in kg per kg C<sub>2</sub>H<sub>4</sub>. <b>b</b>, Waterfall from the stoichiometric feed requirement to '
+    +'the cost of ethylene, '+usd(r.coo)+'&thinsp;t<sup>&minus;1</sup>. Grey, costs; teal, credits; black, total. '
+    +'Broken line, the stoichiometric floor of '+usd(r.L.floor)+'&thinsp;t<sup>&minus;1</sup>, which no flowsheet '
+    +'can undercut. Dotted line, the published conventional case. <b>c</b>, Each control perturbed by &plusmn;10%, '
+    +'clamped to its validated window; ordered by amplitude. The ranking belongs to the price deck, not to the '
+    +'plant, and moves when prices move. Screening estimate, AACE Class&nbsp;5, &plusmn;40%.'
+    +'<br><br>The model does not reproduce the published value ('
+    +((r.coo-PUB.coo)>0?'+':'&minus;')+sig(Math.abs((r.coo-PUB.coo)/PUB.coo*100),3)+'%). The difference sits in the '
+    +'system boundary rather than in the parameters: this model credits transfer line steam ('+usd(-r.L.steamCr)
+    +'&thinsp;t<sup>&minus;1</sup>) and burns tail gas in the furnace before buying fuel, while the published '
+    +'flowsheet purchases high pressure steam. No parameter was moved outside its physical range to close the gap. '
+    +'Reference: Mittal, Kwak et&nbsp;al., <em>Chem. Eng. J.</em> <b>523</b>, 168251 (2025), conventional case.';
 }
 
 function band(el,min,max,lo,hi,cur){
@@ -1117,7 +1207,6 @@ function band(el,min,max,lo,hi,cur){
   el.innerHTML='<i style="left:'+p(lo)+'%;width:'+(p(hi)-p(lo))+'%"></i><u style="left:'+p(cur)+'%"></u>';
   el.title='Validated range '+sig(lo,3)+' to '+sig(hi,3)+'. Outside this the model extrapolates.';
 }
-
 
 /* ---------- carbon intensity waterfall ---------- */
 function drawCI(items,total,ref){
@@ -1626,18 +1715,9 @@ function render(){
   $('vGas').textContent='$'+sig(S.gas,3)+'/GJ';
   $('nGas').innerHTML='Heating <b>'+usd(r.L.heat)+'</b>/t';
 
-  drawPFD(r); costTable(r); drawLadder(r); drawTornado(r);
+  drawFig1(r); costTable(r);
   const lci=renderCarbon(r); renderExplained(r,lci);
 
-  const gap=(r.coo-PUB.coo)/PUB.coo*100;
-  $('ladderCap').innerHTML='Bars are model output. The triangle marks the published value of $'+PUB.coo+'/t '
-    +'(Mittal, Kwak et al., <em>Chem. Eng. J.</em> 523 (2025) 168251, conventional case). The red dashed line is '
-    +'the stoichiometric floor, fixed by atom count rather than by simulation.<br>'
-    +'<span style="color:var(--warning)">The model does not reproduce the published value ('
-    +(gap>0?'+':'−')+sig(Math.abs(gap),3)+'%).</span> The difference sits in the system boundary, not in the '
-    +'parameters: this model credits TLE steam ('+usd(-r.L.steamCr)+'/t) and burns tail gas in the furnace before '
-    +'buying fuel, while the published flowsheet purchases HP steam. No parameter was moved outside its physical '
-    +'range to close the gap.';
 
   $('vsCH').textContent=usd(rCH.coo); $('vsJH').textContent=usd(rJH.coo);
   $('vsCHd').innerHTML='60% efficiency, gas $'+sig(S.gas,3)+'/GJ, delivered heat $'+sig(S.gas/0.60,3)+'/GJ';
